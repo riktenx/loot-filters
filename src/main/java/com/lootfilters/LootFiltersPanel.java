@@ -140,23 +140,16 @@ public class LootFiltersPanel extends PluginPanel {
         updateFilterText(index);
     }
 
+    @SneakyThrows
     private void onCreateEmptyFilter(){
         var newSrc = String.join("\n","", TUTORIAL_TEXT,"", EXAMPLE_TEXT);
-        LootFilter newFilter;
-        try {
-            newFilter = LootFilter.fromSource(newSrc);
-        } catch (CompileException | IOException e) {
-            plugin.addChatMessage("Failed to create new filter.");
-            return;
-        }
-
+        LootFilter newFilter = LootFilter.fromSource(newSrc);
         var newName = showInputDialog(this, "Please enter a name:");
         if (newName == null || newName.isBlank()) {
             return;
         }
         newSrc = "meta { name = " + quote(newName) + "; }\n" + newSrc;
         newFilter.setName(newName);
-
 
         if (tryUpdateExisting(newFilter.getName(), newSrc)) {
             return;
