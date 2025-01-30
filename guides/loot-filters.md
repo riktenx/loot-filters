@@ -1,6 +1,50 @@
 # Loot Filters
 
-This document serves as a comprehensive reference for loot filter scripting.
+## Overview
+
+A loot filter is a basic script that contains the following
+* Self-identifying metadata (filter name, description, etc.)
+* Any number of **matchers** - each being a tuple of condition and display config - that determines how to display items
+  on the ground.
+
+For example, this is a simple loot filter with a single matcher that highlights anglerfish and coins with specific text
+colors:
+
+```
+meta {
+  name = "riktenx/test";
+}
+
+// we really care about anglerfish
+if (name:"anglerfish") {
+  color = MAGENTA;
+}
+
+if (name:"coins") {
+  color = YELLOW; // and also, coins
+}
+```
+
+Scriptable filters allow us to exercise both a deep and far-reaching level of control over how to display ground items.
+
+## Whitespace and comments
+
+Single-line comments are supported, delimited by `//`, and can appear anywhere on a line, as demonstrated above. The
+parser will ignore all text from the comment marker until the end of the line.
+
+Block-style comments, e.g. `/* block */` are not supported at this time.
+
+The script parser will ignore whitespace in the way you'd expect it to for any other language. For example, these two
+matcher expressions are semantically equivalent:
+
+```
+// relaxed
+if (value:>100) {
+  color = BLUE;
+}
+
+if (value:>100) {color = BLUE;} // compact
+```
 
 ## The `meta` block
 
@@ -141,6 +185,19 @@ if (name:"dragon arrowtips") { color = "ffff0000"; }
 ```
 
 Note that you can override a previous definition of a macro by re-defining it on a subsequent line.
+
+### Multi-line macros
+
+You can use a backslash at the end of a line, any number of times, to "continue" a macro definition:
+
+```
+#define MATCH_VALUE_MULTILINE(_name, _vexpr, _color) if (name:_name && value:_vexpr) { \
+  color = _color; \
+  borderColor = _color; \
+}
+```
+
+A comment **CANNOT** appear after an EOL backslash.
 
 ### Builtin macros
 
