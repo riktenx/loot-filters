@@ -69,10 +69,9 @@ public class FilterUtil {
     /**
      * Captures the current config-based item matchers, exporting them to their own filter.
      */
-    public static String configToFilterSource(LootFiltersConfig config, String name) {
+    public static String configToFilterSource(LootFiltersConfig config, String name, String tutorialText) {
         var defines = "#define HCOLOR " + quote(colorToAlphaHexCode(config.highlightColor()));
         var meta = "meta {\n  name = " + quote(name) + ";\n}\n\n";
-
         var highlights = "";
         if (!config.highlightedItems().isBlank()) {
             highlights = stream(config.highlightedItems().split(","))
@@ -90,6 +89,7 @@ public class FilterUtil {
         return String.join("\n",
                 defines,
                 meta,
+                tutorialText,
                 highlights,
                 hides);
     }
