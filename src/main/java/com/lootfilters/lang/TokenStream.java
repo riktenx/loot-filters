@@ -26,7 +26,7 @@ public class TokenStream {
      */
     public Token peek() {
         return tokens.stream()
-                .filter(it -> !it.isWhitespace())
+                .filter(Token::isSemantic)
                 .findFirst()
                 .orElse(null);
     }
@@ -37,7 +37,7 @@ public class TokenStream {
     public Token take(boolean includeWhitespace) {
         while (isNotEmpty()) {
             var next = tokens.remove(0);
-            if (includeWhitespace || !next.isWhitespace()) {
+            if (next.isSemantic() || includeWhitespace && next.isWhitespace()) {
                 return next;
             }
         }
@@ -203,8 +203,7 @@ public class TokenStream {
         return args;
     }
 
-    public boolean isNotEmpty() {
-        return tokens.stream()
-                .anyMatch(it -> !it.isWhitespace());
+    public boolean isNotEmpty() { // this doesn't _currently_ need a version that checks non-semantic
+        return tokens.stream().anyMatch(Token::isSemantic);
     }
 }

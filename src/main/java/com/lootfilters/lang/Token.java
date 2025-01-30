@@ -21,6 +21,7 @@ public class Token {
         LIST_START, LIST_END,
         STMT_END,
         PREPROC_DEFINE,
+        COMMENT,
     }
 
     public static Token intLiteral(String value) { return new Token(Type.LITERAL_INT, value); }
@@ -59,6 +60,10 @@ public class Token {
 
     public boolean isWhitespace() {
         return type == Type.WHITESPACE || type == Type.NEWLINE;
+    }
+
+    public boolean isSemantic() {
+        return type != Type.COMMENT && !isWhitespace();
     }
 
     @Override

@@ -1,5 +1,5 @@
 #define GREEN "ff00ff00"
-#define HIDE(_name) if (name:_name) { hidden = true; }
+#define HIDE(_name) if (name:_name) { hidden = true; } // comment
 #define HIGHLIGHT(_name, _color) if (name:_name) { color = _color; }
 
 #define HIGHLIGHT2(_name, _color) \

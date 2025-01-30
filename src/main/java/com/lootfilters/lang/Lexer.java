@@ -50,6 +50,9 @@ public class Lexer {
             if (tokenizeStatic()) {
                 continue;
             }
+            if (tokenizeComment()) {
+                continue;
+            }
 
             var ch = input.charAt(offset);
             if (isWhitespace(ch)) {
@@ -81,6 +84,20 @@ public class Lexer {
             }
         }
         return false;
+    }
+
+    private boolean tokenizeComment() {
+        if (!input.startsWith("//", offset)) {
+            return false;
+        }
+
+        var lineEnd = input.indexOf('\n', offset);
+        var text = lineEnd > -1
+                ? input.substring(offset, lineEnd)
+                : input.substring(offset);
+        tokens.add(new Token(Token.Type.COMMENT, text));
+        offset += text.length();
+        return true;
     }
 
     private void tokenizeWhitespace() {
