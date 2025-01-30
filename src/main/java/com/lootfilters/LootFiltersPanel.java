@@ -230,6 +230,7 @@ public class LootFiltersPanel extends PluginPanel {
             LootFilter.fromSource(newSrc);
         } catch (CompileException | IOException e) {
             plugin.addChatMessage("Cannot update active filter: " + e.getMessage());
+            return;
         }
 
         if (!confirm("Save changes to the active filter?")) {
