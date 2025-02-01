@@ -33,7 +33,8 @@ public class FilterUtil {
 
         matchersWithConfig.add(MatcherConfig.valueTier(
                 config.enableInsaneItemValueTier(), config.insaneValue(), config.insaneValueColor(),
-                true, true));
+        config.lootbeamTier().ordinal() >= ValueTier.INSANE.ordinal(),
+                config.notifyTier().ordinal() >= ValueTier.INSANE.ordinal()));
         matchersWithConfig.add(MatcherConfig.valueTier(
                 config.enableHighItemValueTier(), config.highValue(), config.highValueColor(),
                 config.lootbeamTier().ordinal() >= ValueTier.HIGH.ordinal(),

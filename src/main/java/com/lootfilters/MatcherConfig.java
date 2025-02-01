@@ -77,7 +77,6 @@ public class MatcherConfig {
         };
         var display = DisplayConfig.builder()
                 .textColor(color)
-                .showValue(true)
                 .showLootbeam(showLootbeam)
                 .notify(notify)
                 .build();

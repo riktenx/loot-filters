@@ -1,15 +1,19 @@
 package com.lootfilters.rule;
 
+import lombok.AllArgsConstructor;
+
+@AllArgsConstructor
 public enum ValueTier {
-    INSANE, HIGH, MEDIUM, LOW;
+    NONE("none"),
+    INSANE("insane"),
+    HIGH("high"),
+    MEDIUM("medium"),
+    LOW("low");
+
+    private final String name;
 
     @Override
     public String toString() {
-        switch (this) {
-            case INSANE: return "insane";
-            case HIGH: return "high";
-            case MEDIUM: return "medium";
-            default: return "low";
-        }
+        return name;
     }
 }
