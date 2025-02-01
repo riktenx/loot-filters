@@ -147,16 +147,17 @@ Match based on an item value. The value used for comparison is determined by plu
 
 The following table lists the supported display settings for matchers:
 
-| name             | value type              | description                                                                                          |
-|------------------|-------------------------|------------------------------------------------------------------------------------------------------|
-| hidden           | boolean                 | Whether this item is hidden in the overlay. When set to true, other display settings have no effect. |
-| color, textColor | string (ARGB color hex) | Color for the display text of the item.                                                              |
-| backgroundColor  | string (ARGB color hex) | Background color behind the display text.                                                            |
-| borderColor      | string (ARGB color hex) | Border color around the display text.                                                                |
-| showLootbeam     | boolean                 | Show an in-world lootbeam on the item's tile. The lootbeam color matches the configured text color.  |
-| showValue        | boolean                 | Include an item's value in the text overlay. The highest value between GE and HA price is chosen.    |
-| showDespawn      | boolean                 | Show a despawn timer, in game ticks, next to the text overlay.                                       |
-| notify           | boolean                 | Fire a system notification when the matched item drops.                                              |
+| name             | value type              | ordinal macros | description                                                                                          |
+|------------------|-------------------------|----------------|------------------------------------------------------------------------------------------------------|
+| hidden           | boolean                 |                | Whether this item is hidden in the overlay. When set to true, other display settings have no effect. |
+| color, textColor | string (ARGB color hex) |                | Color for the display text of the item.                                                              |
+| backgroundColor  | string (ARGB color hex) |                | Background color behind the display text.                                                            |
+| borderColor      | string (ARGB color hex) |                | Border color around the display text.                                                                |
+| showLootbeam     | boolean                 |                | Show an in-world lootbeam on the item's tile. The lootbeam color matches the configured text color.  |
+| showValue        | boolean                 |                | Include an item's value in the text overlay. The highest value between GE and HA price is chosen.    |
+| showDespawn      | boolean                 |                | Show a despawn timer, in game ticks, next to the text overlay.                                       |
+| notify           | boolean                 |                | Fire a system notification when the matched item drops.                                              |
+| textAccent       | enum                    | `TEXTACCENT_*` | Text accent to use:<li>1 = text shadow (default)</li><li>2 = outline</li>                            |
 
 ## Text macros
 
