@@ -41,17 +41,25 @@ public interface LootFiltersConfig extends Config {
     @ConfigItem(
             keyName = "ownershipFilter",
             name = "Ownership filter",
-            description = "When enabled, filters out any items you cannot pick up. This filter is ABSOLUTE, and overrides ALL other rules, including default highlight/hide, default item value rules, and the active loot filter.",
+            description = "When enabled, filters out any items you cannot pick up. This filter overrides ALL other rules/config.",
             section = general,
             position = 3
     )
     default boolean ownershipFilter() { return false; }
     @ConfigItem(
+            keyName = "itemSpawnFilter",
+            name = "Item spawn filter",
+            description = "When enabled, filters out item spawns (world spawns, ashes from fire, etc). This filter overrides ALL other rules/config.",
+            section = general,
+            position = 4
+    )
+    default boolean itemSpawnFilter() { return false; }
+    @ConfigItem(
             keyName = "valueType",
             name = "Value type",
             description = "The type of item value to use for rules and text overlay.",
             section = general,
-            position = 4
+            position = 5
     )
     default ValueType valueType() { return ValueType.HIGHEST; }
 

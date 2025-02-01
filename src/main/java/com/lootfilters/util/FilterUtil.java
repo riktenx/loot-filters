@@ -23,6 +23,7 @@ public class FilterUtil {
     public static LootFilter withConfigMatchers(LootFilter filter, LootFiltersConfig config) {
         var matchersWithConfig = new ArrayList<MatcherConfig>();
         matchersWithConfig.add(MatcherConfig.ownershipFilter(config.ownershipFilter()));
+        matchersWithConfig.add(MatcherConfig.itemSpawnFilter(config.itemSpawnFilter()));
 
         matchersWithConfig.addAll(filter.getMatchers());
 

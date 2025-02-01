@@ -44,6 +44,18 @@ public class MatcherConfig {
         return new MatcherConfig(rule, display);
     }
 
+    public static MatcherConfig itemSpawnFilter(boolean enabled) {
+        var rule = new Rule("") {
+            @Override public boolean test(LootFiltersPlugin plugin, TileItem item) {
+                return enabled && item.getOwnership() == TileItem.OWNERSHIP_NONE;
+            }
+        };
+        var display = DisplayConfig.builder()
+                .hidden(true)
+                .build();
+        return new MatcherConfig(rule, display);
+    }
+
     public static MatcherConfig showUnmatched(boolean enabled) {
         var rule = new Rule("") {
             @Override public boolean test(LootFiltersPlugin plugin, TileItem item) {
