@@ -1,5 +1,6 @@
 package com.lootfilters;
 
+import com.lootfilters.rule.TextAccent;
 import net.runelite.api.Client;
 import net.runelite.api.TileItem;
 import net.runelite.api.coords.LocalPoint;
@@ -97,6 +98,7 @@ public class LootFiltersOverlay extends Overlay {
                 text.setFont(getRunescapeSmallFont());
                 text.setColor(match.isHidden() ? COLOR_HIDDEN : match.getTextColor());
                 text.setPosition(new Point(textPoint.getX(), textPoint.getY() - currentOffset));
+                text.setOutline(match.getTextAccent() != null && match.getTextAccent() == TextAccent.OUTLINE);
 
                 var boundingBox = new Rectangle(
                         textPoint.getX() - BOX_PAD, textPoint.getY() - currentOffset - textHeight - BOX_PAD,

@@ -3,6 +3,7 @@ package com.lootfilters.util;
 import com.lootfilters.LootFilter;
 import com.lootfilters.LootFiltersConfig;
 import com.lootfilters.MatcherConfig;
+import com.lootfilters.rule.TextAccent;
 import com.lootfilters.rule.ValueTier;
 
 import java.util.ArrayList;
@@ -59,6 +60,13 @@ public class FilterUtil {
             matchersWithConfig = matchersWithConfig.stream()
                     .map(it -> new MatcherConfig(it.getRule(), it.getDisplay().toBuilder()
                             .showDespawn(true)
+                            .build()))
+                    .collect(Collectors.toCollection(ArrayList::new));
+        }
+        if (config.textAccent().ordinal() > TextAccent.USE_FILTER.ordinal()) {
+            matchersWithConfig = matchersWithConfig.stream()
+                    .map(it -> new MatcherConfig(it.getRule(), it.getDisplay().toBuilder()
+                            .textAccent(config.textAccent())
                             .build()))
                     .collect(Collectors.toCollection(ArrayList::new));
         }

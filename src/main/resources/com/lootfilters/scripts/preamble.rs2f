@@ -30,3 +30,6 @@
 
 #define RARE(_name, _color) if (name:_name) { color = _color; borderColor = _color; }
 #define RARE2(_name, _color) if (name:_name) { color = _color; borderColor = _color; backgroundColor = "80000000"; showLootbeam = true; }
+
+#define TEXTACCENT_SHADOW 1
+#define TEXTACCENT_OUTLINE 2

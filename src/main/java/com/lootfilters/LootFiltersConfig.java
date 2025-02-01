@@ -1,5 +1,6 @@
 package com.lootfilters;
 
+import com.lootfilters.rule.TextAccent;
 import com.lootfilters.rule.ValueTier;
 import com.lootfilters.rule.ValueType;
 import net.runelite.client.config.Config;
@@ -102,7 +103,7 @@ public interface LootFiltersConfig extends Config {
     String displayOverrides = "displayOverrides";
     @ConfigItem(
             keyName = "alwaysShowValue",
-            name = "Always show value",
+            name = "Show value",
             description = "Always show item value.",
             section = displayOverrides,
             position = 0
@@ -110,12 +111,20 @@ public interface LootFiltersConfig extends Config {
     default boolean alwaysShowValue() { return false; }
     @ConfigItem(
             keyName = "alwaysShowDespawn",
-            name = "Always show despawn",
+            name = "Show despawn",
             description = "Always show item despawn timers.",
             section = displayOverrides,
             position = 1
     )
     default boolean alwaysShowDespawn() { return false; }
+    @ConfigItem(
+            keyName = "textAccent",
+            name = "Text accent",
+            description = "Text accent type.",
+            section = displayOverrides,
+            position = 2
+    )
+    default TextAccent textAccent() { return TextAccent.USE_FILTER; }
 
     @ConfigSection(
             name = "Item lists",
