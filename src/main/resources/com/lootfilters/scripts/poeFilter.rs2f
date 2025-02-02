@@ -1,0 +1,275 @@
+meta {
+    name = "poe-style-filters";
+    description = "POE Style Filtering for mains";
+}
+
+// Set to 0 to disable
+#define MIN_VALUE_THRESHOLD 1000
+
+// Highlight Color (Default Alt + Left Click)
+#define HCOLOR "AA00FF"
+
+#define BROWN "ffD2B287"
+#define LIGHT_BROWN "ffAF6025"
+#define LIGHTER_BROWN "ffF05A23"
+#define CARAMEL "ffF99619"
+#define GOLD "ffD59F00"
+#define BURGUNDY "ff350D0D"
+#define DARK_GREEN "ff09600D"
+#define RARE_RED "ffFF0000"
+#define KHAKI "ffBEB287"
+#define TRANSPARENT_KHAKI "80BEB287"
+
+// Methods
+#define HIDE_1(_name) if (name:_name && quantity:<2) { hidden = true; }
+#define DARK_BG(_name, _color) if (name:_name) { color = _color; borderColor = _color; backgroundColor = BLACK; }
+
+#define UNIQUE_S_TIER(_name ) if (name:_name) { color = LIGHT_BROWN; borderColor = LIGHT_BROWN; backgroundColor = WHITE; textAccent = 1; showLootbeam = true; }
+#define UNIQUE_A_TIER(_name ) if (name:_name) { color = WHITE; borderColor = WHITE; backgroundColor = LIGHT_BROWN; textAccent = 1; showLootbeam = true; }
+#define UNIQUE_B_TIER(_name) if (name:_name) { color = BLACK; borderColor = BLACK; backgroundColor = LIGHT_BROWN; textAccent = 1; }
+#define UNIQUE_C_TIER(_name) if (name:_name) { color = LIGHT_BROWN; borderColor = LIGHT_BROWN; backgroundColor = BLACK; textAccent = 1; }
+#define UNIQUE(_name) if (name:_name) { color = LIGHT_BROWN; borderColor =  LIGHT_BROWN; backgroundColor = BURGUNDY; textAccent = 1; }
+
+#define RARE_CUSTOM(_name, _color, _backgroundColor) if (name:_name) { color = _color; borderColor = _color; backgroundColor = _backgroundColor; showLootbeam = true; textAccent = 1; }
+
+// TODO: figure this out
+#define S_TIER { color = RARE_RED; borderColor = RARE_RED; backgroundColor = WHITE; textAccent = 1; showLootbeam = true; }
+
+#define VALUE_S_TIER (_name) if (name:_name) { color = RARE_RED; borderColor = RARE_RED; backgroundColor = WHITE; textAccent = 1; showLootbeam = true; }
+#define VALUE_A_TIER (_name) if (name:_name) { color = WHITE; borderColor = WHITE; backgroundColor = LIGHTER_BROWN; textAccent = 1; showLootbeam = true; }
+#define VALUE_B_TIER (_name) if (name:_name) { color = BLACK; borderColor = BLACK; backgroundColor = LIGHTER_BROWN; textAccent = 1; showLootbeam = true; }
+#define VALUE_C_TIER (_name) if (name:_name) { color = BLACK; borderColor = BLACK; backgroundColor = CARAMEL; textAccent = 1; }
+#define VALUE_D_TIER (_name) if (name:_name) { color = BLACK; borderColor = BLACK; backgroundColor = GOLD; textAccent = 1; }
+#define VALUE_E_TIER (_name) if (name:_name) { color = BLACK; borderColor = BLACK; backgroundColor = BROWN; textAccent = 1; }
+#define LOW_VALUE (_name) if (name:_name) { color = KHAKI; borderColor = KHAKI; backgroundColor = BLACK; textAccent = 1; }
+
+#define MASTER_CLUES (_name) if (name:_name) { color = "ff9B3026"; borderColor = "ff9B3026"; backgroundColor = TRANSPARENT_KHAKI; textAccent = 1; }
+#define ELITE_CLUES (_name) if (name:_name) { color = "ffBDA518"; borderColor = "ffBDA518"; backgroundColor = TRANSPARENT_KHAKI; textAccent = 1; }
+#define HARD_CLUES (_name) if (name:_name) { color = "ff833798"; borderColor = "ff833798"; backgroundColor = TRANSPARENT_KHAKI; textAccent = 1; }
+#define MEDIUM_CLUES (_name) if (name:_name) { color = "ff569699"; borderColor = "ff569699"; backgroundColor = TRANSPARENT_KHAKI; textAccent = 1; }
+#define EASY_CLUES (_name) if (name:_name) { color = DARK_GREEN; borderColor = DARK_GREEN; backgroundColor = TRANSPARENT_KHAKI; textAccent = 1; }
+#define BEGINNER_CLUES (_name) if (name:_name) { color = WHITE; borderColor = WHITE; backgroundColor = TRANSPARENT_KHAKI; textAccent = 1; }
+
+// Clues/Caskets
+MASTER_CLUES("clue scroll (master)")
+ELITE_CLUES("clue scroll (elite)")
+HARD_CLUES("clue scroll (hard)")
+MEDIUM_CLUES("clue scroll (medium)")
+EASY_CLUES("clue scroll (easy)")
+BEGINNER_CLUES("clue scroll (beginner)")
+
+MASTER_CLUES("Reward casket (master)")
+ELITE_CLUES("Reward casket (elite)")
+HARD_CLUES("Reward casket (hard)")
+MEDIUM_CLUES("Reward casket (medium)")
+EASY_CLUES("Reward casket (easy)")
+BEGINNER_CLUES("Reward casket (beginner)")
+
+// Tormented Demons Supplies
+DARK_BG("Smouldering pile of flesh", RED)
+DARK_BG("Smouldering gland", CYAN)
+DARK_BG("Smouldering heart", MAGENTA)
+
+// Misc Uniques
+UNIQUE_C_TIER("Dark totem top")
+UNIQUE_C_TIER("Dark totem base")
+UNIQUE_C_TIER("Dark totem middle")
+UNIQUE("Ancient shard")
+
+UNIQUE_B_TIER("Mossy key")
+UNIQUE_B_TIER("Giant key")
+UNIQUE_B_TIER("Ecumenical key")
+
+UNIQUE_C_TIER("Long bone")
+UNIQUE_C_TIER("Curved bone")
+
+UNIQUE("Blessed bone shards")
+UNIQUE("Sun-kissed bones")
+
+// Slayer Uniques
+UNIQUE_A_TIER("Brimstone key")
+UNIQUE_B_TIER("Abyssal head")
+
+// Abyssal Sire Uniques
+UNIQUE_S_TIER("Unsired")
+UNIQUE_B_TIER("Bludgeon claw")
+UNIQUE_B_TIER("Bludgeon spine")
+UNIQUE_B_TIER("Bludgeon axon")
+
+// Araxxor Uniques
+RARE_CUSTOM("Araxyte fang", DARK_GREEN, BLACK)
+
+UNIQUE_A_TIER("Noxious pommel")
+UNIQUE_A_TIER("Noxious point")
+UNIQUE_A_TIER("Noxious blade")
+
+// Desert Treasure 2 Boss Uniques
+UNIQUE_S_TIER("Ancient blood ornament kit")
+UNIQUE_C_TIER("Chromium ingot")
+
+// Vardorvis
+UNIQUE_S_TIER("Ultor vestige")
+UNIQUE_S_TIER("Executioner's axe head")
+UNIQUE_B_TIER("Strangled tablet")
+UNIQUE("Blood quartz")
+
+// Leviathan
+UNIQUE_S_TIER("Venator vestige")
+UNIQUE_S_TIER("Leviathan's lure")
+UNIQUE_B_TIER("Scarred tablet")
+UNIQUE("Smoke quartz")
+
+// Whisperer
+UNIQUE_S_TIER("Bellator vestige")
+UNIQUE_S_TIER("Siren's staff")
+UNIQUE_B_TIER("Sirenic tablet")
+UNIQUE("Shadow quartz")
+
+// Duke Sucellus
+UNIQUE_S_TIER("Magus vestige")
+UNIQUE_S_TIER("Eye of the duke")
+UNIQUE_B_TIER("Frozen tablet")
+UNIQUE("Ice quartz")
+
+// Scurrius
+UNIQUE_B_TIER("Scurrius' spine")
+
+
+// Value Style defaults
+// 100mil
+if (value:>100000000) {
+    color = "ffFF0000";
+    borderColor = "ffFF0000";
+    backgroundColor = WHITE;
+    textAccent = 1;
+    showLootbeam = true;
+}
+// 10mil
+if (value:>10000000) {
+    color = WHITE;
+    borderColor = WHITE;
+    backgroundColor = LIGHTER_BROWN;
+    textAccent = 1;
+    showLootbeam = true;
+}
+// 1mil
+if (value:>1000000) {
+    color = BLACK;
+    borderColor = BLACK;
+    backgroundColor = LIGHTER_BROWN;
+    textAccent = 1;
+    showLootbeam = true;
+}
+// 100k
+if (value:>100000) {
+    color = BLACK;
+    borderColor = BLACK;
+    backgroundColor = CARAMEL;
+    textAccent = 1;
+}
+// 50k
+if (value:>50000) {
+    color = BLACK;
+    borderColor = BLACK;
+    backgroundColor = GOLD;
+    textAccent = 1;
+}
+// 10k
+if (value:>10000) {
+    color = KHAKI;
+    textAccent = 1;
+}
+// value greater than min
+if (value:>MIN_VALUE_THRESHOLD) {
+    color = WHITE;
+    textAccent = 1;
+}
+
+
+// Tradeable Currencies
+VALUE_D_TIER("Numulite")
+VALUE_D_TIER("Mole claw")
+VALUE_D_TIER("Mole skin")
+VALUE_D_TIER("Archery ticket")
+VALUE_D_TIER("Trading sticks")
+VALUE_D_TIER("Shantay pass")
+VALUE_D_TIER("Ship ticket")
+
+// Untradeable Currencies
+VALUE_E_TIER("Abyssal pearls")
+VALUE_E_TIER("Anima-infused bark")
+VALUE_E_TIER("Agility arena ticket")
+VALUE_E_TIER("Barronite shards")
+VALUE_E_TIER("Blood money")
+VALUE_E_TIER("Brimhaven voucher")
+VALUE_E_TIER("Castle wars ticket")
+VALUE_E_TIER("Ecto-token")
+VALUE_E_TIER("Frog token")
+VALUE_E_TIER("Golden nugget")
+VALUE_E_TIER("Glistening tear")
+VALUE_E_TIER("Hallowed mark")
+VALUE_E_TIER("Intelligence")
+VALUE_E_TIER("Mark of grace")
+VALUE_E_TIER("Mermaid's tear")
+VALUE_E_TIER("Minnow")
+VALUE_E_TIER("Molch pearl")
+VALUE_E_TIER("Nuggets")
+VALUE_E_TIER("Paramaya ticket")
+VALUE_E_TIER("Rare creature parts")
+VALUE_E_TIER("Reward token credits")
+VALUE_E_TIER("Stardust")
+VALUE_E_TIER("Tokkul")
+VALUE_E_TIER("Termites")
+VALUE_E_TIER("Unidentified minerals")
+VALUE_E_TIER("Warrior guild token")
+
+// Misc Valuable/Stackable Items
+    // Tradeable
+VALUE_D_TIER("Dragon bones")
+VALUE_D_TIER("Dagannoth bones")
+
+    // Untradeable 
+
+// if (value:>100000000) VALUE_S_TIER
+// if (value:>10000000) VALUE_A_TIER
+// if (value:>1000000) VALUE_B_TIER
+// if (value:>100000) VALUE_C_TIER
+// if (value:>50000) VALUE_D_TIER
+// if (value:>10000) VALUE_E_TIER
+// if (value:<10000) LOW_VALUE
+
+// Hide specific single/un-noted items
+HIDE_1("*ashes")
+HIDE_1("Dragon dart")
+
+HIDE_1("blue dragonhide")
+HIDE_1("green dragonhide")
+HIDE_1("red dragonhide")
+HIDE_1("black dragonhide")
+
+// Herbs (grouped by GE value, remove herbs you want to pickup)
+// < 1k 
+HIDE_1("*Marrentill")
+HIDE_1("*Tarromin")
+HIDE_1("*Guam leaf")
+HIDE_1("*Harralander")
+
+// > 1k
+HIDE_1("*Irit leaf")
+HIDE_1("*Lantadyme")
+HIDE_1("*Dwarf weed")
+HIDE_1("*Avantoe")
+HIDE_1("*Torstol")
+HIDE_1("*Cadantine")
+HIDE_1("*Toadflax")
+HIDE_1("*Kwuarm")
+
+// > 5k
+// HIDE_1("*Ranarr weed")
+// HIDE_1("*Snapdragon")
+// HIDE_1("*Huasca")
+
+// Hide below min threshold
+if (value:< MIN_VALUE_THRESHOLD) {
+    hidden = true;
+}
