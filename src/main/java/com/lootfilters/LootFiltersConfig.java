@@ -8,6 +8,7 @@ import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
 import net.runelite.client.config.ConfigSection;
 import net.runelite.client.config.Keybind;
+import net.runelite.client.config.Range;
 import net.runelite.client.config.Units;
 
 import java.awt.Color;
@@ -62,6 +63,16 @@ public interface LootFiltersConfig extends Config {
             position = 5
     )
     default ValueType valueType() { return ValueType.HIGHEST; }
+    @ConfigItem(
+            keyName = "soundVolume",
+            name = "Sound volume",
+            description = "Volume of sounds played by loot filter. Setting this to 0 will disable sound playback.",
+            section = general,
+            position = 6
+    )
+    @Range(max = 100)
+    @Units(Units.PERCENT)
+    default int soundVolume() { return 100; }
 
     @ConfigSection(
             name = "Hotkey",

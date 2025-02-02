@@ -16,6 +16,7 @@ import net.runelite.api.events.ItemSpawned;
 import net.runelite.api.events.MenuEntryAdded;
 import net.runelite.api.events.MenuOpened;
 import net.runelite.client.Notifier;
+import net.runelite.client.RuneLite;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
@@ -30,6 +31,7 @@ import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.ui.overlay.OverlayManager;
 
 import javax.inject.Inject;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -48,6 +50,8 @@ public class LootFiltersPlugin extends Plugin {
 	public static final String CONFIG_GROUP = "loot-filters";
 	public static final String USER_FILTERS_KEY = "user-filters";
 	public static final String USER_FILTERS_INDEX_KEY = "user-filters-index";
+	public static final String PLUGIN_DIR = "loot-filters";
+	public static final String SOUND_DIR = "sounds";
 
 	@Inject private Client client;
 	@Inject private ClientThread clientThread;
@@ -137,6 +141,8 @@ public class LootFiltersPlugin extends Plugin {
 
 	@Override
 	protected void startUp() throws Exception {
+		initPluginDirectory();
+
 		overlayManager.add(overlay);
 
 		loadFilter();
@@ -151,6 +157,13 @@ public class LootFiltersPlugin extends Plugin {
 		clientToolbar.addNavigation(pluginPanelNav);
 		keyManager.registerKeyListener(hotkeyListener);
 		mouseManager.registerMouseListener(mouseAdapter);
+	}
+
+	private void initPluginDirectory() {
+		var root = new File(RuneLite.RUNELITE_DIR, PLUGIN_DIR);
+		var sounds = new File(root, SOUND_DIR);
+		root.mkdir();
+		sounds.mkdir();
 	}
 
 	@Override
@@ -190,12 +203,19 @@ public class LootFiltersPlugin extends Plugin {
 		tileItemIndex.put(tile, item);
 
 		var match = getActiveFilter().findMatch(this, item);
-		if (match != null && match.isShowLootbeam()) {
+		if (match == null) {
+			return;
+		}
+
+		if (match.isShowLootbeam()) {
 			var beam = new Lootbeam(client, clientThread, tile.getWorldLocation(), match.getTextColor(), Lootbeam.Style.MODERN);
 			lootbeamIndex.put(tile, item, beam);
 		}
-		if (match != null && match.isNotify()) {
+		if (match.isNotify()) {
 			notifier.notify(getItemName(item.getId()));
+		}
+		if (match.getSound() != null) {
+			match.getSound().play(this);
 		}
 	}
 

@@ -11,6 +11,7 @@ import com.lootfilters.rule.ItemQuantityRule;
 import com.lootfilters.rule.ItemValueRule;
 import com.lootfilters.rule.OrRule;
 import com.lootfilters.rule.Rule;
+import com.lootfilters.rule.Sound;
 import com.lootfilters.rule.TextAccent;
 
 import java.util.ArrayList;
@@ -161,6 +162,8 @@ public class Parser {
                     builder.notify(assign[1].expectBoolean()); break;
                 case "textAccent":
                     builder.textAccent(TextAccent.fromOrdinal(assign[1].expectInt())); break;
+                case "sound":
+                    builder.sound(new Sound.File(assign[1].expectString())); break;
                 default:
                     throw new ParseException("unexpected identifier in display config block", assign[0]);
             }
