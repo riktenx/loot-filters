@@ -112,6 +112,9 @@ UNIQUE("Unidentified medium fossil")
 UNIQUE("Unidentified large fossil")
 UNIQUE("Unidentified rare fossil")
 
+
+UNIQUE("Unidentified rare fossil")
+
 // Slayer Uniques
 UNIQUE_A_TIER("Brimstone key")
 UNIQUE_A_TIER("Jar of*")
@@ -205,7 +208,7 @@ TEXT_HIGHLIGHT("*Buchu leaf", "ffAC2315")
 TEXT_HIGHLIGHT("*Noxifer", "ff7C1ADF")
 
 // Potions 
-TEXT_HIGHLIGHT("Super restore", "ffe91e63")
+TEXT_HIGHLIGHT("Super restore*", "ffe91e63")
 TEXT_HIGHLIGHT("Saradomin brew*", YELLOW)
 
 // Value Style defaults
