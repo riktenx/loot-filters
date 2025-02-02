@@ -120,6 +120,10 @@ public class LootFiltersPlugin extends Plugin {
 				.findFirst().orElse(LootFilter.Nop);
 	}
 
+	public boolean hasFilter(String name) {
+		return parsedUserFilters.stream().anyMatch(it -> it.getName().equals(name));
+	}
+
 	public void addChatMessage(String msg) {
 		clientThread.invoke(() -> {
 			client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", msg, "loot-filters", false);

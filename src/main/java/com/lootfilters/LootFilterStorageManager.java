@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.RuneLite;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -47,7 +49,19 @@ public class LootFilterStorageManager {
         return filters;
     }
 
-    public void saveNewFilter() throws IOException {
-        // todo
+    public void saveNewFilter(String name, String src) throws IOException {
+        var sanitized = toFilename(name);
+        var newFile = new File(filterDirectory(), toFilename(name));
+        if (!newFile.createNewFile()) {
+            throw new IOException("could not create file " + sanitized);
+        }
+
+        try (var writer = new FileWriter(newFile)) {
+            writer.write(src);
+        }
+    }
+
+    private static String toFilename(String filterName) {
+        return filterName.replaceAll("[^a-zA-Z0-9._-]", "_") + ".rs2f";
     }
 }
