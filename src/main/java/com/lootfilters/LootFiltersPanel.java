@@ -4,6 +4,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.ui.PluginPanel;
 
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -47,6 +48,7 @@ public class LootFiltersPanel extends PluginPanel {
 
     private void init() {
         var top = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        var mid = new JPanel(new FlowLayout(FlowLayout.LEFT));
         var textPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
         var label = new JLabel("Active filter:");
@@ -60,16 +62,19 @@ public class LootFiltersPanel extends PluginPanel {
                 "Reload filters from disk.",
                 this::onReloadFilters);
         var browseFolder = createIconButton("folder_icon",
-                "View filters directory in the system file browser.",
+                "View the filters directory in the system file browser.",
                 this::onBrowseFolder);
 
-        top.add(label);
         top.add(createNew);
         top.add(importConfig);
+        top.add(Box.createHorizontalStrut(130));
         top.add(reloadFilters);
         top.add(browseFolder);
 
+        mid.add(label);
+
         root.add(top);
+        root.add(mid);
         root.add(filterSelect);
         root.add(textPanel);
 
