@@ -50,6 +50,8 @@ public class Migrations {
             for (var i = 0; i < toMigrate.size(); ++i) {
                 plugin.getStorageManager().saveNewFilter("migrated_filter_" + i, toMigrate.get(i));
             }
+            plugin.reloadFilters();
+            plugin.getPluginPanel().reflowFilterSelect(plugin.getParsedUserFilters(), plugin.getSelectedFilterName());
         }
 
         private List<String> getConfigUserFilters() {

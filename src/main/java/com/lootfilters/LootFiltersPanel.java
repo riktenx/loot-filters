@@ -158,7 +158,7 @@ public class LootFiltersPanel extends PluginPanel {
         return button;
     }
 
-    private void reflowFilterSelect(List<LootFilter> filters, String selected) {
+    public void reflowFilterSelect(List<LootFilter> filters, String selected) {
         for (var l : filterSelect.getActionListeners()) {
             filterSelect.removeActionListener(l);
         }
