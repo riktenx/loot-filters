@@ -82,7 +82,8 @@ public class Preprocessor {
                     var args = tokens.takeArgList();
                     postproc.addAll(expandParameterizedDefine(append(visited, define.name), define, args));
                 } else {
-                    postproc.addAll(define.value);
+                    var defineTokens = new TokenStream(new ArrayList<>(define.value));
+                    postproc.addAll(expandDefines(append(visited, define.name), defineTokens));
                 }
             } else {
                 postproc.add(token);

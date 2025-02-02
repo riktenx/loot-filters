@@ -1,5 +1,6 @@
 if (value:>10000000) {
     color = "ff00ff00";
+    textColor = "ff00ff00";
     showLootbeam = true;
 }
 
