@@ -1,7 +1,6 @@
 package com.lootfilters;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.google.inject.Provides;
 import lombok.Getter;
 import lombok.Setter;
@@ -36,7 +35,6 @@ import java.util.Objects;
 
 import static com.lootfilters.util.FilterUtil.withConfigMatchers;
 import static com.lootfilters.util.TextUtil.quote;
-import static java.util.Collections.emptyList;
 import static net.runelite.client.util.ImageUtil.loadImageResource;
 
 @Slf4j
@@ -50,9 +48,6 @@ public class LootFiltersPlugin extends Plugin {
 	public static final String PLUGIN_DIR = "loot-filters";
 	public static final String SOUND_DIR = "sounds";
 	public static final String FILTER_DIR = "filters";
-
-	// old json string of all user filters, needs migrated on startup
-	public static final String USER_FILTERS_KEY = "user-filters";
 
 	@Inject private Client client;
 	@Inject private ClientThread clientThread;
@@ -89,17 +84,6 @@ public class LootFiltersPlugin extends Plugin {
 
 	public LootFilter getActiveFilter() {
 		return currentAreaFilter != null ? currentAreaFilter : activeFilter;
-	}
-
-	// for migration only
-	public List<String> getLegacyConfigUserFilters() {
-		var cfg = configManager.getConfiguration(CONFIG_GROUP, USER_FILTERS_KEY);
-		if (cfg == null || cfg.isEmpty()) {
-			return emptyList();
-		}
-
-		var type = new TypeToken<List<String>>(){}.getType();
-        return gson.fromJson(configManager.getConfiguration(CONFIG_GROUP, USER_FILTERS_KEY), type);
 	}
 
 	public String getSelectedFilterName() {
@@ -152,6 +136,8 @@ public class LootFiltersPlugin extends Plugin {
 		clientToolbar.addNavigation(pluginPanelNav);
 		keyManager.registerKeyListener(hotkeyListener);
 		mouseManager.registerMouseListener(mouseAdapter);
+
+		Migrations.run(this);
 	}
 
 	private void initPluginDirectory() {
