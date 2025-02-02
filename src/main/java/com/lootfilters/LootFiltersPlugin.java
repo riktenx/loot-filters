@@ -77,7 +77,7 @@ public class LootFiltersPlugin extends Plugin {
 	private final TileItemIndex tileItemIndex = new TileItemIndex();
 	private final LootbeamIndex lootbeamIndex = new LootbeamIndex(this);
 	private final MenuEntryComposer menuEntryComposer = new MenuEntryComposer(this);
-	private final LootFilterStorageManager storageManager = new LootFilterStorageManager(this);
+	private final FilterStorageManager storageManager = new FilterStorageManager(this);
 
 	private LootFilter activeFilter;
 	private LootFilter currentAreaFilter;

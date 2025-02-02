@@ -17,7 +17,7 @@ import static com.lootfilters.util.TextUtil.quote;
 
 @Slf4j
 @AllArgsConstructor
-public class LootFilterStorageManager {
+public class FilterStorageManager {
     private final LootFiltersPlugin plugin;
 
     public static java.io.File filterDirectory() {
