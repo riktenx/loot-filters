@@ -112,8 +112,14 @@ UNIQUE("Unidentified medium fossil")
 UNIQUE("Unidentified large fossil")
 UNIQUE("Unidentified rare fossil")
 
-
-UNIQUE("Unidentified rare fossil")
+TEXT_HIGHLIGHT("Bronze defender", BRONZE)
+TEXT_HIGHLIGHT("Iron defender", IRON)
+TEXT_HIGHLIGHT("Steel defender", STEEL)
+TEXT_HIGHLIGHT("Black defender", BLACK)
+TEXT_HIGHLIGHT("Mithril defender", MITHRIL)
+TEXT_HIGHLIGHT("Adamant defender", ADAMANT)
+TEXT_HIGHLIGHT("Rune defender", RUNITE)
+TEXT_HIGHLIGHT("Dragon defender", RED)
 
 // Slayer Uniques
 UNIQUE_A_TIER("Brimstone key")
