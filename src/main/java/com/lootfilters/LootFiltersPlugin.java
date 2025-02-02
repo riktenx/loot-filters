@@ -31,6 +31,7 @@ import net.runelite.client.ui.overlay.OverlayManager;
 
 import javax.inject.Inject;
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 
@@ -92,7 +93,7 @@ public class LootFiltersPlugin extends Plugin {
 	}
 
 	// for migration only
-	public List<String> getUserFilters() {
+	public List<String> getLegacyConfigUserFilters() {
 		var cfg = configManager.getConfiguration(CONFIG_GROUP, USER_FILTERS_KEY);
 		if (cfg == null || cfg.isEmpty()) {
 			return emptyList();
@@ -261,4 +262,13 @@ public class LootFiltersPlugin extends Plugin {
 			currentAreaFilter = null;
 		}
 	}
+
+	public void reloadFilters() {
+        try {
+            parsedUserFilters = storageManager.loadFilters();
+			loadSelectedFilter();
+        } catch (IOException e) {
+            log.warn(e.getMessage());
+        }
+    }
 }

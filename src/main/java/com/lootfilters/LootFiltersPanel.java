@@ -1,9 +1,9 @@
 package com.lootfilters;
 
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.ui.PluginPanel;
 
-import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -16,9 +16,11 @@ import java.io.IOException;
 
 import static com.lootfilters.util.FilterUtil.configToFilterSource;
 import static com.lootfilters.util.TextUtil.quote;
+import static java.awt.Desktop.getDesktop;
 import static javax.swing.JOptionPane.showInputDialog;
 import static net.runelite.client.util.ImageUtil.loadImageResource;
 
+@Slf4j
 public class LootFiltersPanel extends PluginPanel {
     private static final String NONE_ITEM = "<none>";
     private static final String TUTORIAL_TEXT = "// Welcome to the loot filter\n" +
@@ -45,7 +47,6 @@ public class LootFiltersPanel extends PluginPanel {
 
     private void init() {
         var top = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        var textButtons = new JPanel(new FlowLayout(FlowLayout.LEFT));
         var textPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
         var label = new JLabel("Active filter:");
@@ -55,15 +56,21 @@ public class LootFiltersPanel extends PluginPanel {
         var importConfig = createIconButton("import_config",
                 "Import item highlight and hide lists into a new filter. Doing this will also reset those lists.",
                 this::onImportConfig);
+        var reloadFilters = createIconButton("reload_icon",
+                "Reload filters from disk.",
+                this::onReloadFilters);
+        var browseFolder = createIconButton("folder_icon",
+                "View filters directory in the system file browser.",
+                this::onBrowseFolder);
 
         top.add(label);
         top.add(createNew);
         top.add(importConfig);
-        textButtons.add(Box.createHorizontalStrut(50));
+        top.add(reloadFilters);
+        top.add(browseFolder);
 
         root.add(top);
         root.add(filterSelect);
-        root.add(textButtons);
         root.add(textPanel);
 
         add(root);
@@ -114,9 +121,43 @@ public class LootFiltersPanel extends PluginPanel {
         plugin.getConfig().setHiddenItems("");
     }
 
+    private void onReloadFilters() {
+        try {
+            plugin.reloadFilters();
+            var filters = plugin.getParsedUserFilters();
+            for (var l : filterSelect.getActionListeners()) {
+                filterSelect.removeActionListener(l);
+            }
+            filterSelect.removeAllItems();
+            filterSelect.addItem(NONE_ITEM);
+            for (var filter : filters) {
+                filterSelect.addItem(filter.getName());
+            }
+
+            var selected = plugin.getSelectedFilterName(); // the currently-selected filter _could_ have gone away
+            if (filters.stream().anyMatch(it -> it.getName().equals(selected))) {
+                filterSelect.setSelectedItem(selected);
+            } else {
+                plugin.setSelectedFilterName(null);
+            }
+            filterSelect.addActionListener(this::onFilterSelect);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
+    }
+
+    private void onBrowseFolder() {
+        try {
+            getDesktop().open(LootFilterStorageManager.filterDirectory());
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
+    }
+
     private void onFilterSelect(ActionEvent event) {
         var selected = (String) filterSelect.getSelectedItem();
         plugin.setSelectedFilterName(NONE_ITEM.equals(selected) ? null : selected);
+        System.out.println("selected " + selected);
     }
 
     private JButton createIconButton(String iconSource, String tooltip, Runnable onClick) {
