@@ -13,6 +13,7 @@ import java.util.List;
 
 import static com.lootfilters.LootFiltersPlugin.FILTER_DIR;
 import static com.lootfilters.LootFiltersPlugin.PLUGIN_DIR;
+import static com.lootfilters.util.TextUtil.quote;
 
 @Slf4j
 @AllArgsConstructor
@@ -41,6 +42,11 @@ public class LootFilterStorageManager {
                 filter = LootFilter.fromSource(src);
             } catch (Exception e) {
                 log.warn(e.getMessage());
+                continue;
+            }
+            if (filters.stream().anyMatch(it -> it.getName().equals(filter.getName()))) {
+                log.warn("Duplicate filters found with name " + quote(filter.getName())
+                        + ". Only the first one was loaded.");
                 continue;
             }
 
