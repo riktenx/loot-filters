@@ -1,5 +1,7 @@
 #define GREEN "ff00ff00"
 #define green GREEN
+#define A B
+#define B A
 #define HIDE(_name) if (name:_name) { hidden = true; } // comment
 #define HIGHLIGHT(_name, _color) if (name:_name) { color = _color; }
 
@@ -18,3 +20,4 @@ if (value:>10000000) {
 HIDE("dragon crossbow")
 HIGHLIGHT("zaryte crossbow", GREEN)
 HIGHLIGHT2("zaryte pickaxe", GREEN)
+A
