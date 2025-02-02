@@ -177,7 +177,7 @@ if (value:>50000) {
 // 10k
 if (value:>10000) {
     color = KHAKI;
-    textAccent = 1;
+    textAccent = 2;
 }
 // value greater than min
 if (value:>MIN_VALUE_THRESHOLD) {
