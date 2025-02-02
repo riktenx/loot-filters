@@ -5,7 +5,6 @@ import com.google.gson.reflect.TypeToken;
 import com.google.inject.Provides;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
@@ -32,7 +31,6 @@ import net.runelite.client.ui.overlay.OverlayManager;
 
 import javax.inject.Inject;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -48,10 +46,13 @@ import static net.runelite.client.util.ImageUtil.loadImageResource;
 @Getter
 public class LootFiltersPlugin extends Plugin {
 	public static final String CONFIG_GROUP = "loot-filters";
-	public static final String USER_FILTERS_KEY = "user-filters";
-	public static final String USER_FILTERS_INDEX_KEY = "user-filters-index";
+	public static final String SELECTED_FILTER_KEY = "selected-filter";
 	public static final String PLUGIN_DIR = "loot-filters";
 	public static final String SOUND_DIR = "sounds";
+	public static final String FILTER_DIR = "filters";
+
+	// old json string of all user filters, needs migrated on startup
+	public static final String USER_FILTERS_KEY = "user-filters";
 
 	@Inject private Client client;
 	@Inject private ClientThread clientThread;
@@ -76,6 +77,7 @@ public class LootFiltersPlugin extends Plugin {
 	private final TileItemIndex tileItemIndex = new TileItemIndex();
 	private final LootbeamIndex lootbeamIndex = new LootbeamIndex(this);
 	private final MenuEntryComposer menuEntryComposer = new MenuEntryComposer(this);
+	private final LootFilterStorageManager storageManager = new LootFilterStorageManager();
 
 	private LootFilter activeFilter;
 	private LootFilter currentAreaFilter;
@@ -89,6 +91,7 @@ public class LootFiltersPlugin extends Plugin {
 		return currentAreaFilter != null ? currentAreaFilter : activeFilter;
 	}
 
+	// for migration only
 	public List<String> getUserFilters() {
 		var cfg = configManager.getConfiguration(CONFIG_GROUP, USER_FILTERS_KEY);
 		if (cfg == null || cfg.isEmpty()) {
@@ -99,34 +102,22 @@ public class LootFiltersPlugin extends Plugin {
         return gson.fromJson(configManager.getConfiguration(CONFIG_GROUP, USER_FILTERS_KEY), type);
 	}
 
-	@SneakyThrows // incoming user filters are vetted at this point, exceptions are a defect
-    public void setUserFilters(List<String> filters) {
-		parsedUserFilters = new ArrayList<>();
-		for (var filter : filters) {
-			parsedUserFilters.add(LootFilter.fromSource(filter));
+	public String getSelectedFilterName() {
+		return configManager.getConfiguration(CONFIG_GROUP, SELECTED_FILTER_KEY);
+	}
+
+	public void setSelectedFilterName(String name) {
+		if (name != null) {
+			configManager.setConfiguration(CONFIG_GROUP, SELECTED_FILTER_KEY, name);
+		} else {
+			configManager.unsetConfiguration(CONFIG_GROUP, SELECTED_FILTER_KEY);
 		}
-
-		var json = gson.toJson(filters);
-		configManager.setConfiguration(CONFIG_GROUP, USER_FILTERS_KEY, json);
 	}
 
-	public int getUserFilterIndex() {
-		var indexCfg = configManager.getConfiguration(CONFIG_GROUP, USER_FILTERS_INDEX_KEY);
-        var index = indexCfg == null || indexCfg.isEmpty()
-				? -1
-				: Integer.parseInt(indexCfg);
-		return Math.max(index, -1);
-	}
-
-	public void setUserFilterIndex(int index) {
-		configManager.setConfiguration(CONFIG_GROUP, USER_FILTERS_INDEX_KEY, Integer.toString(index));
-	}
-
-	public String getUserActiveFilter() {
-		var filters = getUserFilters();
-		var index = getUserFilterIndex();
-		return filters.isEmpty() || index == -1 || index > filters.size()-1
-				? "" : filters.get(index);
+	public LootFilter getSelectedFilter() {
+		return parsedUserFilters.stream()
+				.filter(it -> it.getName().equals(getSelectedFilterName()))
+				.findFirst().orElse(LootFilter.Nop);
 	}
 
 	public void addChatMessage(String msg) {
@@ -145,8 +136,8 @@ public class LootFiltersPlugin extends Plugin {
 
 		overlayManager.add(overlay);
 
-		loadFilter();
-		setUserFilters(getUserFilters()); // round-trip on startup to parse everything into memory
+		parsedUserFilters = storageManager.loadFilters();
+		loadSelectedFilter();
 
 		pluginPanel = new LootFiltersPanel(this);
 		pluginPanelNav = NavigationButton.builder()
@@ -162,8 +153,10 @@ public class LootFiltersPlugin extends Plugin {
 	private void initPluginDirectory() {
 		var root = new File(RuneLite.RUNELITE_DIR, PLUGIN_DIR);
 		var sounds = new File(root, SOUND_DIR);
+		var filters = new File(root, FILTER_DIR);
 		root.mkdir();
 		sounds.mkdir();
+		filters.mkdir();
 	}
 
 	@Override
@@ -189,7 +182,7 @@ public class LootFiltersPlugin extends Plugin {
 			return;
 		}
 
-		loadFilter();
+		loadSelectedFilter();
 		if (!config.autoToggleFilters()) {
 			currentAreaFilter = null;
 		} // if we're transitioning TO enabled, do nothing - onGameTick() will handle it
@@ -242,9 +235,8 @@ public class LootFiltersPlugin extends Plugin {
 		menuEntryComposer.onMenuOpened();
 	}
 
-	private void loadFilter() throws Exception {
-		var userFilter = LootFilter.fromSource(getUserActiveFilter());
-		activeFilter = withConfigMatchers(userFilter, config);
+	private void loadSelectedFilter() {
+		activeFilter = withConfigMatchers(getSelectedFilter(), config);
 	}
 
 	private void scanAreaFilter() {

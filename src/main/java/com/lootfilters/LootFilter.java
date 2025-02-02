@@ -21,11 +21,14 @@ import java.io.IOException;
 import java.util.List;
 
 import static com.lootfilters.util.TextUtil.loadFilterScript;
+import static java.util.Collections.emptyList;
 
 @Getter
 @AllArgsConstructor
 @EqualsAndHashCode
 public class LootFilter {
+    public static final LootFilter Nop = new LootFilter("", "", null, emptyList());
+
     @Setter private String name; // anonymous filter can be imported, would need name
 
     private final String description;
