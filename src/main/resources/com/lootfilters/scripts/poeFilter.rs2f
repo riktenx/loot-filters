@@ -32,16 +32,21 @@ meta {
 
 #define RARE_CUSTOM(_name, _color, _backgroundColor) if (name:_name) { color = _color; borderColor = _color; backgroundColor = _backgroundColor; showLootbeam = true; textAccent = 1; }
 
-// TODO: figure this out
 #define S_TIER { color = RARE_RED; borderColor = RARE_RED; backgroundColor = WHITE; textAccent = 1; showLootbeam = true; }
+#define A_TIER { color = WHITE; borderColor = WHITE; backgroundColor = LIGHTER_BROWN; textAccent = 1; showLootbeam = true; }
+#define B_TIER { color = BLACK; borderColor = BLACK; backgroundColor = LIGHTER_BROWN; textAccent = 1; showLootbeam = true; }
+#define C_TIER { color = BLACK; borderColor = BLACK; backgroundColor = CARAMEL; textAccent = 1; }
+#define D_TIER { color = BLACK; borderColor = BLACK; backgroundColor = GOLD; textAccent = 1; }
+#define E_TIER { color = KHAKI; textAccent = 2; }
+#define DEFAULT_STYLE { color = WHITE; textAccent = 1; }
 
-#define VALUE_S_TIER (_name) if (name:_name) { color = RARE_RED; borderColor = RARE_RED; backgroundColor = WHITE; textAccent = 1; showLootbeam = true; }
-#define VALUE_A_TIER (_name) if (name:_name) { color = WHITE; borderColor = WHITE; backgroundColor = LIGHTER_BROWN; textAccent = 1; showLootbeam = true; }
-#define VALUE_B_TIER (_name) if (name:_name) { color = BLACK; borderColor = BLACK; backgroundColor = LIGHTER_BROWN; textAccent = 1; showLootbeam = true; }
-#define VALUE_C_TIER (_name) if (name:_name) { color = BLACK; borderColor = BLACK; backgroundColor = CARAMEL; textAccent = 1; }
-#define VALUE_D_TIER (_name) if (name:_name) { color = BLACK; borderColor = BLACK; backgroundColor = GOLD; textAccent = 1; }
-#define VALUE_E_TIER (_name) if (name:_name) { color = BLACK; borderColor = BLACK; backgroundColor = BROWN; textAccent = 1; }
-#define LOW_VALUE (_name) if (name:_name) { color = KHAKI; borderColor = KHAKI; backgroundColor = BLACK; textAccent = 1; }
+#define VALUE_S_TIER (_name) if (name:_name) S_TIER
+#define VALUE_A_TIER (_name) if (name:_name) A_TIER
+#define VALUE_B_TIER (_name) if (name:_name) B_TIER
+#define VALUE_C_TIER (_name) if (name:_name) C_TIER
+#define VALUE_D_TIER (_name) if (name:_name) D_TIER
+#define VALUE_E_TIER (_name) if (name:_name) E_TIER
+#define LOW_VALUE (_name) if (name:_name) DEFAULT_STYLE
 
 #define MASTER_CLUES (_name) if (name:_name) { color = "ff9B3026"; borderColor = "ff9B3026"; backgroundColor = TRANSPARENT_KHAKI; textAccent = 1; }
 #define ELITE_CLUES (_name) if (name:_name) { color = "ffBDA518"; borderColor = "ffBDA518"; backgroundColor = TRANSPARENT_KHAKI; textAccent = 1; }
@@ -50,7 +55,7 @@ meta {
 #define EASY_CLUES (_name) if (name:_name) { color = DARK_GREEN; borderColor = DARK_GREEN; backgroundColor = TRANSPARENT_KHAKI; textAccent = 1; }
 #define BEGINNER_CLUES (_name) if (name:_name) { color = WHITE; borderColor = WHITE; backgroundColor = TRANSPARENT_KHAKI; textAccent = 1; }
 
-// Clues/Caskets
+// Clues
 MASTER_CLUES("clue scroll (master)")
 ELITE_CLUES("clue scroll (elite)")
 HARD_CLUES("clue scroll (hard)")
@@ -64,6 +69,13 @@ HARD_CLUES("Reward casket (hard)")
 MEDIUM_CLUES("Reward casket (medium)")
 EASY_CLUES("Reward casket (easy)")
 BEGINNER_CLUES("Reward casket (beginner)")
+
+MASTER_CLUES("Challenge scroll (master)")
+ELITE_CLUES("Challenge scroll (elite)")
+HARD_CLUES("Challenge scroll (hard)")
+MEDIUM_CLUES("Challenge scroll (medium)")
+EASY_CLUES("Challenge scroll (easy)")
+BEGINNER_CLUES("Challenge scroll (beginner)")
 
 // Tormented Demons Supplies
 DARK_BG("Smouldering pile of flesh", RED)
@@ -136,55 +148,13 @@ UNIQUE_B_TIER("Scurrius' spine")
 
 
 // Value Style defaults
-// 100mil
-if (value:>100000000) {
-    color = "ffFF0000";
-    borderColor = "ffFF0000";
-    backgroundColor = WHITE;
-    textAccent = 1;
-    showLootbeam = true;
-}
-// 10mil
-if (value:>10000000) {
-    color = WHITE;
-    borderColor = WHITE;
-    backgroundColor = LIGHTER_BROWN;
-    textAccent = 1;
-    showLootbeam = true;
-}
-// 1mil
-if (value:>1000000) {
-    color = BLACK;
-    borderColor = BLACK;
-    backgroundColor = LIGHTER_BROWN;
-    textAccent = 1;
-    showLootbeam = true;
-}
-// 100k
-if (value:>100000) {
-    color = BLACK;
-    borderColor = BLACK;
-    backgroundColor = CARAMEL;
-    textAccent = 1;
-}
-// 50k
-if (value:>50000) {
-    color = BLACK;
-    borderColor = BLACK;
-    backgroundColor = GOLD;
-    textAccent = 1;
-}
-// 10k
-if (value:>10000) {
-    color = KHAKI;
-    textAccent = 2;
-}
-// value greater than min
-if (value:>MIN_VALUE_THRESHOLD) {
-    color = WHITE;
-    textAccent = 1;
-}
-
+if (value:>100000000) S_TIER
+if (value:>10000000) A_TIER
+if (value:>1000000) B_TIER
+if (value:>100000) C_TIER
+if (value:>50000) D_TIER
+if (value:>10000) E_TIER
+if (value:>MIN_VALUE_THRESHOLD) DEFAULT_STYLE
 
 // Tradeable Currencies
 VALUE_D_TIER("Numulite")
@@ -230,13 +200,6 @@ VALUE_D_TIER("Dagannoth bones")
 
     // Untradeable 
 
-// if (value:>100000000) VALUE_S_TIER
-// if (value:>10000000) VALUE_A_TIER
-// if (value:>1000000) VALUE_B_TIER
-// if (value:>100000) VALUE_C_TIER
-// if (value:>50000) VALUE_D_TIER
-// if (value:>10000) VALUE_E_TIER
-// if (value:<10000) LOW_VALUE
 
 // Hide specific single/un-noted items
 HIDE_1("*ashes")
