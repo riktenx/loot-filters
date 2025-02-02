@@ -23,7 +23,7 @@ public class Migrations {
             JOptionPane.showMessageDialog(null, "Loot filters plugin: FAILED to migrate" +
                     " config-based filters to disk. Please contact the plugin maintainers. Your existing filter data" +
                     " has NOT been removed.");
-            log.warn("{}{}", e.getMessage(), Arrays.toString(e.getStackTrace()));
+            log.warn("migrate filters to disk: {}{}", e.getMessage(), Arrays.toString(e.getStackTrace()));
         }
     }
 
