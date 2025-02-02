@@ -12,7 +12,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
-import java.io.IOException;
+import java.util.List;
 
 import static com.lootfilters.util.FilterUtil.configToFilterSource;
 import static com.lootfilters.util.TextUtil.quote;
@@ -76,17 +76,8 @@ public class LootFiltersPanel extends PluginPanel {
         add(root);
     }
 
-    private void initControls() throws IOException {
-        filterSelect.addItem(NONE_ITEM);
-
-        var filters = plugin.getStorageManager().loadFilters();
-        for (var filter : filters) {
-            filterSelect.addItem(filter.getName());
-        }
-
-        var selected = plugin.getSelectedFilterName();
-        filterSelect.setSelectedItem(selected != null ? selected : NONE_ITEM);
-        filterSelect.addActionListener(this::onFilterSelect);
+    private void initControls() {
+        reflowFilterSelect(plugin.getStorageManager().loadFilters(), plugin.getSelectedFilterName());
     }
 
     @SneakyThrows
@@ -122,28 +113,8 @@ public class LootFiltersPanel extends PluginPanel {
     }
 
     private void onReloadFilters() {
-        try {
-            plugin.reloadFilters();
-            var filters = plugin.getParsedUserFilters();
-            for (var l : filterSelect.getActionListeners()) {
-                filterSelect.removeActionListener(l);
-            }
-            filterSelect.removeAllItems();
-            filterSelect.addItem(NONE_ITEM);
-            for (var filter : filters) {
-                filterSelect.addItem(filter.getName());
-            }
-
-            var selected = plugin.getSelectedFilterName(); // the currently-selected filter _could_ have gone away
-            if (filters.stream().anyMatch(it -> it.getName().equals(selected))) {
-                filterSelect.setSelectedItem(selected);
-            } else {
-                plugin.setSelectedFilterName(null);
-            }
-            filterSelect.addActionListener(this::onFilterSelect);
-        } catch (Exception e) {
-            log.error(e.getMessage());
-        }
+        plugin.reloadFilters();
+        reflowFilterSelect(plugin.getParsedUserFilters(), plugin.getSelectedFilterName());
     }
 
     private void onBrowseFolder() {
@@ -157,7 +128,6 @@ public class LootFiltersPanel extends PluginPanel {
     private void onFilterSelect(ActionEvent event) {
         var selected = (String) filterSelect.getSelectedItem();
         plugin.setSelectedFilterName(NONE_ITEM.equals(selected) ? null : selected);
-        System.out.println("selected " + selected);
     }
 
     private JButton createIconButton(String iconSource, String tooltip, Runnable onClick) {
@@ -167,6 +137,25 @@ public class LootFiltersPanel extends PluginPanel {
         button.setBorder(null);
         button.addActionListener(it -> onClick.run());
         return button;
+    }
+
+    private void reflowFilterSelect(List<LootFilter> filters, String selected) {
+        for (var l : filterSelect.getActionListeners()) {
+            filterSelect.removeActionListener(l);
+        }
+
+        filterSelect.removeAllItems();
+        filterSelect.addItem(NONE_ITEM);
+        for (var filter : filters) {
+            filterSelect.addItem(filter.getName());
+        }
+
+        if (filters.stream().anyMatch(it -> it.getName().equals(selected))) { // selected filter could be gone
+            filterSelect.setSelectedItem(selected);
+        } else {
+            plugin.setSelectedFilterName(null);
+        }
+        filterSelect.addActionListener(this::onFilterSelect);
     }
 
     private static ImageIcon icon(String name) {

@@ -31,7 +31,6 @@ import net.runelite.client.ui.overlay.OverlayManager;
 
 import javax.inject.Inject;
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 
@@ -78,7 +77,7 @@ public class LootFiltersPlugin extends Plugin {
 	private final TileItemIndex tileItemIndex = new TileItemIndex();
 	private final LootbeamIndex lootbeamIndex = new LootbeamIndex(this);
 	private final MenuEntryComposer menuEntryComposer = new MenuEntryComposer(this);
-	private final LootFilterStorageManager storageManager = new LootFilterStorageManager();
+	private final LootFilterStorageManager storageManager = new LootFilterStorageManager(this);
 
 	private LootFilter activeFilter;
 	private LootFilter currentAreaFilter;
@@ -264,11 +263,7 @@ public class LootFiltersPlugin extends Plugin {
 	}
 
 	public void reloadFilters() {
-        try {
-            parsedUserFilters = storageManager.loadFilters();
-			loadSelectedFilter();
-        } catch (IOException e) {
-            log.warn(e.getMessage());
-        }
-    }
+		parsedUserFilters = storageManager.loadFilters();
+		loadSelectedFilter();
+	}
 }
