@@ -2,6 +2,7 @@ package com.lootfilters;
 
 import com.lootfilters.util.TextComponent;
 import net.runelite.api.Client;
+import net.runelite.api.ItemID;
 import net.runelite.api.TileItem;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.client.game.ItemManager;
@@ -15,7 +16,7 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 
-import static com.lootfilters.util.TextUtil.getValueText;
+import static com.lootfilters.util.TextUtil.abbreviate;
 import static java.util.stream.Collectors.counting;
 import static java.util.stream.Collectors.groupingBy;
 import static net.runelite.api.Perspective.getCanvasTextLocation;
@@ -159,12 +160,13 @@ public class LootFiltersOverlay extends Overlay {
         var text = itemManager.getItemComposition(item.getId()).getName();
 
         if (item.getQuantity() > 1) {
-            text += " (" + item.getQuantity() + ")";
+            text += " (" + abbreviate(item.getQuantity()) + ")";
         } else if (unstackedCount > 1) {
             text += " x" + unstackedCount; // we want these to be visually different
         }
 
-        if (display.isShowValue()) {
+        var isMoney = item.getId() == ItemID.COINS_995 || item.getId() == ItemID.PLATINUM_TOKEN; // value is redundant
+        if (!isMoney && display.isShowValue()) {
             var ge = itemManager.getItemPrice(item.getId());
             var ha = itemManager.getItemComposition(item.getId()).getHaPrice();
             int value;
@@ -189,7 +191,7 @@ public class LootFiltersOverlay extends Overlay {
                 if (isAlch) {
                     text += "*";
                 }
-                text += getValueText(value) + ")";
+                text += abbreviate(value) + "gp)";
             }
         }
 

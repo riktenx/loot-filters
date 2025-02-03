@@ -33,7 +33,7 @@ public class TextUtil {
         return new Color(Long.decode("0x" + argb).intValue(), true);
     }
 
-    public static String getValueText(int value) {
+    public static String abbreviate(int value) {
         if (value >= 1e9) { // > 1b
             return String.format("%.2fB", (float)value / 1e9);
         } else if (value >= 1e8) { // > 100m
@@ -49,7 +49,7 @@ public class TextUtil {
         } else if (value >= 1e3) { // > 1k
             return String.format("%.2fK", (float)value / 1e3);
         }
-        return value + "gp";
+        return Integer.toString(value);
     }
 
     public static String normalizeCrlf(String str) {
