@@ -27,6 +27,7 @@ public class DisplayConfig {
     private final TextAccent textAccent;
     private final Sound sound;
     private final Color textAccentColor;
+    private final Color lootbeamColor;
 
     public DisplayConfig(Color textColor) {
         this.textColor = textColor;
@@ -40,5 +41,10 @@ public class DisplayConfig {
         textAccent = null;
         sound = null;
         textAccentColor = null;
+        lootbeamColor = null;
+    }
+
+    public Color getLootbeamColor() {
+        return lootbeamColor != null ? lootbeamColor : textColor;
     }
 }

@@ -166,6 +166,8 @@ public class Parser {
                     builder.sound(new Sound.File(assign[1].expectString())); break;
                 case "textAccentColor":
                     builder.textAccentColor(parseArgb(assign[1].expectString())); break;
+                case "lootbeamColor":
+                    builder.lootbeamColor(parseArgb(assign[1].expectString())); break;
                 default:
                     throw new ParseException("unexpected identifier in display config block", assign[0]);
             }
