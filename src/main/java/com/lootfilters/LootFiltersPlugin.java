@@ -32,6 +32,7 @@ import javax.inject.Inject;
 import java.io.File;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static com.lootfilters.util.FilterUtil.withConfigMatchers;
 import static com.lootfilters.util.TextUtil.quote;
@@ -213,6 +214,7 @@ public class LootFiltersPlugin extends Plugin {
 	@Subscribe
 	public void onGameTick(GameTick event) {
 		scanAreaFilter();
+		reapTileItems();
 	}
 
 	@Subscribe
@@ -255,5 +257,16 @@ public class LootFiltersPlugin extends Plugin {
 	public void reloadFilters() {
 		parsedUserFilters = storageManager.loadFilters();
 		loadSelectedFilter();
+	}
+
+	private void reapTileItems() {
+		var toDispatch = tileItemIndex.entrySet().stream()
+				.filter(it -> it.getKey().getItemLayer() == null)
+				.flatMap(entry -> entry.getValue().stream()
+						.map(item -> new ItemDespawned(entry.getKey(), item)))
+				.collect(Collectors.toList());
+		for (var event : toDispatch) {
+			onItemDespawned(event);
+		}
 	}
 }

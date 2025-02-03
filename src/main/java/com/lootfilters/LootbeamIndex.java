@@ -13,6 +13,12 @@ public class LootbeamIndex {
 
     private final Map<Tile, Map<TileItem, Lootbeam>> index = new HashMap<>();
 
+    public int size() {
+        return index.values().stream()
+                .mapToInt(Map::size)
+                .sum();
+    }
+
     public void put(Tile tile, TileItem item, Lootbeam beam) {
         if (!index.containsKey(tile)) {
             index.put(tile, new HashMap<>());

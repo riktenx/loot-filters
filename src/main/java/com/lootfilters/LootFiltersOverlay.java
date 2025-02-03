@@ -31,6 +31,8 @@ public class LootFiltersOverlay extends Overlay {
     private final LootFiltersPlugin plugin;
     private final LootFiltersConfig config;
 
+    private final boolean debug = false;
+
     @Inject
     private ItemManager itemManager;
 
@@ -44,6 +46,10 @@ public class LootFiltersOverlay extends Overlay {
 
     @Override
     public Dimension render(Graphics2D g) {
+        if (debug) {
+            renderDebugOverlay(g);
+        }
+
         if (!plugin.isOverlayEnabled()) {
             return null;
         }
@@ -196,5 +202,37 @@ public class LootFiltersOverlay extends Overlay {
         }
 
         return text;
+    }
+
+    private void renderDebugOverlay(Graphics2D g) {
+        int itemCount = 0;
+        int screenY = 64;
+        for (var entry : plugin.getTileItemIndex().entrySet()) {
+            var tile = entry.getKey();
+            var items = entry.getValue();
+
+            var errs = "";
+            var errno = 0;
+            var loc = LocalPoint.fromWorld(client.getTopLevelWorldView(), tile.getWorldLocation());
+            if (loc == null) {
+                ++errno;
+                errs += "[LOC]";
+            }
+            if (tile.getItemLayer() == null) {
+                ++errno;
+                errs += "[IL]";
+            }
+
+            var coords = tile.getWorldLocation().getX() + ", " + tile.getWorldLocation().getY();
+            var sz = items.size();
+            g.setColor(errno > 0 ? Color.RED : Color.WHITE);
+            g.drawString(coords+" "+sz+" "+errs, 0, screenY);
+
+            itemCount += sz;
+            screenY += 16;
+        }
+        g.setColor(Color.WHITE);
+        g.drawString("items: " + itemCount, 0, 32);
+        g.drawString("lootbeams: " + plugin.getLootbeamIndex().size(), 0, 48);
     }
 }
