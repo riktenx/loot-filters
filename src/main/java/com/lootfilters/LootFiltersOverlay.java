@@ -1,13 +1,12 @@
 package com.lootfilters;
 
-import com.lootfilters.rule.TextAccent;
+import com.lootfilters.util.TextComponent;
 import net.runelite.api.Client;
 import net.runelite.api.TileItem;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayPosition;
-import net.runelite.client.ui.overlay.components.TextComponent;
 
 import javax.inject.Inject;
 import java.awt.Color;
@@ -95,10 +94,14 @@ public class LootFiltersOverlay extends Overlay {
 
                 var text = new TextComponent();
                 text.setText(displayText);
-                text.setFont(getRunescapeSmallFont());
                 text.setColor(match.isHidden() ? COLOR_HIDDEN : match.getTextColor());
                 text.setPosition(new Point(textPoint.getX(), textPoint.getY() - currentOffset));
-                text.setOutline(match.getTextAccent() != null && match.getTextAccent() == TextAccent.OUTLINE);
+                if (match.getTextAccentColor() != null) {
+                    text.setAccentColor(match.getTextAccentColor());
+                }
+                if (match.getTextAccent() != null ) {
+                    text.setTextAccent(match.getTextAccent());
+                }
 
                 var boundingBox = new Rectangle(
                         textPoint.getX() - BOX_PAD, textPoint.getY() - currentOffset - textHeight - BOX_PAD,
@@ -128,6 +131,7 @@ public class LootFiltersOverlay extends Overlay {
                         continue;
                     }
                     text.setColor(getDespawnTextColor(item));
+                    text.setAccentColor(Color.BLACK); // text color is r/y/g for despawn, fixed black accent is fine
                     text.setText(Integer.toString(ticksRemaining));
                     text.setPosition(new Point(textPoint.getX() + textWidth + 2 + 1, textPoint.getY() - currentOffset));
                     text.render(g);

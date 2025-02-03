@@ -164,6 +164,8 @@ public class Parser {
                     builder.textAccent(TextAccent.fromOrdinal(assign[1].expectInt())); break;
                 case "sound":
                     builder.sound(new Sound.File(assign[1].expectString())); break;
+                case "textAccentColor":
+                    builder.textAccentColor(parseArgb(assign[1].expectString())); break;
                 default:
                     throw new ParseException("unexpected identifier in display config block", assign[0]);
             }

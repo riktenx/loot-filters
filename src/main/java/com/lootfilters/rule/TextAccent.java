@@ -1,24 +1,28 @@
 package com.lootfilters.rule;
 
 import com.lootfilters.lang.ParseException;
+import lombok.AllArgsConstructor;
 
+@AllArgsConstructor
 public enum TextAccent {
-    USE_FILTER, SHADOW, OUTLINE;
+    USE_FILTER("use filter"),
+    SHADOW("shadow"),
+    OUTLINE("outline"),
+    NONE("none");
+
+    private final String value;
 
     public static TextAccent fromOrdinal(int o) {
         switch (o) {
             case 1: return SHADOW;
             case 2: return OUTLINE;
+            case 3: return NONE;
             default: throw new ParseException("unrecognized TextAccent ordinal " + o);
         }
     }
 
     @Override
     public String toString() {
-        switch (this) {
-            case USE_FILTER: return "use filter";
-            case SHADOW: return "shadow";
-            default: return "outline";
-        }
+        return value;
     }
 }

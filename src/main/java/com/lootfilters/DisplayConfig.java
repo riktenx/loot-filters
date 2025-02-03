@@ -26,6 +26,7 @@ public class DisplayConfig {
     private final boolean notify;
     private final TextAccent textAccent;
     private final Sound sound;
+    private final Color textAccentColor;
 
     public DisplayConfig(Color textColor) {
         this.textColor = textColor;
@@ -38,5 +39,6 @@ public class DisplayConfig {
         notify = false;
         textAccent = null;
         sound = null;
+        textAccentColor = null;
     }
 }
