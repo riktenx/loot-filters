@@ -7,6 +7,7 @@ import java.awt.event.MouseEvent;
 
 import static com.lootfilters.util.TextUtil.setCsv;
 import static com.lootfilters.util.TextUtil.unsetCsv;
+import static com.lootfilters.util.TextUtil.toggleCsv;
 import static javax.swing.SwingUtilities.isLeftMouseButton;
 import static javax.swing.SwingUtilities.isMiddleMouseButton;
 import static javax.swing.SwingUtilities.isRightMouseButton;
@@ -27,20 +28,17 @@ public class LootFiltersMouseAdapter extends MouseAdapter {
         if (isLeftMouseButton(e)) {
             plugin.getClientThread().invoke(() -> {
                 var item = plugin.getItemName(hover).toLowerCase();
-                plugin.getConfig().setHiddenItems(unsetCsv(hides, item));
-                plugin.getConfig().setHighlightedItems(setCsv(highlights, item));
+
+                plugin.getConfig().setHighlightedItems(toggleCsv(highlightedItems, item))
+                plugin.getConfig().setHiddenItems(unsetCsv(hides, item))
             });
             e.consume();
         } else if (isRightMouseButton(e)) {
             plugin.getClientThread().invoke(() -> {
                 var item = plugin.getItemName(hover).toLowerCase();
 
-                if (hides.contains(item)) {
-                    plugin.getConfig().setHiddenItems(unsetCsv(hides, item));
-                } else {
-                    plugin.getConfig().setHighlightedItems(unsetCsv(highlights, item));
-                    plugin.getConfig().setHiddenItems(setCsv(hides, item));
-                }
+                plugin.getConfig().setHiddenItems(toggleCsv(highlightedItems, item))
+                plugin.getConfig().setHighlightedItems(unsetCsv(hides, item))
             });
             e.consume();
         } else if (isMiddleMouseButton(e)) {

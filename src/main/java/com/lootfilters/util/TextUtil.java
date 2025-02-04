@@ -82,4 +82,12 @@ public class TextUtil {
                 .filter(it -> !it.equals(value))
                 .collect(Collectors.joining(","));
     }
+
+    public static String toggleCsv(String csv, String item) {
+        if (csv.contains(item)) {
+            return unsetCsv(csv, item);
+        } else {
+            return setCsv(csv, item);
+        }
+    }
 }
