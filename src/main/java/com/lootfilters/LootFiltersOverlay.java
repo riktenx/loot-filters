@@ -20,10 +20,9 @@ import static com.lootfilters.util.TextUtil.abbreviate;
 import static java.util.stream.Collectors.counting;
 import static java.util.stream.Collectors.groupingBy;
 import static net.runelite.api.Perspective.getCanvasTextLocation;
-import static net.runelite.client.ui.FontManager.getRunescapeSmallFont;
 
 public class LootFiltersOverlay extends Overlay {
-    private static final int Z_STACK_OFFSET = 17; // for initial perspective and subsequent vertical stack
+    private static final int Z_STACK_OFFSET = 16;
     private static final int BOX_PAD = 2;
     private static final Color COLOR_HIDDEN = Color.GRAY.brighter();
 
@@ -89,13 +88,15 @@ public class LootFiltersOverlay extends Overlay {
                     continue;
                 }
 
+                g.setFont(match.getFont());
+
                 var displayText = buildDisplayText(item, count, match);
                 var textPoint = getCanvasTextLocation(client, g, loc, displayText, tile.getItemLayer().getHeight() + Z_STACK_OFFSET);
                 if (textPoint == null) {
                     continue;
                 }
 
-                var fm = g.getFontMetrics(getRunescapeSmallFont());
+                var fm = g.getFontMetrics(match.getFont());
                 var textWidth = fm.stringWidth(displayText);
                 var textHeight = fm.getHeight();
 
@@ -144,7 +145,7 @@ public class LootFiltersOverlay extends Overlay {
                     text.render(g);
                 }
 
-                currentOffset += Z_STACK_OFFSET;
+                currentOffset += textHeight + BOX_PAD + 3;
             }
         }
 

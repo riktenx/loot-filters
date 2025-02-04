@@ -5,6 +5,7 @@ import com.lootfilters.LootFilter;
 import com.lootfilters.MatcherConfig;
 import com.lootfilters.rule.AndRule;
 import com.lootfilters.rule.Comparator;
+import com.lootfilters.rule.FontType;
 import com.lootfilters.rule.ItemIdRule;
 import com.lootfilters.rule.ItemNameRule;
 import com.lootfilters.rule.ItemQuantityRule;
@@ -169,6 +170,8 @@ public class Parser {
                     builder.textAccentColor(parseArgb(assign[1].expectString())); break;
                 case "lootbeamColor":
                     builder.lootbeamColor(parseArgb(assign[1].expectString())); break;
+                case "fontType":
+                    builder.fontType(FontType.fromOrdinal(assign[1].expectInt())); break;
                 default:
                     throw new ParseException("unexpected identifier in display config block", assign[0]);
             }
