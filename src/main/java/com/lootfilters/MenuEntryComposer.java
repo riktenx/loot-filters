@@ -38,11 +38,11 @@ public class MenuEntryComposer {
 
         var itemCounts = Stream.of(entries)
                 .filter(MenuEntryComposer::isGroundItem)
-                .collect(Collectors.groupingBy(it -> it.getType()+it.getTarget(), Collectors.counting()));
+                .collect(Collectors.groupingBy(MenuEntryComposer::entrySlug, Collectors.counting()));
 
         var newEntries = Arrays.stream(entries)
                 .map(it -> isGroundItem(it)
-                        ? withCount(it, itemCounts.getOrDefault(it.getType()+it.getTarget(), 1L))
+                        ? withCount(it, itemCounts.getOrDefault(entrySlug(it), 1L))
                         : it)
                 .distinct()
                 .toArray(MenuEntry[]::new);
@@ -80,5 +80,9 @@ public class MenuEntryComposer {
                 || type == MenuAction.GROUND_ITEM_FOURTH_OPTION
                 || type == MenuAction.GROUND_ITEM_FIFTH_OPTION
                 || type == MenuAction.EXAMINE_ITEM_GROUND;
+    }
+
+    private static String entrySlug(MenuEntry entry) {
+        return entry.getType().toString() + entry.getIdentifier();
     }
 }
