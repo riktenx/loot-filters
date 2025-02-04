@@ -19,7 +19,7 @@ meta {
 #define VALUE_TIER_S 100000000 // 100m
 #define VALUE_TIER_A 10000000  // 10m
 #define VALUE_TIER_B 1000000   // 1m
-#define VALUE_TIER_C 500000    // 500k
+#define VALUE_TIER_C 500000    // 400k
 #define VALUE_TIER_D 100000    // 100k
 #define VALUE_TIER_E 20000     // 20k
 
@@ -60,7 +60,7 @@ meta {
     COLOR3(LBROWN, BLACK) \
     textAccent = 3; \
 }
-#define UNIQUE(_name) if (name:_name) { \
+#define UNIQUE { \
     COLOR3(LBROWN, BURGUNDY) \
     textAccent = 3; \
 }
@@ -122,9 +122,6 @@ UNIQUE_B_TIER("Dark totem")
 UNIQUE_C_TIER("Dark totem top")
 UNIQUE_C_TIER("Dark totem base")
 UNIQUE_C_TIER("Dark totem middle")
-UNIQUE("Ancient shard")
-UNIQUE("Spirit seed")
-UNIQUE("Rusty Sword")
 
 UNIQUE_S_TIER("Infernal Cape")
 UNIQUE_S_TIER("Fire Cape")
@@ -139,12 +136,8 @@ VALUE_A_TIER("Hill giant club")
 UNIQUE_B_TIER("Ecumenical key")
 UNIQUE_C_TIER("Long bone")
 UNIQUE_C_TIER("Curved bone")
-UNIQUE("Looting bag")
 
-UNIQUE("Unidentified small fossil")
-UNIQUE("Unidentified medium fossil")
-UNIQUE("Unidentified large fossil")
-UNIQUE("Unidentified rare fossil")
+if (tradeable: false) UNIQUE
 
 TEXT_HIGHLIGHT("Bronze defender", BRONZE)
 TEXT_HIGHLIGHT("Iron defender", IRON)
@@ -164,7 +157,6 @@ UNIQUE_B_TIER("Alchemical hydra heads")
 UNIQUE_B_TIER("Kbd heads")
 UNIQUE_B_TIER("Kq head*")
 UNIQUE_B_TIER("Dark claw")
-UNIQUE("Key master teleport")
 
 // Abyssal Sire Uniques
 UNIQUE_S_TIER("Unsired")
@@ -190,25 +182,21 @@ UNIQUE_C_TIER("Chromium ingot")
 UNIQUE_S_TIER("Ultor vestige")
 UNIQUE_S_TIER("Executioner's axe head")
 UNIQUE_B_TIER("Strangled tablet")
-UNIQUE("Blood quartz")
 
 // Leviathan
 UNIQUE_S_TIER("Venator vestige")
 UNIQUE_S_TIER("Leviathan's lure")
 UNIQUE_B_TIER("Scarred tablet")
-UNIQUE("Smoke quartz")
 
 // Whisperer
 UNIQUE_S_TIER("Bellator vestige")
 UNIQUE_S_TIER("Siren's staff")
 UNIQUE_B_TIER("Sirenic tablet")
-UNIQUE("Shadow quartz")
 
 // Duke Sucellus
 UNIQUE_S_TIER("Magus vestige")
 UNIQUE_S_TIER("Eye of the duke")
 UNIQUE_B_TIER("Frozen tablet")
-UNIQUE("Ice quartz")
 
 // Scurrius
 UNIQUE_B_TIER("Scurrius' spine")
@@ -260,7 +248,6 @@ if (value:>VALUE_TIER_D) D_TIER
 if (value:>VALUE_TIER_E) E_TIER
 
 // Misc Valuable/Stackable Items (Comment or remove any you don't want to see under min value)
-    // Tradeable
 VALUE_D_TIER("Dragon bones")
 VALUE_D_TIER("Dagannoth bones")
 VALUE_D_TIER("Frozen tear")
@@ -269,11 +256,6 @@ VALUE_D_TIER("Sunfire splinters")
 VALUE_D_TIER("Ancient essence")
 VALUE_D_TIER("Granite dust")
 VALUE_D_TIER("Crystal shard")
-
-    // Untradeable
-UNIQUE("Blessed bone shards")
-UNIQUE("Sun-kissed bones")
-UNIQUE("Ecumenical key shard")
 
 // Tradeable Currencies (Comment or remove any you don't want to see under min value)
 VALUE_E_TIER("Archery ticket")
