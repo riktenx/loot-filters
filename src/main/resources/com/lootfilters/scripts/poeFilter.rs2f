@@ -19,7 +19,7 @@ meta {
 #define VALUE_TIER_S 100000000 // 100m
 #define VALUE_TIER_A 10000000  // 10m
 #define VALUE_TIER_B 1000000   // 1m
-#define VALUE_TIER_C 500000    // 400k
+#define VALUE_TIER_C 500000    // 500k
 #define VALUE_TIER_D 100000    // 100k
 #define VALUE_TIER_E 20000     // 20k
 
