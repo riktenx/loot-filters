@@ -24,13 +24,9 @@ public class LootFiltersMouseAdapter extends MouseAdapter {
         var highlights = plugin.getConfig().highlightedItems();
         var hides = plugin.getConfig().hiddenItems();
 
-
-
         if (isLeftMouseButton(e)) {
             plugin.getClientThread().invoke(() -> {
                 var item = plugin.getItemName(hover).toLowerCase();
-
-
 
                 plugin.getConfig().setHighlightedItems(toggleCsv(highlights, item));
                 plugin.getConfig().setHiddenItems(unsetCsv(hides, item));
