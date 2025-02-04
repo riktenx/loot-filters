@@ -70,12 +70,12 @@ meta {
     showLootbeam = true; \
 }
 
-#define S_TIER { COLOR3(RED, WHITE)     textAccent = 3; showLootbeam = true;                                          }
-#define A_TIER { COLOR3(WHITE, ORANGE)  textAccent = 1; showLootbeam = true;  sound = SOUND5;                         }
-#define B_TIER { COLOR3(BLACK, ORANGE)  textAccent = 3; showLootbeam = true;  sound = SOUND4; lootbeamColor = ORANGE; }
-#define C_TIER { COLOR2(CARAMEL)        textAccent = 2; showLootbeam = false; sound = SOUND2;                         }
-#define D_TIER { COLOR2(GOLD)           textAccent = 2; showLootbeam = false; sound = SOUND2; lootbeamColor = ORANGE; }
-#define E_TIER { color = KHAKI;         textAccent = 2;                                                               }
+#define S_TIER { COLOR3(RED, WHITE)     textAccent = 1; showLootbeam = true;  sound = SOUND6;                         }
+#define A_TIER { COLOR3(WHITE, ORANGE)  textAccent = 1; showLootbeam = true;  sound = SOUND5; lootbeamColor = ORANGE; }
+#define B_TIER { COLOR3(BLACK, ORANGE)  textAccent = 3; showLootbeam = true;  sound = SOUND2; lootbeamColor = ORANGE; }
+#define C_TIER { COLOR2(CARAMEL)        textAccent = 2; showLootbeam = false;                                         }
+#define D_TIER { color = GOLD;          textAccent = 2; showLootbeam = false;                                         }
+#define E_TIER { color = KHAKI;         textAccent = 1; showLootbeam = false;                                         }
 
 #define DEFAULT_STYLE { color = WHITE; textAccent = 1; }
 
@@ -94,6 +94,7 @@ meta {
 #define BEGINNER_CLUES(_name) if (name:_name) { COLOR3(     WHITE, KHAKI) sound = SOUND12; }
 
 // Clues
+MASTER_CLUES("clue scroll (master)")
 MASTER_CLUES("clue scroll (master)")
 ELITE_CLUES("clue scroll (elite)")
 HARD_CLUES("clue scroll (hard)")
