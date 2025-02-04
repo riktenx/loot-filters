@@ -23,6 +23,7 @@ public class LootFiltersMouseAdapter extends MouseAdapter {
 
         var highlights = plugin.getConfig().highlightedItems();
         var hides = plugin.getConfig().hiddenItems();
+
         if (isLeftMouseButton(e)) {
             plugin.getClientThread().invoke(() -> {
                 var item = plugin.getItemName(hover).toLowerCase();
@@ -33,8 +34,13 @@ public class LootFiltersMouseAdapter extends MouseAdapter {
         } else if (isRightMouseButton(e)) {
             plugin.getClientThread().invoke(() -> {
                 var item = plugin.getItemName(hover).toLowerCase();
-                plugin.getConfig().setHighlightedItems(unsetCsv(highlights, item));
-                plugin.getConfig().setHiddenItems(setCsv(hides, item));
+
+                if (hides.contains(item)) {
+                    plugin.getConfig().setHiddenItems(unsetCsv(hides, item));
+                } else {
+                    plugin.getConfig().setHighlightedItems(unsetCsv(highlights, item));
+                    plugin.getConfig().setHiddenItems(setCsv(hides, item));
+                }
             });
             e.consume();
         } else if (isMiddleMouseButton(e)) {
