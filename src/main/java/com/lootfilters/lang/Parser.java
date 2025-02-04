@@ -3,17 +3,7 @@ package com.lootfilters.lang;
 import com.lootfilters.DisplayConfig;
 import com.lootfilters.LootFilter;
 import com.lootfilters.MatcherConfig;
-import com.lootfilters.rule.AndRule;
-import com.lootfilters.rule.Comparator;
-import com.lootfilters.rule.FontType;
-import com.lootfilters.rule.ItemIdRule;
-import com.lootfilters.rule.ItemNameRule;
-import com.lootfilters.rule.ItemQuantityRule;
-import com.lootfilters.rule.ItemValueRule;
-import com.lootfilters.rule.OrRule;
-import com.lootfilters.rule.Rule;
-import com.lootfilters.rule.Sound;
-import com.lootfilters.rule.TextAccent;
+import com.lootfilters.rule.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -169,6 +159,7 @@ public class Parser {
                 case "textAccentColor":
                     builder.textAccentColor(parseArgb(assign[1].expectString())); break;
                 case "lootbeamColor":
+                case "lootBeamColor":
                     builder.lootbeamColor(parseArgb(assign[1].expectString())); break;
                 case "fontType":
                     builder.fontType(FontType.fromOrdinal(assign[1].expectInt())); break;
@@ -192,6 +183,8 @@ public class Parser {
                 return parseItemQuantityRule();
             case "value":
                 return parseItemValueRule();
+            case "tradeable":
+                return parseItemTradeableRule();
             default:
                 throw new ParseException("unknown rule identifier", first);
         }
@@ -219,13 +212,19 @@ public class Parser {
         return new ItemValueRule(Integer.parseInt(value.getValue()), Comparator.fromToken(op));
     }
 
+    private ItemTradeableRule parseItemTradeableRule() {
+        var op = tokens.take();
+        return new ItemTradeableRule((op.expectBoolean()));
+    }
+
     private Rule buildRule(List<Rule> postfix) {
         var operands = new Stack<Rule>();
         for (var rule : postfix) {
             if (rule instanceof ItemIdRule
                     || rule instanceof ItemNameRule
                     || rule instanceof ItemQuantityRule
-                    || rule instanceof ItemValueRule) {
+                    || rule instanceof ItemValueRule
+                    || rule instanceof ItemTradeableRule) {
                 operands.push(rule);
             } else if (rule instanceof AndRule) {
                 operands.push(new AndRule(operands.pop(), operands.pop()));

@@ -23,3 +23,7 @@ if (value:>10000) {
     color="ff1eff00";
 }
 // end comment
+
+if (tradeable:false) {
+    color="ffff8000";
+}

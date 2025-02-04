@@ -3,6 +3,7 @@ package com.lootfilters;
 import com.lootfilters.lang.Lexer;
 import com.lootfilters.lang.Parser;
 import com.lootfilters.rule.Comparator;
+import com.lootfilters.rule.ItemTradeableRule;
 import com.lootfilters.rule.ItemValueRule;
 import org.junit.Test;
 
@@ -38,6 +39,10 @@ public class ParserTest {
                 new MatcherConfig(new ItemValueRule(10_000, Comparator.GT),
                         DisplayConfig.builder()
                                 .textColor(new Color(0x1e,0xff,0x00, 0xff))
+                                .build()),
+                new MatcherConfig(new ItemTradeableRule(false),
+                        DisplayConfig.builder()
+                                .textColor(new Color(0xff,0x80,0x00, 0xff))
                                 .build())
         );
         var expect = new LootFilter(expectName, expectDesc, expectArea, expectMatchers);
