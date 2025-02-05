@@ -19,7 +19,7 @@ meta {
 #define VALUE_TIER_S 100000000 // 100m
 #define VALUE_TIER_A 10000000  // 10m
 #define VALUE_TIER_B 1000000   // 1m
-#define VALUE_TIER_C 500000    // 400k
+#define VALUE_TIER_C 500000    // 500k
 #define VALUE_TIER_D 100000    // 100k
 #define VALUE_TIER_E 20000     // 20k
 
@@ -27,7 +27,7 @@ meta {
 #define COLOR3(_fg, _bg) textColor = _fg; borderColor = _fg; backgroundColor = _bg;
 
 #define BROWN "ffD2B287"
-#define LBROWN "ffAF6025"
+#define LIGHT_BROWN "ffAF6025"
 #define ORANGE "ffF05A23"
 #define CARAMEL "ffF99619"
 #define GOLD "ffD59F00"
@@ -43,39 +43,67 @@ meta {
 #define UNIQUE_S_TIER(_name ) if (name:_name) { \
     COLOR3(RED, WHITE) \
     textAccent = 3; \
-    showLootbeam = true; \
+    fontType = 2; \
+    showLootBeam = true; \
     sound = SOUND6; \
 }
 #define UNIQUE_A_TIER(_name ) if (name:_name) { \
-    COLOR3(WHITE, LBROWN) \
+    COLOR3(WHITE, LIGHT_BROWN) \
     textAccent = 3; \
-    showLootbeam = true; \
+    showLootBeam = true; \
     sound = SOUND5; \
 }
 #define UNIQUE_B_TIER(_name) if (name:_name) { \
-    COLOR3(BLACK, LBROWN) \
+    COLOR3(BLACK, LIGHT_BROWN) \
     textAccent = 3; \
 }
 #define UNIQUE_C_TIER(_name) if (name:_name) { \
-    COLOR3(LBROWN, BLACK) \
-    textAccent = 3; \
-}
-#define UNIQUE { \
-    COLOR3(LBROWN, BURGUNDY) \
-    textAccent = 3; \
+    COLOR3(LIGHT_BROWN, BURGUNDY) \
+       textAccent = 3; \
 }
 
 #define RARE_CUSTOM(_name, _color, _backgroundColor) if (name:_name) { \
     COLOR3(_color, _backgroundColor) \
-    showLootbeam = true; \
+    showLootBeam = true; \
 }
 
-#define S_TIER { COLOR3(RED, WHITE)     textAccent = 1; showLootbeam = true;  sound = SOUND6;                         }
-#define A_TIER { COLOR3(WHITE, ORANGE)  textAccent = 1; showLootbeam = true;  sound = SOUND5; lootbeamColor = ORANGE; }
-#define B_TIER { COLOR3(BLACK, ORANGE)  textAccent = 3; showLootbeam = true;  sound = SOUND2; lootbeamColor = ORANGE; }
-#define C_TIER { COLOR2(CARAMEL)        textAccent = 2; showLootbeam = false;                                         }
-#define D_TIER { color = GOLD;          textAccent = 2; showLootbeam = false;                                         }
-#define E_TIER { color = KHAKI;         textAccent = 1; showLootbeam = false;                                         }
+#define S_TIER { \
+    COLOR3(RED, WHITE) \
+    textAccent = 1; \
+    showLootBeam = true; \
+    sound = SOUND6; \
+    fontType = 2; \
+}
+#define A_TIER { \
+    COLOR3(WHITE, ORANGE) \
+    textAccent = 1; \
+    showLootBeam = true; \
+    sound = SOUND5; \
+    lootBeamColor = ORANGE; \
+}
+#define B_TIER { \
+    COLOR3(BLACK, ORANGE) \
+    textAccent = 3; \
+    showLootBeam = true; \
+    sound = SOUND2; \
+    lootBeamColor = ORANGE; \
+    menuTextColor = ORANGE; \
+}
+#define C_TIER { \
+    COLOR2(CARAMEL) \
+    textAccent = 2; \
+    showLootBeam = false; \
+}
+#define D_TIER { \
+    color = GOLD; \
+    textAccent = 2; \
+    showLootBeam = false; \
+}
+#define E_TIER { \
+    color = KHAKI; \
+    textAccent = 1; \
+    showLootBeam = false; \
+}
 
 #define DEFAULT_STYLE { color = WHITE; textAccent = 1; }
 
@@ -136,8 +164,12 @@ VALUE_A_TIER("Hill giant club")
 UNIQUE_B_TIER("Ecumenical key")
 UNIQUE_C_TIER("Long bone")
 UNIQUE_C_TIER("Curved bone")
+UNIQUE_C_TIER("Looting bag")
 
-if (tradeable: false) UNIQUE
+UNIQUE_C_TIER("Unidentified small fossil")
+UNIQUE_C_TIER("Unidentified medium fossil")
+UNIQUE_C_TIER("Unidentified large fossil")
+UNIQUE_C_TIER("Unidentified rare fossil")
 
 TEXT_HIGHLIGHT("Bronze defender", BRONZE)
 TEXT_HIGHLIGHT("Iron defender", IRON)
@@ -157,6 +189,7 @@ UNIQUE_B_TIER("Alchemical hydra heads")
 UNIQUE_B_TIER("Kbd heads")
 UNIQUE_B_TIER("Kq head*")
 UNIQUE_B_TIER("Dark claw")
+UNIQUE_C_TIER("Key master teleport")
 
 // Abyssal Sire Uniques
 UNIQUE_S_TIER("Unsired")
@@ -182,21 +215,25 @@ UNIQUE_C_TIER("Chromium ingot")
 UNIQUE_S_TIER("Ultor vestige")
 UNIQUE_S_TIER("Executioner's axe head")
 UNIQUE_B_TIER("Strangled tablet")
+UNIQUE_C_TIER("Blood quartz")
 
 // Leviathan
 UNIQUE_S_TIER("Venator vestige")
 UNIQUE_S_TIER("Leviathan's lure")
 UNIQUE_B_TIER("Scarred tablet")
+UNIQUE_C_TIER("Smoke quartz")
 
 // Whisperer
 UNIQUE_S_TIER("Bellator vestige")
 UNIQUE_S_TIER("Siren's staff")
 UNIQUE_B_TIER("Sirenic tablet")
+UNIQUE_C_TIER("Shadow quartz")
 
 // Duke Sucellus
 UNIQUE_S_TIER("Magus vestige")
 UNIQUE_S_TIER("Eye of the duke")
 UNIQUE_B_TIER("Frozen tablet")
+UNIQUE_C_TIER("Ice quartz")
 
 // Scurrius
 UNIQUE_B_TIER("Scurrius' spine")
@@ -235,9 +272,23 @@ TEXT_HIGHLIGHT("*Golpar", "ff18BF8C")
 TEXT_HIGHLIGHT("*Buchu leaf", "ffAC2315")
 TEXT_HIGHLIGHT("*Noxifer", "ff7C1ADF")
 
+// ToA
+TEXT_HIGHLIGHT("Ambrosia*", "ffE3ECE3")
+TEXT_HIGHLIGHT("Liquid adrenaline*", "ff35C6D7")
+TEXT_HIGHLIGHT("Nectar*", YELLOW)
+TEXT_HIGHLIGHT("Tears of elidinis*", "ffe91e63")
+
 // Potions
 TEXT_HIGHLIGHT("Super restore*", "ffe91e63")
 TEXT_HIGHLIGHT("Saradomin brew*", YELLOW)
+TEXT_HIGHLIGHT("Prayer potion*", "ff59D6AE")
+TEXT_HIGHLIGHT("Sanfew serum*", "ffe59e9e")
+TEXT_HIGHLIGHT("Super combat potion*", "ff2a9e16")
+TEXT_HIGHLIGHT("Divine Super combat potion*", "ff2a9e16")
+TEXT_HIGHLIGHT("Ranging potion*", "ff5FB7DA")
+TEXT_HIGHLIGHT("Divine Ranging potion*", "ff5FB7DA")
+TEXT_HIGHLIGHT("Bastion potion*", "ffdb721c")
+TEXT_HIGHLIGHT("Divine Bastion potion*", "ffdb721c")
 
 // Value Style defaults
 if (value:>VALUE_TIER_S) S_TIER
@@ -293,6 +344,9 @@ VALUE_E_TIER("Tokkul")
 VALUE_E_TIER("Termites")
 VALUE_E_TIER("Unidentified minerals")
 VALUE_E_TIER("Warrior guild token")
+VALUE_E_TIER("Blessed bone shards")
+VALUE_E_TIER("Sun-kissed bones")
+VALUE_E_TIER("Ecumenical key shard")
 
 // Hide specific single/un-noted items
 HIDE_1("*ashes")
@@ -324,3 +378,9 @@ HIDE_1("*Kwuarm")
 // HIDE_1("*Ranarr weed")
 // HIDE_1("*Snapdragon")
 // HIDE_1("*Huasca")
+
+// Catch all to display untradeables
+if (tradeable: false) {
+    color = WHITE;
+    textAccent = 3;
+}
