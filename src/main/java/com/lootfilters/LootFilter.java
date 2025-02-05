@@ -5,6 +5,7 @@ import com.lootfilters.lang.CompileException;
 import com.lootfilters.lang.Lexer;
 import com.lootfilters.lang.Parser;
 import com.lootfilters.lang.Preprocessor;
+import com.lootfilters.lang.Sources;
 import com.lootfilters.rule.Rule;
 import com.lootfilters.serde.ColorDeserializer;
 import com.lootfilters.serde.ColorSerializer;
@@ -17,10 +18,8 @@ import net.runelite.api.TileItem;
 import net.runelite.api.coords.WorldPoint;
 
 import java.awt.Color;
-import java.io.IOException;
 import java.util.List;
 
-import static com.lootfilters.util.TextUtil.loadFilterScript;
 import static java.util.Collections.emptyList;
 
 @Getter
@@ -43,9 +42,8 @@ public class LootFilter {
         return ggson.fromJson(json, LootFilter.class);
     }
 
-    public static LootFilter fromSource(String source) throws CompileException, IOException {
-        source = loadFilterScript("preamble.rs2f") + "\n" + source;
-        var postproc = new Preprocessor(source).preprocess();
+    public static LootFilter fromSource(String source) throws CompileException {
+        var postproc = new Preprocessor(Sources.getPreamble() + "\n" + source).preprocess();
         var tokens = new Lexer(postproc).tokenize();
         return new Parser(tokens).parse();
     }

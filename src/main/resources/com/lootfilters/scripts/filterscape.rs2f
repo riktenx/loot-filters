@@ -1,6 +1,6 @@
 meta {
-    name = "poe-style-filters";
-    description = "POE Style Filtering for mains";
+    name = "loot-filters/filterscape";
+    description = "Reference implementation of a loot filter, inspired by Path of Exile, targeting main accounts.";
 }
 
 // USERVAR: Highlight Color (Default Alt + Left Click)
@@ -382,5 +382,4 @@ HIDE_1("*Kwuarm")
 // Catch all to display untradeables
 if (tradeable: false) {
     color = WHITE;
-    textAccent = 3;
 }

@@ -1,7 +1,6 @@
 package com.lootfilters.util;
 
 import java.awt.Color;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -56,13 +55,6 @@ public class TextUtil {
         return str
                 .replaceAll("\r\n", "\n")
                 .replaceAll("\r", "\n");
-    }
-
-    public static String loadFilterScript(String resource) throws IOException {
-        try (var r = TextUtil.class.getResourceAsStream("/com/lootfilters/scripts/" + resource)) {
-            assert r != null;
-            return normalizeCrlf(new String(r.readAllBytes()));
-        }
     }
 
     public static String setCsv(String csv, String value) {

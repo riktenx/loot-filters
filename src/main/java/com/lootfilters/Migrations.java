@@ -51,7 +51,7 @@ public class Migrations {
                 plugin.getStorageManager().saveNewFilter("migrated_filter_" + i, toMigrate.get(i));
             }
             plugin.reloadFilters();
-            plugin.getPluginPanel().reflowFilterSelect(plugin.getParsedUserFilters(), plugin.getSelectedFilterName());
+            plugin.getPluginPanel().reflowFilterSelect(plugin.getFilters(), plugin.getSelectedFilterName());
         }
 
         private List<String> getConfigUserFilters() {

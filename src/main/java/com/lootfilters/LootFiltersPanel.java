@@ -1,5 +1,6 @@
 package com.lootfilters;
 
+import com.lootfilters.lang.Sources;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.ui.PluginPanel;
@@ -10,6 +11,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -82,11 +84,18 @@ public class LootFiltersPanel extends PluginPanel {
     }
 
     private void initControls() {
-        reflowFilterSelect(plugin.getStorageManager().loadFilters(), plugin.getSelectedFilterName());
+        reflowFilterSelect(plugin.getFilters(), plugin.getSelectedFilterName());
     }
 
     @SneakyThrows
-    private void onCreateEmptyFilter(){
+    private void onCreateEmptyFilter() {
+        String[] templateOptions = {"blank script", "loot-filters/filterscape"};
+        var template = JOptionPane.showInputDialog(this, "Choose a template:","Create new filter",
+                JOptionPane.PLAIN_MESSAGE, null, templateOptions, "blank script");
+        if (template == null) {
+            return;
+        }
+
         var newName = showInputDialog(this, "Please enter a name:");
         if (newName == null || newName.isBlank()) {
             return;
@@ -97,10 +106,15 @@ public class LootFiltersPanel extends PluginPanel {
         }
 
         try {
-            var newSrc = String.join("\n","", TUTORIAL_TEXT,"", EXAMPLE_TEXT);
-            newSrc = "meta { name = " + quote(newName) + "; }\n" + newSrc;
+            String newSrc;
+            if (template.equals(templateOptions[0])) {
+                newSrc = "meta { name = " + quote(newName) + "; }\n" +
+                        String.join("\n","", TUTORIAL_TEXT, "", EXAMPLE_TEXT);
+            } else { // loot-filters/filterscape
+                newSrc = Sources.getReferenceSource()
+                        .replace("    name = \"loot-filters/filterscape\";", "name = " + quote(newName) + ";");
+            }
             plugin.getStorageManager().saveNewFilter(newName, newSrc);
-
         } catch (Exception e) {
             log.warn(e.getMessage());
             return;
@@ -138,7 +152,7 @@ public class LootFiltersPanel extends PluginPanel {
 
     private void onReloadFilters() {
         plugin.reloadFilters();
-        reflowFilterSelect(plugin.getParsedUserFilters(), plugin.getSelectedFilterName());
+        reflowFilterSelect(plugin.getFilters(), plugin.getSelectedFilterName());
     }
 
     private void onBrowseFolder() {

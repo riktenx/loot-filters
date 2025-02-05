@@ -13,6 +13,13 @@ public class CollectionUtil {
         return newList;
     }
 
+    public static <E> List<E> prepend(E element, List<E> list) {
+        var newList = new ArrayList<E>();
+        newList.add(element);
+        newList.addAll(list);
+        return newList;
+    }
+
     public static <E> List<E> without(List<E> list, E element) {
         var newList = new ArrayList<>(list);
         newList.remove(element);

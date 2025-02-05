@@ -17,7 +17,7 @@ public class ItemTradeableRule extends Rule {
     @Override
     public boolean test(LootFiltersPlugin plugin, TileItem item) {
         if (item.getId() == ItemID.COINS_995 || item.getId() == ItemID.PLATINUM_TOKEN) {
-            return true;
+            return target;
         }
 
         var comp = plugin.getItemManager().getItemComposition(item.getId());
