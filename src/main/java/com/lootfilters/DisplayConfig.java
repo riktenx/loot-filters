@@ -12,6 +12,8 @@ import net.runelite.client.ui.FontManager;
 import java.awt.Color;
 import java.awt.Font;
 
+import static net.runelite.client.util.ColorUtil.colorTag;
+
 @Getter
 @Builder(toBuilder = true)
 @AllArgsConstructor
@@ -32,6 +34,7 @@ public class DisplayConfig {
     private final Color textAccentColor;
     private final Color lootbeamColor;
     private final FontType fontType;
+    private final Color menuTextColor;
 
     public DisplayConfig(Color textColor) {
         this.textColor = textColor;
@@ -47,10 +50,19 @@ public class DisplayConfig {
         textAccentColor = null;
         lootbeamColor = null;
         fontType = null;
+        menuTextColor = null;
     }
 
     public Color getLootbeamColor() {
         return lootbeamColor != null ? lootbeamColor : textColor;
+    }
+
+    public Color getMenuTextColor() {
+
+        if (menuTextColor != null) {
+            return menuTextColor;
+        }
+        return textColor.equals(Color.WHITE) ? Color.decode("#ff9040") : textColor;
     }
 
     public Font getFont() {

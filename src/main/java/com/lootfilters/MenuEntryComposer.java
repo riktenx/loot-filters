@@ -66,9 +66,8 @@ public class MenuEntryComposer {
         if (item.getQuantity() > 1) {
             text += " (" + item.getQuantity() + ")";
         }
-        var colorTag = display.getTextColor().equals(Color.WHITE)
-                ? colorTag(Color.decode("#ff9040"))
-                : colorTag(display.getTextColor());
+
+        var colorTag = colorTag(display.getMenuTextColor());
         return colorTag + text;
     }
 
