@@ -268,9 +268,9 @@ TEXT_HIGHLIGHT("Prayer enhance*", MAGENTA)
 TEXT_HIGHLIGHT("Revitalisation*", "ffe91e63")
 TEXT_HIGHLIGHT("Xeric's aid*", YELLOW)
 
-TEXT_HIGHLIGHT("*Golpar", "ff18BF8C")
-TEXT_HIGHLIGHT("*Buchu leaf", "ffAC2315")
-TEXT_HIGHLIGHT("*Noxifer", "ff7C1ADF")
+TEXT_HIGHLIGHT("Golpar", "ff18BF8C")
+TEXT_HIGHLIGHT("Buchu leaf", "ffAC2315")
+TEXT_HIGHLIGHT("Noxifer", "ff7C1ADF")
 
 // ToA
 TEXT_HIGHLIGHT("Ambrosia*", "ffE3ECE3")
