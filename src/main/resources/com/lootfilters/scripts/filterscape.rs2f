@@ -265,7 +265,7 @@ DARK_BG("Smouldering heart", MAGENTA)
 // CoX
 TEXT_HIGHLIGHT("Overload*", "ff1e88e5")
 TEXT_HIGHLIGHT("Prayer enhance*", MAGENTA)
-TEXT_HIGHLIGHT("Revitalisation potion*", "ffe91e63")
+TEXT_HIGHLIGHT("Revitalisation*", "ffe91e63")
 TEXT_HIGHLIGHT("Xeric's aid*", YELLOW)
 
 TEXT_HIGHLIGHT("*Golpar", "ff18BF8C")
