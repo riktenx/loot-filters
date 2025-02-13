@@ -85,7 +85,7 @@ activation area:
 [x0, y0, z0, x1, y1, z1]
 ```
 
-There are several excellent web-based tools for finding map coordinates, such as https://mejrs.github.io/.
+There are several excellent web-based tools for finding map coordinates, such as https://mejrs.github.io/osrs.
 
 For example, the coordinate pair `[2240, 4032, 0, 2303, 4095, 0]` describes the area for Vorkath.
 
