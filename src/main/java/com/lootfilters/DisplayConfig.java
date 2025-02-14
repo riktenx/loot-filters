@@ -11,8 +11,6 @@ import net.runelite.client.ui.FontManager;
 import java.awt.Color;
 import java.awt.Font;
 
-import static net.runelite.client.util.ColorUtil.colorTag;
-
 @Getter
 @Builder(toBuilder = true)
 @AllArgsConstructor
@@ -33,6 +31,7 @@ public class DisplayConfig {
     private final Color lootbeamColor;
     private final FontType fontType;
     private final Color menuTextColor;
+    private final String sound;
 
     public DisplayConfig(Color textColor) {
         this.textColor = textColor;
@@ -48,6 +47,7 @@ public class DisplayConfig {
         lootbeamColor = null;
         fontType = null;
         menuTextColor = null;
+        sound = null;
     }
 
     public Color getLootbeamColor() {
