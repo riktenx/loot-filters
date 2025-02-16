@@ -182,6 +182,7 @@ UNIQUE_B_TIER("Bludgeon axon")
 RARE_CUSTOM("Araxyte fang", DARK_GREEN, BLACK)
 UNIQUE_A_TIER("Noxious pommel")
 UNIQUE_A_TIER("Noxious point")
+UNIQUE_A_TIER("Noxious blade")
 
 // Hydra
 UNIQUE_B_TIER("Hydra's eye")
