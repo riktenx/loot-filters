@@ -1,5 +1,6 @@
 package com.lootfilters;
 
+import com.lootfilters.model.DespawnTimerType;
 import com.lootfilters.rule.TextAccent;
 import com.lootfilters.rule.ValueTier;
 import com.lootfilters.rule.ValueType;
@@ -104,8 +105,8 @@ public interface LootFiltersConfig extends Config {
     default int hotkeyDoubleTapDelay() { return 250; }
 
     @ConfigSection(
-            name = "Display overrides",
-            description = "Configure global display overrides.",
+            name = "Display settings",
+            description = "Configure global display settings/overrides.",
             position = 2
     )
     String displayOverrides = "displayOverrides";
@@ -126,11 +127,28 @@ public interface LootFiltersConfig extends Config {
     )
     default boolean alwaysShowDespawn() { return false; }
     @ConfigItem(
+            keyName = "despawnTimerType",
+            name = "Despawn type",
+            description = "Type of despawn timer to render.",
+            section = displayOverrides,
+            position = 2
+    )
+    default DespawnTimerType despawnTimerType() { return DespawnTimerType.TICKS; }
+    @ConfigItem(
+            keyName = "despawnThreshold",
+            name = "Despawn threshold",
+            description = "Number of remaining ticks until despawn at which to show the despawn timer (0 to always show).",
+            section = displayOverrides,
+            position = 3
+    )
+    @Units(Units.TICKS)
+    default int despawnThreshold() { return 0; }
+    @ConfigItem(
             keyName = "textAccent",
             name = "Text accent",
             description = "Text accent type.",
             section = displayOverrides,
-            position = 2
+            position = 4
     )
     default TextAccent textAccent() { return TextAccent.USE_FILTER; }
 

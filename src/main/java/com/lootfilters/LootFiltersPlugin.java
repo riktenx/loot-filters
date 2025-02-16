@@ -3,6 +3,7 @@ package com.lootfilters;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.google.inject.Provides;
+import com.lootfilters.model.PluginTileItem;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
@@ -11,6 +12,7 @@ import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.events.CommandExecuted;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.ItemDespawned;
@@ -32,6 +34,7 @@ import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.ui.overlay.OverlayManager;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -85,6 +88,10 @@ public class LootFiltersPlugin extends Plugin {
 	@Setter private int hoveredItem = -1;
 	@Setter private boolean hotkeyActive = false;
 	@Setter private boolean overlayEnabled = true;
+
+	@Inject @Named("developerMode") boolean developerMode;
+
+	@Getter private boolean debugEnabled = false;
 
 	public LootFilter getActiveFilter() {
 		return currentAreaFilter != null ? currentAreaFilter : activeFilter;
@@ -191,7 +198,7 @@ public class LootFiltersPlugin extends Plugin {
 	@Subscribe
 	public void onItemSpawned(ItemSpawned event) {
 		var tile = event.getTile();
-		var item = event.getItem();
+		var item = new PluginTileItem(this, event.getItem());
 		tileItemIndex.put(tile, item);
 
 		var match = getActiveFilter().findMatch(this, item);
@@ -211,7 +218,7 @@ public class LootFiltersPlugin extends Plugin {
 	@Subscribe
 	public void onItemDespawned(ItemDespawned event) {
 		var tile = event.getTile();
-		var item = event.getItem();
+		var item = new PluginTileItem(this, event.getItem());
 		tileItemIndex.remove(tile, item);
 		lootbeamIndex.remove(tile, item); // idempotent, we don't care if there wasn't a beam
 	}
@@ -237,6 +244,13 @@ public class LootFiltersPlugin extends Plugin {
 	@Subscribe
 	public void onMenuOpened(MenuOpened event) {
 		menuEntryComposer.onMenuOpened();
+	}
+
+	@Subscribe
+	public void onCommandExecuted(CommandExecuted event) {
+		if (developerMode && event.getCommand().equals("lfDebug")) {
+			debugEnabled = !debugEnabled;
+		}
 	}
 
 	private void loadFilter() throws Exception {

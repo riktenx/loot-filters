@@ -1,8 +1,8 @@
 package com.lootfilters;
 
+import com.lootfilters.model.PluginTileItem;
 import lombok.AllArgsConstructor;
 import net.runelite.api.Tile;
-import net.runelite.api.TileItem;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,7 +11,7 @@ import java.util.Map;
 public class LootbeamIndex {
     private final LootFiltersPlugin plugin;
 
-    private final Map<Tile, Map<TileItem, Lootbeam>> index = new HashMap<>();
+    private final Map<Tile, Map<PluginTileItem, Lootbeam>> index = new HashMap<>();
 
     public int size() {
         return index.values().stream()
@@ -19,7 +19,7 @@ public class LootbeamIndex {
                 .sum();
     }
 
-    public void put(Tile tile, TileItem item, Lootbeam beam) {
+    public void put(Tile tile, PluginTileItem item, Lootbeam beam) {
         if (!index.containsKey(tile)) {
             index.put(tile, new HashMap<>());
         }
@@ -28,7 +28,7 @@ public class LootbeamIndex {
         beams.put(item, beam);
     }
 
-    public void remove(Tile tile, TileItem item) {
+    public void remove(Tile tile, PluginTileItem item) {
         if (!index.containsKey(tile)) {
             return; // what?
         }

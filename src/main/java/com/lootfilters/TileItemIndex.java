@@ -1,5 +1,6 @@
 package com.lootfilters;
 
+import com.lootfilters.model.PluginTileItem;
 import net.runelite.api.Tile;
 import net.runelite.api.TileItem;
 import net.runelite.api.coords.WorldPoint;
@@ -11,12 +12,12 @@ import java.util.Map;
 import java.util.Set;
 
 public class TileItemIndex {
-    private final Map<Tile, List<TileItem>> itemIndex = new HashMap<>();
+    private final Map<Tile, List<PluginTileItem>> itemIndex = new HashMap<>();
 
     // Tile instances are not readily available in all contexts,
     private final Map<WorldPoint, Tile> pointIndex = new HashMap<>();
 
-    public Set<Map.Entry<Tile, List<TileItem>>> entrySet() {
+    public Set<Map.Entry<Tile, List<PluginTileItem>>> entrySet() {
         return itemIndex.entrySet();
     }
 
@@ -37,7 +38,7 @@ public class TileItemIndex {
                 : null;
     }
 
-    public void put(Tile tile, TileItem item) {
+    public void put(Tile tile, PluginTileItem item) {
         if (!itemIndex.containsKey(tile)) {
             itemIndex.put(tile, new ArrayList<>());
         }
@@ -45,7 +46,7 @@ public class TileItemIndex {
         pointIndex.put(tile.getWorldLocation(), tile);
     }
 
-    public void remove(Tile tile, TileItem item) {
+    public void remove(Tile tile, PluginTileItem item) {
         if (!itemIndex.containsKey(tile)) {
             return; // what?
         }

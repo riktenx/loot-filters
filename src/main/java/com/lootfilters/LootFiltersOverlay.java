@@ -1,5 +1,7 @@
 package com.lootfilters;
 
+import com.lootfilters.model.DespawnTimerType;
+import com.lootfilters.model.PluginTileItem;
 import com.lootfilters.util.TextComponent;
 import net.runelite.api.Client;
 import net.runelite.api.ItemID;
@@ -8,6 +10,7 @@ import net.runelite.api.coords.LocalPoint;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayPosition;
+import net.runelite.client.ui.overlay.components.ProgressPieComponent;
 
 import javax.inject.Inject;
 import java.awt.Color;
@@ -15,6 +18,8 @@ import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.time.Duration;
+import java.time.Instant;
 
 import static com.lootfilters.util.TextUtil.abbreviate;
 import static java.util.stream.Collectors.counting;
@@ -30,8 +35,6 @@ public class LootFiltersOverlay extends Overlay {
     private final LootFiltersPlugin plugin;
     private final LootFiltersConfig config;
 
-    private final boolean debug = false;
-
     @Inject
     private ItemManager itemManager;
 
@@ -45,7 +48,7 @@ public class LootFiltersOverlay extends Overlay {
 
     @Override
     public Dimension render(Graphics2D g) {
-        if (debug) {
+        if (plugin.isDebugEnabled()) {
             renderDebugOverlay(g);
         }
 
@@ -134,15 +137,7 @@ public class LootFiltersOverlay extends Overlay {
                 text.render(g);
 
                 if (match.isShowDespawn()) {
-                    var ticksRemaining = item.getDespawnTime() - client.getTickCount();
-                    if (ticksRemaining < 0) { // doesn't despawn
-                        continue;
-                    }
-                    text.setColor(getDespawnTextColor(item));
-                    text.setAccentColor(Color.BLACK); // text color is r/y/g for despawn, fixed black accent is fine
-                    text.setText(Integer.toString(ticksRemaining));
-                    text.setPosition(new Point(textPoint.getX() + textWidth + 2 + 1, textPoint.getY() - currentOffset));
-                    text.render(g);
+                    renderDespawnTimer(g, item, textPoint, textWidth, fm.getHeight(), currentOffset);
                 }
 
                 currentOffset += textHeight + BOX_PAD + 3;
@@ -153,11 +148,11 @@ public class LootFiltersOverlay extends Overlay {
         return null;
     }
 
-    private Color getDespawnTextColor(TileItem item) {
+    private Color getDespawnTextColor(PluginTileItem item) {
         if (item.getDespawnTime() - client.getTickCount() < 100) {
             return Color.RED;
         }
-        if (item.getVisibleTime() <= client.getTickCount()) {
+        if (!item.isPrivate() && item.getVisibleTime() <= client.getTickCount()) {
             return Color.YELLOW;
         }
         return Color.GREEN;
@@ -235,5 +230,38 @@ public class LootFiltersOverlay extends Overlay {
         g.setColor(Color.WHITE);
         g.drawString("items: " + itemCount + "," + plugin.getTileItemIndex().pointIndexSize(), 0, 32);
         g.drawString("lootbeams: " + plugin.getLootbeamIndex().size(), 0, 48);
+    }
+
+    private void renderDespawnTimer(Graphics2D g, PluginTileItem item, net.runelite.api.Point textPoint, int textWidth, int textHeight, int yOffset) {
+        var ticksRemaining = item.getDespawnTime() - client.getTickCount();
+        if (ticksRemaining < 0) { // doesn't despawn
+            return;
+        }
+        if (config.despawnThreshold() > 0 && ticksRemaining > config.despawnThreshold()) {
+            return;
+        }
+
+        var type = config.despawnTimerType();
+        if (type == DespawnTimerType.TICKS || type == DespawnTimerType.SECONDS) {
+            var text = new TextComponent();
+            text.setText(type == DespawnTimerType.TICKS
+                    ? Integer.toString(ticksRemaining)
+                    : String.format("%.1f", (Duration.between(Instant.now(), item.getDespawnInstant())).toMillis() / 1000f));
+            text.setColor(getDespawnTextColor(item));
+            text.setPosition(new Point(textPoint.getX() + textWidth + 2 + 1, textPoint.getY() - yOffset));
+            text.render(g);
+        } else {
+            var timer = new ProgressPieComponent();
+            var total = item.getDespawnTime() - item.getSpawnTime();
+            var remaining = item.getDespawnTime() - plugin.getClient().getTickCount();
+            var radius = textHeight / 2;
+            timer.setPosition(new net.runelite.api.Point(textPoint.getX() + textWidth + 2 + 1 + radius,
+                    textPoint.getY() - yOffset - radius));
+            timer.setProgress(remaining / (double) total);
+            timer.setDiameter(textHeight);
+            timer.setFill(getDespawnTextColor(item));
+            timer.setBorderColor(getDespawnTextColor(item));
+            timer.render(g);
+        }
     }
 }
