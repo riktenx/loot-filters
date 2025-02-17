@@ -67,11 +67,8 @@ public class LootFiltersOverlay extends Overlay {
 
             var tile = entry.getKey();
             var currentOffset = 0;
-            for (var id : itemCounts.keySet()) {
-                var count = itemCounts.get(id);
-                var item = items.stream()
-                        .filter(it -> it.getId() == id)
-                        .findFirst().orElseThrow();
+            for (var item : items) {
+                var count = itemCounts.get(item.getId());
 
                 var match = activeFilter.findMatch(plugin, item);
                 if (match == null) {
