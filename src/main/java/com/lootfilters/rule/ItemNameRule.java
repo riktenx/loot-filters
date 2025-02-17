@@ -4,23 +4,34 @@ import com.lootfilters.LootFiltersPlugin;
 import lombok.EqualsAndHashCode;
 import net.runelite.api.TileItem;
 
+import java.util.List;
+
 @EqualsAndHashCode(callSuper = false)
 public class ItemNameRule extends Rule {
-    private final String name;
+    private final List<String> names;
+
+    public ItemNameRule(List<String> names) {
+        super("item_name");
+        this.names = names;
+    }
 
     public ItemNameRule(String name) {
         super("item_name");
-        this.name = name;
+        this.names = List.of(name);
     }
 
     @Override
     public boolean test(LootFiltersPlugin plugin, TileItem item) {
         var itemName = plugin.getItemName(item.getId());
-        if (name.startsWith("*")) {
-            return itemName.toLowerCase().endsWith(name.toLowerCase().substring(1));
-        } else if (name.endsWith("*")) {
-            return itemName.toLowerCase().startsWith(name.toLowerCase().substring(0, name.length() - 1));
+        return names.stream().anyMatch(it -> test(itemName, it));
+    }
+
+    private boolean test(String name, String target) {
+        if (target.startsWith("*")) {
+            return name.toLowerCase().endsWith(target.toLowerCase().substring(1));
+        } else if (target.endsWith("*")) {
+            return name.toLowerCase().startsWith(target.toLowerCase().substring(0, target.length() - 1));
         }
-        return itemName.equalsIgnoreCase(name);
+        return name.equalsIgnoreCase(target);
     }
 }
