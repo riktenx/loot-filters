@@ -212,9 +212,15 @@ public class Parser {
         return new ItemIdRule(id.expectInt());
     }
 
-    private ItemNameRule parseItemNameRule() {
-        var name = tokens.takeExpect(LITERAL_STRING);
-        return new ItemNameRule(name.getValue());
+    private Rule parseItemNameRule() {
+        if (tokens.peek().is(LITERAL_STRING)) {
+            return new ItemNameRule(tokens.take().expectString());
+        } else if (tokens.peek().is(LIST_START)) {
+            var block = tokens.take(LIST_START, LIST_END, true);
+            return new ItemNameRule(block.expectStringList());
+        } else {
+            throw new ParseException("parse item name: unexpected argument token", tokens.peek());
+        }
     }
 
     private ItemQuantityRule parseItemQuantityRule() {

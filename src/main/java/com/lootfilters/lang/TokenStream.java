@@ -203,6 +203,35 @@ public class TokenStream {
         return args;
     }
 
+    /**
+     * Attempt to parse the entire token stream as a list of strings.
+     */
+    public List<String> expectStringList() {
+        var strings = new ArrayList<String>();
+
+        takeExpect(Token.Type.LIST_START);
+        while (isNotEmpty()) {
+            if (peek().is(Token.Type.LIST_END)) {
+                return strings;
+            }
+
+            strings.add(take().expectString());
+            if (peek().is(Token.Type.COMMA)) {
+                take();
+            } else if (peek().is(Token.Type.LIST_END)) {
+                take();
+                break;
+            } else {
+                throw new ParseException("unexpected token in list", peek());
+            }
+        }
+        if (isNotEmpty()) {
+            throw new ParseException("unterminated list");
+        }
+
+        return strings;
+    }
+
     public boolean isNotEmpty() { // this doesn't _currently_ need a version that checks non-semantic
         return tokens.stream().anyMatch(Token::isSemantic);
     }
