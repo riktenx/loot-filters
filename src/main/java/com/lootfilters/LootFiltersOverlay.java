@@ -20,6 +20,7 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
 
 import static com.lootfilters.util.TextUtil.abbreviate;
 import static java.util.stream.Collectors.counting;
@@ -67,11 +68,14 @@ public class LootFiltersOverlay extends Overlay {
 
             var tile = entry.getKey();
             var currentOffset = 0;
-            for (var id : itemCounts.keySet()) {
-                var count = itemCounts.get(id);
-                var item = items.stream()
-                        .filter(it -> it.getId() == id)
-                        .findFirst().orElseThrow();
+            var rendered = new ArrayList<Integer>();
+            for (var item : items) {
+                if (rendered.contains(item.getId())) {
+                    continue;
+                }
+                rendered.add(item.getId());
+
+                var count = itemCounts.get(item.getId());
 
                 var match = activeFilter.findMatch(plugin, item);
                 if (match == null) {
