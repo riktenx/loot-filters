@@ -1,6 +1,8 @@
 package com.lootfilters;
 
 import com.lootfilters.model.DespawnTimerType;
+import com.lootfilters.model.DualValueDisplayType;
+import com.lootfilters.model.ValueDisplayType;
 import com.lootfilters.rule.TextAccent;
 import com.lootfilters.rule.ValueTier;
 import com.lootfilters.rule.ValueType;
@@ -119,11 +121,27 @@ public interface LootFiltersConfig extends Config {
     )
     default boolean alwaysShowValue() { return false; }
     @ConfigItem(
+            keyName = "valueDisplayType",
+            name = "Value display",
+            description = "Which value(s) to show.",
+            section = displayOverrides,
+            position = 1
+    )
+    default ValueDisplayType valueDisplayType() { return ValueDisplayType.HIGHEST; }
+    @ConfigItem(
+            keyName = "dualValueDisplayType",
+            name = "Dual-value display",
+            description = "How to layout both values when display type is set to both.",
+            section = displayOverrides,
+            position = 2
+    )
+    default DualValueDisplayType dualValueDisplay() { return DualValueDisplayType.COMPACT; }
+    @ConfigItem(
             keyName = "alwaysShowDespawn",
             name = "Show despawn",
             description = "Always show item despawn timers.",
             section = displayOverrides,
-            position = 1
+            position = 11
     )
     default boolean alwaysShowDespawn() { return false; }
     @ConfigItem(
@@ -131,7 +149,7 @@ public interface LootFiltersConfig extends Config {
             name = "Despawn type",
             description = "Type of despawn timer to render.",
             section = displayOverrides,
-            position = 2
+            position = 12
     )
     default DespawnTimerType despawnTimerType() { return DespawnTimerType.TICKS; }
     @ConfigItem(
@@ -139,7 +157,7 @@ public interface LootFiltersConfig extends Config {
             name = "Despawn threshold",
             description = "Number of remaining ticks until despawn at which to show the despawn timer (0 to always show).",
             section = displayOverrides,
-            position = 3
+            position = 13
     )
     @Units(Units.TICKS)
     default int despawnThreshold() { return 0; }
@@ -148,7 +166,7 @@ public interface LootFiltersConfig extends Config {
             name = "Text accent",
             description = "Text accent type.",
             section = displayOverrides,
-            position = 4
+            position = 14
     )
     default TextAccent textAccent() { return TextAccent.USE_FILTER; }
 
