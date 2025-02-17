@@ -63,7 +63,7 @@ public class LootbeamIndex {
                 var match = plugin.getActiveFilter().findMatch(plugin, item);
                 if (match != null && match.isShowLootbeam()) {
                     put(tile, item, new Lootbeam(plugin.getClient(), plugin.getClientThread(), tile.getWorldLocation(),
-                            match.getTextColor(), Lootbeam.Style.MODERN));
+                            match.getLootbeamColor(), Lootbeam.Style.MODERN));
                 }
             }
         }
