@@ -47,6 +47,14 @@ public class TextUtil {
         return Integer.toString(value);
     }
 
+    public static String abbreviateValue(int value) {
+        return value < 1000 ? value + "gp" : abbreviate(value);
+    }
+
+    public static String withParentheses(String value) {
+        return "(" + value + ")";
+    }
+
     public static String normalizeCrlf(String str) {
         return str
                 .replaceAll("\r\n", "\n")

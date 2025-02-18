@@ -8,7 +8,9 @@ import com.lootfilters.rule.Comparator;
 import com.lootfilters.rule.FontType;
 import com.lootfilters.rule.ItemIdRule;
 import com.lootfilters.rule.ItemNameRule;
+import com.lootfilters.rule.ItemNotedRule;
 import com.lootfilters.rule.ItemQuantityRule;
+import com.lootfilters.rule.ItemStackableRule;
 import com.lootfilters.rule.ItemTradeableRule;
 import com.lootfilters.rule.ItemValueRule;
 import com.lootfilters.rule.NotRule;
@@ -20,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
+import static com.lootfilters.lang.Token.Type.APPLY;
 import static com.lootfilters.lang.Token.Type.ASSIGN;
 import static com.lootfilters.lang.Token.Type.BLOCK_END;
 import static com.lootfilters.lang.Token.Type.BLOCK_START;
@@ -59,7 +62,9 @@ public class Parser {
             if (tok.is(META)) {
                 parseMeta();
             } else if (tok.is(IF)) {
-                parseMatcher();
+                parseMatcher(true);
+            } else if (tok.is(APPLY)) {
+                parseMatcher(false);
             } else {
                 throw new ParseException("unexpected token", tok);
             }
@@ -100,7 +105,7 @@ public class Parser {
         }
     }
 
-    private void parseMatcher() {
+    private void parseMatcher(boolean isTerminal) {
         var operators = new Stack<Token>();
         var rulesPostfix = new ArrayList<Rule>();
         tokens.walkExpression(EXPR_START, EXPR_END, it -> {
@@ -186,7 +191,7 @@ public class Parser {
         }
         tokens.takeExpect(BLOCK_END);
 
-        matchers.add(new MatcherConfig(buildRule(rulesPostfix), builder.build()));
+        matchers.add(new MatcherConfig(buildRule(rulesPostfix), builder.build(), isTerminal));
     }
 
     private Rule parseRule(Token first) {

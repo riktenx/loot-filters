@@ -24,6 +24,8 @@ import java.time.Instant;
 import java.util.ArrayList;
 
 import static com.lootfilters.util.TextUtil.abbreviate;
+import static com.lootfilters.util.TextUtil.abbreviateValue;
+import static com.lootfilters.util.TextUtil.withParentheses;
 import static java.util.stream.Collectors.counting;
 import static java.util.stream.Collectors.groupingBy;
 import static net.runelite.api.Perspective.getCanvasTextLocation;
@@ -179,28 +181,40 @@ public class LootFiltersOverlay extends Overlay {
 
         var ge = itemManager.getItemPrice(item.getId());
         var ha = itemManager.getItemComposition(item.getId()).getHaPrice();
-        var geFmt = abbreviate(ge);
-        if (ge < 1000) {
-            geFmt += "gp";
-        }
-        var haFmt = abbreviate(ha);
-        if (ha < 1000) {
-            haFmt += "gp";
-        }
         switch (config.valueDisplayType()) {
             case HIGHEST:
-                var isAlch = ha > ge;
-                return String.format("%s (%s%s)", text, isAlch ? "*" : "", isAlch ? haFmt : geFmt);
+                return ge == 0 && ha == 0 ? text
+                        : text + " " + formatDualValueText(config.dualValueDisplay(), ge, ha, false);
             case GE:
-                return String.format("%s (%s)", text, geFmt);
+                return ge == 0 ? text : String.format("%s (%s)", text, abbreviateValue(ge));
             case HA:
-                return String.format("%s (%s)", text, haFmt);
+                return ha == 0 ? text : String.format("%s (%s)", text, abbreviateValue(ha));
             default: // BOTH
-                if (config.dualValueDisplay() == DualValueDisplayType.COMPACT) {
-                    return String.format("%s (%s/*%s)", text, geFmt, haFmt);
-                } // VERBOSE
-                return String.format("%s (GE: %s, HA: %s)", text, geFmt, abbreviate(ha));
+                return ge == 0 && ha == 0 ? text
+                        : text + " " + formatDualValueText(config.dualValueDisplay(), ge, ha, true);
         }
+    }
+
+    private String formatDualValueText(DualValueDisplayType displayType, int geValue, int haValue, boolean showBoth) {
+        var geFmt = abbreviateValue(geValue);
+        var haFmt = abbreviateValue(haValue);
+        var geFmtStr = displayType == DualValueDisplayType.COMPACT ? "%s" : "(GE: %s)";
+        var haFmtStr = displayType == DualValueDisplayType.COMPACT ? "*%s" : "(HA: %s)";
+
+        if (!showBoth) {
+            var text = geValue >= haValue ? String.format(geFmtStr, geFmt) : String.format(haFmtStr, haFmt);
+            return displayType == DualValueDisplayType.COMPACT ? withParentheses(text) : text;
+        }
+
+        var parts = new ArrayList<String>();
+        if (geValue > 0) {
+            parts.add(String.format(geFmtStr, geFmt));
+        }
+        if (haValue > 0) {
+            parts.add(String.format(haFmtStr, haFmt));
+        }
+        var text = String.join(displayType == DualValueDisplayType.COMPACT ? "/" : " ", parts);
+        return displayType == DualValueDisplayType.COMPACT ? withParentheses(text) : text;
     }
 
     private void renderDebugOverlay(Graphics2D g) {

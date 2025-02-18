@@ -131,7 +131,7 @@ public interface LootFiltersConfig extends Config {
     @ConfigItem(
             keyName = "dualValueDisplayType",
             name = "Dual-value display",
-            description = "How to layout both values when display type is set to both.",
+            description = "How to compose the display of values when display type is set to either 'highest' or 'both'.",
             section = displayOverrides,
             position = 2
     )

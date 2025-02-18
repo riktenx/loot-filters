@@ -16,6 +16,7 @@ public class Lexer {
     private static final LinkedHashMap<String, Token.Type> STATICS = new LinkedHashMap<>() {{
         put("\\\n", Token.Type.WHITESPACE);
         put("#define", Token.Type.PREPROC_DEFINE);
+        put("apply", Token.Type.APPLY);
         put("false", Token.Type.FALSE);
         put("true", Token.Type.TRUE);
         put("meta", Token.Type.META);

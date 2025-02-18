@@ -15,7 +15,6 @@ import net.runelite.api.Varbits;
 
 import java.awt.Color;
 import java.util.Arrays;
-import java.util.List;
 import java.util.stream.Collectors;
 
 @Getter
@@ -24,13 +23,12 @@ import java.util.stream.Collectors;
 public class MatcherConfig {
     private final Rule rule;
     private final DisplayConfig display;
+    private final boolean isTerminal;
 
-    public static DisplayConfig findMatch(List<MatcherConfig> filters, LootFiltersPlugin plugin, TileItem item) {
-        var match = filters.stream()
-                .filter(it -> it.rule.test(plugin, item))
-                .findFirst()
-                .orElse(null);
-        return match != null ? match.display : null;
+    public MatcherConfig(Rule rule, DisplayConfig display) {
+        this.rule = rule;
+        this.display = display;
+        this.isTerminal = true;
     }
 
     public static MatcherConfig ownershipFilter(boolean enabled) {
@@ -67,7 +65,7 @@ public class MatcherConfig {
         var display = DisplayConfig.builder()
                 .textColor(Color.WHITE)
                 .build();
-        return new MatcherConfig(rule, display);
+        return new MatcherConfig(rule, display, false);
     }
 
     public static MatcherConfig valueTier(boolean enabled, int value, Color color, boolean showLootbeam, boolean notify) {

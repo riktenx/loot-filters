@@ -22,6 +22,8 @@ public class FilterUtil {
      */
     public static LootFilter withConfigMatchers(LootFilter filter, LootFiltersConfig config) {
         var matchersWithConfig = new ArrayList<MatcherConfig>();
+        matchersWithConfig.add(MatcherConfig.showUnmatched(config.showUnmatchedItems()));
+
         matchersWithConfig.add(MatcherConfig.ownershipFilter(config.ownershipFilter()));
         matchersWithConfig.add(MatcherConfig.itemSpawnFilter(config.itemSpawnFilter()));
 
@@ -49,27 +51,25 @@ public class FilterUtil {
                 config.notifyTier().ordinal() >= ValueTier.LOW.ordinal()));
         matchersWithConfig.add(MatcherConfig.hiddenTier(config.hideTierEnabled(), config.hideTierValue(), config.hideTierShowUntradeable()));
 
-        matchersWithConfig.add(MatcherConfig.showUnmatched(config.showUnmatchedItems()));
-
         if (config.alwaysShowValue()) {
             matchersWithConfig = matchersWithConfig.stream()
-                    .map(it -> new MatcherConfig(it.getRule(), it.getDisplay().toBuilder()
-                            .showValue(true)
-                            .build()))
+                    .map(it -> new MatcherConfig(it.getRule(),
+                            it.getDisplay().toBuilder().showValue(true).build(),
+                            it.isTerminal()))
                     .collect(Collectors.toCollection(ArrayList::new));
         }
         if (config.alwaysShowDespawn()) {
             matchersWithConfig = matchersWithConfig.stream()
-                    .map(it -> new MatcherConfig(it.getRule(), it.getDisplay().toBuilder()
-                            .showDespawn(true)
-                            .build()))
+                    .map(it -> new MatcherConfig(it.getRule(),
+                            it.getDisplay().toBuilder().showDespawn(true).build(),
+                            it.isTerminal()))
                     .collect(Collectors.toCollection(ArrayList::new));
         }
         if (config.textAccent().ordinal() > TextAccent.USE_FILTER.ordinal()) {
             matchersWithConfig = matchersWithConfig.stream()
-                    .map(it -> new MatcherConfig(it.getRule(), it.getDisplay().toBuilder()
-                            .textAccent(config.textAccent())
-                            .build()))
+                    .map(it -> new MatcherConfig(it.getRule(),
+                            it.getDisplay().toBuilder().textAccent(config.textAccent()).build(),
+                            it.isTerminal()))
                     .collect(Collectors.toCollection(ArrayList::new));
         }
 

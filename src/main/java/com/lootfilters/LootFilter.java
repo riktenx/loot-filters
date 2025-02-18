@@ -52,11 +52,23 @@ public class LootFilter {
     }
 
     public DisplayConfig findMatch(LootFiltersPlugin plugin, TileItem item) {
-        var match = matchers.stream()
-                .filter(it -> it.getRule().test(plugin, item))
-                .findFirst()
-                .orElse(null);
-        return match != null ? match.getDisplay() : null;
+        DisplayConfig display = null;
+        for (var matcher : matchers) {
+            if (!matcher.getRule().test(plugin, item)) {
+                continue;
+            }
+
+            if (matcher.isTerminal()) {
+                return display == null
+                        ? matcher.getDisplay()
+                        : display.merge(matcher.getDisplay());
+            } else {
+                display = display == null
+                        ? matcher.getDisplay()
+                        : display.merge(matcher.getDisplay());
+            }
+        }
+        return display;
     }
 
     public boolean isInActivationArea(WorldPoint p) {
