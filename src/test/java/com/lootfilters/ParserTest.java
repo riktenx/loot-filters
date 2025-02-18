@@ -5,6 +5,8 @@ import com.lootfilters.lang.Parser;
 import com.lootfilters.rule.AndRule;
 import com.lootfilters.rule.Comparator;
 import com.lootfilters.rule.ItemNameRule;
+import com.lootfilters.rule.ItemNotedRule;
+import com.lootfilters.rule.ItemStackableRule;
 import com.lootfilters.rule.ItemTradeableRule;
 import com.lootfilters.rule.ItemValueRule;
 import com.lootfilters.rule.NotRule;
@@ -47,6 +49,14 @@ public class ParserTest {
                 new MatcherConfig(new ItemTradeableRule(false),
                         DisplayConfig.builder()
                                 .textColor(new Color(0xff,0x80,0x00, 0xff))
+                                .build()),
+                new MatcherConfig(new ItemStackableRule(false),
+                        DisplayConfig.builder()
+                                .textColor(new Color(0xff,0x90,0x00, 0xff))
+                                .build()),
+                new MatcherConfig(new ItemNotedRule(false),
+                        DisplayConfig.builder()
+                                .textColor(new Color(0xff,0x95,0x00, 0xff))
                                 .build()),
                 new MatcherConfig(new NotRule(new ItemNameRule("foo")),
                         DisplayConfig.builder().hidden(true).build()),

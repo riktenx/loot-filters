@@ -43,6 +43,8 @@ Filters can match on various characteristics of an item:
 * value
 * quantity of stacked items
 * whether an item is tradeable
+* whether an item is stackable
+* whether an item is noted
 
 Items that match a particular set of conditions can be configured to display in various ways:
 * show/hide
