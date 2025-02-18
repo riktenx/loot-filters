@@ -41,7 +41,6 @@ import java.util.Objects;
 
 import static com.lootfilters.util.FilterUtil.withConfigMatchers;
 import static com.lootfilters.util.TextUtil.quote;
-import static java.util.Collections.emptyList;
 import static net.runelite.client.util.ImageUtil.loadImageResource;
 
 @Slf4j
@@ -100,7 +99,7 @@ public class LootFiltersPlugin extends Plugin {
 	public List<String> getUserFilters() {
 		var cfg = configManager.getConfiguration(CONFIG_GROUP, USER_FILTERS_KEY);
 		if (cfg == null || cfg.isEmpty()) {
-			return emptyList();
+			return new ArrayList<>();
 		}
 
 		var type = new TypeToken<List<String>>(){}.getType();

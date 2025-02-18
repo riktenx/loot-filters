@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import static com.lootfilters.util.CollectionUtil.append;
 import static com.lootfilters.util.FilterUtil.configToFilterSource;
 import static com.lootfilters.util.TextUtil.quote;
-import static java.util.Collections.emptyList;
 import static javax.swing.JOptionPane.showConfirmDialog;
 import static javax.swing.JOptionPane.showInputDialog;
 import static javax.swing.SwingUtilities.invokeLater;
@@ -255,7 +254,7 @@ public class LootFiltersPanel extends PluginPanel {
         filterSelect.removeAllItems();
         filterSelect.addItem(NONE_ITEM);
         filterSelect.setSelectedIndex(0);
-        plugin.setUserFilters(emptyList());
+        plugin.setUserFilters(new ArrayList<>());
         plugin.setUserFilterIndex(-1);
         updateFilterText(-1);
         invokeLater(() -> filterSelect.addActionListener(this::onFilterSelect));

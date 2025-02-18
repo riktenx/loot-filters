@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 import static com.lootfilters.util.CollectionUtil.append;
 import static com.lootfilters.util.TextUtil.normalizeCrlf;
 import static com.lootfilters.util.TextUtil.quote;
-import static java.util.Collections.emptyList;
 
 public class Preprocessor {
     private final TokenStream tokens;
@@ -38,7 +37,7 @@ public class Preprocessor {
             }
         }
 
-        return expandDefines(emptyList(), new TokenStream(preproc)).stream()
+        return expandDefines(new ArrayList<>(), new TokenStream(preproc)).stream()
                 .map(it -> it.is(Token.Type.LITERAL_STRING) ? quote(it.getValue()) : it.getValue())
                 .collect(Collectors.joining(""))
                 .trim();
