@@ -1,5 +1,32 @@
 package com.lootfilters;
 
+import com.lootfilters.lang.CompileException;
+import com.lootfilters.lang.Sources;
+import lombok.SneakyThrows;
+import net.runelite.client.ui.FontManager;
+import net.runelite.client.ui.PluginPanel;
+
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import java.awt.Color;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.Toolkit;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.event.ActionEvent;
+import java.io.IOException;
+import java.util.ArrayList;
+
 import static com.lootfilters.util.CollectionUtil.append;
 import static com.lootfilters.util.FilterUtil.configToFilterSource;
 import static com.lootfilters.util.TextUtil.quote;
@@ -7,20 +34,6 @@ import static javax.swing.JOptionPane.showConfirmDialog;
 import static javax.swing.JOptionPane.showInputDialog;
 import static javax.swing.SwingUtilities.invokeLater;
 import static net.runelite.client.util.ImageUtil.loadImageResource;
-
-import com.lootfilters.lang.CompileException;
-import com.lootfilters.lang.Sources;
-import java.awt.*;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.event.ActionEvent;
-import java.io.IOException;
-import java.util.ArrayList;
-import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import lombok.SneakyThrows;
-import net.runelite.client.ui.FontManager;
-import net.runelite.client.ui.PluginPanel;
 
 public class LootFiltersPanel extends PluginPanel {
     private static final String NONE_ITEM = "<none>";
