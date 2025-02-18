@@ -31,6 +31,7 @@ public class DisplayConfig {
     private final Color lootbeamColor;
     private final FontType fontType;
     private final Color menuTextColor;
+    private final String sound;
 
     public DisplayConfig(Color textColor) {
         this.textColor = textColor;
@@ -46,6 +47,7 @@ public class DisplayConfig {
         lootbeamColor = null;
         fontType = null;
         menuTextColor = null;
+        sound = null;
     }
 
     public Color getLootbeamColor() {
@@ -94,6 +96,7 @@ public class DisplayConfig {
         if (other.lootbeamColor != null) { b.lootbeamColor(other.lootbeamColor); }
         if (other.fontType != null) { b.fontType(other.fontType); }
         if (other.menuTextColor != null) { b.menuTextColor(other.menuTextColor); }
+        if (other.sound != null) { b.sound(other.sound); }
         return b.build();
     }
 }

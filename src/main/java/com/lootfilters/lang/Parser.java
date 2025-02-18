@@ -185,6 +185,8 @@ public class Parser {
                     builder.fontType(FontType.fromOrdinal(assign[1].expectInt())); break;
                 case "menuTextColor":
                     builder.menuTextColor(assign[1].expectColor()); break;
+                case "sound":
+                    builder.sound(assign[1].expectString()); break;
                 default:
                     throw new ParseException("unexpected identifier in display config block", assign[0]);
             }
