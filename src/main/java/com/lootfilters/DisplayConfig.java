@@ -40,6 +40,7 @@ public class DisplayConfig {
     private final Color tileFillColor;
 
     private final String sound;
+    private final Integer menuSort;
 
     public DisplayConfig(Color textColor) {
         this.textColor = textColor;
@@ -60,6 +61,7 @@ public class DisplayConfig {
         tileFillColor = null;
         hideOverlay = null;
         sound = null;
+        menuSort = null;
     }
 
     public Color getLootbeamColor() {
@@ -78,6 +80,10 @@ public class DisplayConfig {
             return menuTextColor;
         }
         return textColor != null && !textColor.equals(Color.WHITE) ? textColor : DEFAULT_MENU_TEXT_COLOR;
+    }
+
+    public int getMenuSort() {
+        return menuSort != null ? menuSort : 0;
     }
 
     public Font getFont() {
@@ -122,6 +128,7 @@ public class DisplayConfig {
         if (other.tileFillColor != null) { b.tileFillColor(other.tileFillColor); }
         if (other.hideOverlay != null) { b.hideOverlay(other.hideOverlay); }
         if (other.sound != null) { b.sound(other.sound); }
+        if (other.menuSort != null) { b.menuSort(other.menuSort); }
         return b.build();
     }
 }

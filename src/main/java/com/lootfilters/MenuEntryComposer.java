@@ -8,9 +8,11 @@ import net.runelite.api.coords.WorldPoint;
 
 import java.awt.Color;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.lootfilters.util.CollectionUtil.findBounds;
 import static com.lootfilters.util.TextUtil.abbreviate;
 import static net.runelite.client.util.ColorUtil.colorTag;
 
@@ -37,25 +39,52 @@ public class MenuEntryComposer {
         entry.setTarget(buildTargetText(item, color));
     }
 
-    public void onClientTick() { // collapse
-        if (!plugin.getConfig().collapseEntries()) {
+    public void onClientTick() { // sort -> collapse
+        if (plugin.getClient().isMenuOpen()) {
             return;
         }
 
-        var menu = plugin.getClient().getMenu();
-        var entries = menu.getMenuEntries();
+        var entries = sortEntries(plugin.getClient().getMenu().getMenuEntries());
+        if (plugin.getConfig().collapseEntries()) {
+            entries = collapseEntries(entries);
+        }
+        plugin.getClient().getMenu().setMenuEntries(entries);
+    }
 
+    private MenuEntry[] sortEntries(MenuEntry[] entries) {
+        var bounds = findBounds(List.of(entries), MenuEntryComposer::isGroundItem);
+        if (bounds[0] == -1) { // no items to sort
+            return entries;
+        }
+
+        var items = Arrays.copyOfRange(entries, bounds[0], bounds[1]);
+        var sortedItems = Arrays.stream(items).sorted((i, j) -> {
+            var itemI = getItemForEntry(i);
+            var itemJ = getItemForEntry(j);
+            var displayI = plugin.getDisplayIndex().get(itemI);
+            var displayJ = plugin.getDisplayIndex().get(itemJ);
+            var sortI = displayI != null ? displayI.getMenuSort() : 0;
+            var sortJ = displayJ != null ? displayJ.getMenuSort() : 0;
+            return sortI - sortJ;
+        }).toArray(MenuEntry[]::new);
+
+        var sorted = entries.clone();
+        for (var i = bounds[0]; i < bounds[1]; ++i) {
+            sorted[i] = sortedItems[i - bounds[0]];
+        }
+        return sorted;
+    }
+
+    private MenuEntry[] collapseEntries(MenuEntry[] entries) {
         var itemCounts = Stream.of(entries)
                 .filter(MenuEntryComposer::isGroundItem)
                 .collect(Collectors.groupingBy(MenuEntryComposer::entrySlug, Collectors.counting()));
-
-        var newEntries = Arrays.stream(entries)
+        return Arrays.stream(entries)
                 .map(it -> isGroundItem(it)
                         ? withCount(it, itemCounts.getOrDefault(entrySlug(it), 1L))
                         : it)
                 .distinct()
                 .toArray(MenuEntry[]::new);
-        menu.setMenuEntries(newEntries);
     }
 
     private MenuEntry withCount(MenuEntry entry, long count) {
