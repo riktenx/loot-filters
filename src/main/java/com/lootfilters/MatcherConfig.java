@@ -10,6 +10,7 @@ import com.lootfilters.rule.Rule;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.ToString;
 import net.runelite.api.TileItem;
 import net.runelite.api.Varbits;
 
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
 @Getter
 @AllArgsConstructor
 @EqualsAndHashCode
+@ToString
 public class MatcherConfig {
     private final Rule rule;
     private final DisplayConfig display;

@@ -1,8 +1,10 @@
 package com.lootfilters.rule;
 
 import com.lootfilters.LootFiltersPlugin;
+import lombok.ToString;
 import net.runelite.api.TileItem;
 
+@ToString
 public abstract class ComparatorRule extends Rule {
     private final int rhs;
     private final Comparator cmp;

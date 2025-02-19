@@ -14,6 +14,7 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import net.runelite.api.TileItem;
 import net.runelite.api.coords.WorldPoint;
 
@@ -23,6 +24,7 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 @EqualsAndHashCode
+@ToString
 public class LootFilter {
     @Setter private String name; // anonymous filter can be imported, would need name
 

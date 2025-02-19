@@ -2,11 +2,13 @@ package com.lootfilters.rule;
 
 import com.lootfilters.LootFiltersPlugin;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import net.runelite.api.TileItem;
 
 import java.util.List;
 
 @EqualsAndHashCode(callSuper = false)
+@ToString
 public class ItemNameRule extends Rule {
     private final List<String> names;
 
