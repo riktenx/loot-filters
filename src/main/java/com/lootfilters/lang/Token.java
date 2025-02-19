@@ -1,6 +1,7 @@
 package com.lootfilters.lang;
 
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 import lombok.Value;
 import net.runelite.client.util.ColorUtil;
 

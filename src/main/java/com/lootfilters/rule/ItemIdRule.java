@@ -3,10 +3,12 @@ package com.lootfilters.rule;
 import com.lootfilters.LootFiltersPlugin;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.ToString;
 import net.runelite.api.TileItem;
 
 @Getter
 @EqualsAndHashCode(callSuper = false)
+@ToString
 public class ItemIdRule extends Rule {
     private final int id;
 

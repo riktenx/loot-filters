@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.ToString;
 import net.runelite.client.ui.FontManager;
 
 import java.awt.Color;
@@ -15,6 +16,7 @@ import java.awt.Font;
 @Builder(toBuilder = true)
 @AllArgsConstructor
 @EqualsAndHashCode
+@ToString
 public class DisplayConfig {
     private static final Color DEFAULT_MENU_TEXT_COLOR = Color.decode("#ff9040");
 
@@ -63,7 +65,7 @@ public class DisplayConfig {
         if (menuTextColor != null) {
             return menuTextColor;
         }
-        return textColor != null && textColor != Color.WHITE ? textColor : DEFAULT_MENU_TEXT_COLOR;
+        return textColor != null && !textColor.equals(Color.WHITE) ? textColor : DEFAULT_MENU_TEXT_COLOR;
     }
 
     public Font getFont() {

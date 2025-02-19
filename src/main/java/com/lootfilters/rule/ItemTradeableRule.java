@@ -2,10 +2,12 @@ package com.lootfilters.rule;
 
 import com.lootfilters.LootFiltersPlugin;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import net.runelite.api.ItemID;
 import net.runelite.api.TileItem;
 
 @EqualsAndHashCode(callSuper = false)
+@ToString
 public class ItemTradeableRule extends Rule {
     private final boolean target;
 

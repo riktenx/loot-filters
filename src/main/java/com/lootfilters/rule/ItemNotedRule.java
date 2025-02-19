@@ -2,9 +2,11 @@ package com.lootfilters.rule;
 
 import com.lootfilters.LootFiltersPlugin;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import net.runelite.api.TileItem;
 
 @EqualsAndHashCode(callSuper = false)
+@ToString
 public class ItemNotedRule extends Rule {
     private final boolean target;
 

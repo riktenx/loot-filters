@@ -2,10 +2,12 @@ package com.lootfilters.rule;
 
 import com.lootfilters.LootFiltersPlugin;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import net.runelite.api.ItemID;
 import net.runelite.api.TileItem;
 
 @EqualsAndHashCode(callSuper = false)
+@ToString(callSuper = true)
 public class ItemValueRule extends ComparatorRule {
     public ItemValueRule(int value, Comparator cmp) {
        super("item_value", value, cmp);
