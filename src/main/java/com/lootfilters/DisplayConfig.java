@@ -65,7 +65,7 @@ public class DisplayConfig {
         if (menuTextColor != null) {
             return menuTextColor;
         }
-        return textColor != null && textColor.equals(Color.WHITE) ? textColor : DEFAULT_MENU_TEXT_COLOR;
+        return textColor != null && !textColor.equals(Color.WHITE) ? textColor : DEFAULT_MENU_TEXT_COLOR;
     }
 
     public Font getFont() {
