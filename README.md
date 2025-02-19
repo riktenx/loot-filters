@@ -17,6 +17,19 @@ This plugin replicates the majority of the experience offered by the base versio
 * De-prioritize menu entries for hidden items
 * Lootbeams
 
+### Importing & Selecting filters
+Loot Filters adds a sidebar icon and panel that allows you to create, update and delete your existing filters and change which filter is active.
+
+![](./readme-images/config-panel.png)
+
+From left to right the icons do the following:
+1. Add a filter, choosing either a blank template, or the built-in `loot-filters/filterscape` filter.
+2. Import a filter from your clipboard
+3. Import item highlight and hide lists into new filter. Doing this will also reset those lists.
+4. Delete the currently active filter.
+
+You can change the active filter using the dropdown.
+
 ## Additions
 
 The plugin provides the following extensions over the base Ground Items experience:
