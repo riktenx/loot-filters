@@ -2,6 +2,7 @@ package com.lootfilters;
 
 import com.lootfilters.lang.Lexer;
 import com.lootfilters.lang.Parser;
+import com.lootfilters.lang.TokenStream;
 import com.lootfilters.rule.AndRule;
 import com.lootfilters.rule.Comparator;
 import com.lootfilters.rule.ItemNameRule;
@@ -78,8 +79,8 @@ public class ParserTest {
         );
         var expect = new LootFilter(expectName, expectDesc, expectArea, expectMatchers);
 
-        var tokens = new Lexer(input).tokenize();
-        var parser = new Parser(tokens);
+        var lexedTokens = new Lexer("ParserTest", input).tokenize();
+        var parser = new Parser(lexedTokens);
         var actual = parser.parse();
         assertEquals(expect, actual);
     }

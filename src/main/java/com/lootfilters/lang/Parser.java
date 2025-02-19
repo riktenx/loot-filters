@@ -21,6 +21,7 @@ import com.lootfilters.rule.TextAccent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
+import lombok.RequiredArgsConstructor;
 
 import static com.lootfilters.lang.Token.Type.APPLY;
 import static com.lootfilters.lang.Token.Type.ASSIGN;
@@ -44,6 +45,7 @@ import static com.lootfilters.lang.Token.Type.STMT_END;
 
 // Parser somewhat mixes canonical stages 2 (parse) and 3/4 (syntax/semantic analysis) but the filter language is
 // restricted enough that it should be fine for now.
+@RequiredArgsConstructor
 public class Parser {
     private final TokenStream tokens;
     private final List<MatcherConfig> matchers = new ArrayList<>();
@@ -51,10 +53,6 @@ public class Parser {
     private String name;
     private String description;
     private int[] activationArea = null;
-
-    public Parser(List<Token> tokens) {
-        this.tokens = new TokenStream(tokens);
-    }
 
     public LootFilter parse() throws ParseException {
         while (tokens.isNotEmpty()) {

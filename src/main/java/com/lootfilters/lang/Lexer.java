@@ -43,11 +43,15 @@ public class Lexer {
         put("\r", Token.Type.NEWLINE);
     }};
 
+    private final String inputName;
     private final String input;
     private final List<Token> tokens = new ArrayList<>();
     private int offset = 0;
+    // 1 indexed cause editors start line and char counts at 1
+    private int currentLineOffset = 1;
+    private int currentLineNumber = 1;
 
-    public List<Token> tokenize() throws TokenizeException {
+    public TokenStream tokenize() throws TokenizeException {
         while (offset < input.length()) {
             if (tokenizeStatic()) {
                 continue;
@@ -66,13 +70,13 @@ public class Lexer {
             } else if (isLegalIdent(ch)) {
                 tokenizeIdentifier();
             } else {
-                throw new TokenizeException("unrecognized character '" + ch + "'");
+                throw new TokenizeException(String.format("unrecognized character '" + ch + "' line %s char %s", currentLineNumber, currentLineOffset));
             }
         }
 
         return tokens.stream() // un-map escaped newlines
-                .map(it -> it.getValue().equals("\\\n") ? new Token(Token.Type.WHITESPACE, "") : it)
-                .collect(Collectors.toList());
+                .map(it -> it.getValue().equals("\\\n") ? new Token(Token.Type.WHITESPACE, "", it.getLocation()) : it)
+                .collect(Collectors.collectingAndThen(Collectors.toList(), TokenStream::new));
     }
 
     private boolean tokenizeStatic() {
@@ -80,8 +84,15 @@ public class Lexer {
             var value = entry.getKey();
             var type = entry.getValue();
             if (input.startsWith(value, offset)) {
-                tokens.add(new Token(type, value));
+                tokens.add(new Token(type, value, currentLocation()));
+                currentLineOffset += value.length();
                 offset += value.length();
+                // Checking for \n here captures both escaped and unescaped newlines
+                // allowing us to properly track position within newline-escaped macros
+                if (value.endsWith("\n")) {
+                    currentLineOffset = 1;
+                    currentLineNumber += 1;
+                }
                 return true;
             }
         }
@@ -97,7 +108,8 @@ public class Lexer {
         var text = lineEnd > -1
                 ? input.substring(offset, lineEnd)
                 : input.substring(offset);
-        tokens.add(new Token(Token.Type.COMMENT, text));
+        tokens.add(new Token(Token.Type.COMMENT, text, currentLocation()));
+        currentLineOffset += text.length();
         offset += text.length();
         return true;
     }
@@ -106,12 +118,15 @@ public class Lexer {
         for (int i = offset; i < input.length(); ++i) {
             if (!isWhitespace(input.charAt(i))) {
                 var ws = input.substring(offset, i);
-                tokens.add(new Token(Token.Type.WHITESPACE, ws));
+                tokens.add(new Token(Token.Type.WHITESPACE, ws, currentLocation()));
+                currentLineOffset += i - offset;
                 offset += i - offset;
                 return;
             }
         }
-        tokens.add(new Token(Token.Type.WHITESPACE, input.substring(offset)));
+        var ws = input.substring(offset);
+        tokens.add(new Token(Token.Type.WHITESPACE, ws, currentLocation()));
+        currentLineOffset += ws.length();
         offset = input.length();
     }
 
@@ -122,21 +137,25 @@ public class Lexer {
             }
             if (!isNumeric(input.charAt(i))) {
                 var literal = input.substring(offset, i);
-                tokens.add(Token.intLiteral(literal));
+                tokens.add(Token.intLiteral(literal, currentLocation()));
+                currentLineOffset += literal.length();
                 offset += literal.length();
                 return;
             }
         }
-        tokens.add(Token.intLiteral(input.substring(offset)));
+        tokens.add(Token.intLiteral(input.substring(offset), currentLocation()));
+        currentLineOffset += input.substring(offset).length();
         offset = input.length();
     }
 
     private void tokenizeLiteralString() throws TokenizeException {
-        for (int i = offset+1; i < input.length(); ++i) {
+        for (int i = offset + 1; i < input.length(); ++i) {
             if (input.charAt(i) == '"') {
-                var literal = input.substring(offset+1, i);
-                tokens.add(Token.stringLiteral(literal));
-                offset += literal.length() + 2; // for quotes, which the captured literal omits
+                var literal = input.substring(offset + 1, i);
+                // for quotes, which the captured literal omits
+                tokens.add(Token.stringLiteral(literal, currentLocation()));
+                currentLineOffset += literal.length() + 2;
+                offset += literal.length() + 2;
                 return;
             }
         }
@@ -147,12 +166,18 @@ public class Lexer {
         for (int i = offset; i < input.length(); ++i) {
             if (!isLegalIdent(input.charAt(i))) {
                 var ident = input.substring(offset, i);
-                tokens.add(Token.identifier(ident));
+                tokens.add(Token.identifier(ident, currentLocation()));
+                currentLineOffset += ident.length();
                 offset += ident.length();
                 return;
             }
         }
-        tokens.add(Token.identifier(input.substring(offset)));
+        tokens.add(Token.identifier(input.substring(offset), currentLocation()));
+        currentLineOffset += input.substring(offset).length();
         offset = input.length();
+    }
+
+    private Location currentLocation() {
+        return new Location(inputName, currentLineNumber, currentLineOffset);
     }
 }

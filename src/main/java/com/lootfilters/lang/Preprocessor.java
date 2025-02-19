@@ -1,6 +1,7 @@
 package com.lootfilters.lang;
 
-import lombok.AllArgsConstructor;
+import static com.lootfilters.util.CollectionUtil.append;
+import static com.lootfilters.util.TextUtil.quote;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,22 +9,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.lootfilters.util.CollectionUtil.append;
-import static com.lootfilters.util.TextUtil.normalizeCrlf;
-import static com.lootfilters.util.TextUtil.quote;
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 public class Preprocessor {
     private final TokenStream tokens;
 
     private final Map<String, Define> defines = new HashMap<>();
     private final List<Token> preproc = new ArrayList<>(); // pre-expansion w/ all preproc lines removed
 
-    public Preprocessor(String input) {
-        input = normalizeCrlf(input);
-        this.tokens = new TokenStream(new Lexer(input).tokenize());
-    }
 
-    public String preprocess() throws PreprocessException {
+    public TokenStream preprocess() throws PreprocessException {
         while (tokens.isNotEmpty()) {
             var next = tokens.take(true);
             if (next.is(Token.Type.PREPROC_DEFINE)) {
@@ -32,23 +29,22 @@ public class Preprocessor {
                 preproc.add(next);
                 if (!next.is(Token.Type.NEWLINE)) {
                     preproc.addAll(tokens.takeLine());
-                    preproc.add(new Token(Token.Type.NEWLINE, "\n"));
+                    preproc.add(new Token(Token.Type.NEWLINE, "\n", Location.UNKNOWN));
                 }
             }
         }
 
-        return expandDefines(new ArrayList<>(), new TokenStream(preproc)).stream()
-                .map(it -> it.is(Token.Type.LITERAL_STRING) ? quote(it.getValue()) : it.getValue())
-                .collect(Collectors.joining(""))
-                .trim();
+
+        return new TokenStream(expandDefines(new ArrayList<>(), new TokenStream(preproc)));
     }
 
     private void parseDefine() {
-        var name = tokens.takeExpect(Token.Type.IDENTIFIER).getValue();
+        var nameToken = tokens.takeExpect(Token.Type.IDENTIFIER);
+        var name = nameToken.getValue();
         var params = tokens.peek().is(Token.Type.EXPR_START)
                 ? parseDefineParams() : null;
         if (params != null && params.isEmpty()) {
-            throw new PreprocessException("#define " + quote(name) + " has empty param list");
+            throw new PreprocessException("#define " + quote(name) + " has empty param list found at " + nameToken.getLocation().toString());
         }
         tokens.takeExpect(Token.Type.WHITESPACE, true);
         defines.put(name, new Define(name, params, tokens.takeLine()));
@@ -79,10 +75,19 @@ public class Preprocessor {
                 var define = defines.get(token.getValue());
                 if (define.isParameterized()) {
                     var args = tokens.takeArgList();
-                    postproc.addAll(expandParameterizedDefine(append(visited, define.name), define, args));
+                    postproc.addAll(expandParameterizedDefine(append(visited, define.name), define, args, token.getLocation()));
                 } else {
-                    var defineTokens = new TokenStream(new ArrayList<>(define.value));
-                    postproc.addAll(expandDefines(append(visited, define.name), defineTokens));
+                    var defineTokens = define.value.stream().map(
+                                    macroToken -> {
+                                        // the location data for this token is:
+                                        // 1. the location of the original token that will be replaced
+                                        // 2. with the macroSourceLocation for the replacementToken we'll be inserting
+                                        var newLocation = token.getLocation().withMacroSourceLocation(macroToken.getLocation().withMacroName(define.name));
+                                        // create a copy of the macro location with the updated location
+                                        return macroToken.withLocation(newLocation);
+                                    })
+                            .collect(Collectors.toList());
+                    postproc.addAll(expandDefines(append(visited, define.name), new TokenStream(defineTokens)));
                 }
             } else {
                 postproc.add(token);
@@ -91,9 +96,10 @@ public class Preprocessor {
         return postproc;
     }
 
-    private List<Token> expandParameterizedDefine(List<String> visited, Define define, List<TokenStream> args) {
+    private List<Token> expandParameterizedDefine(List<String> visited, Define define, List<TokenStream> args, Location macroInvocation) {
         var expanded = new ArrayList<Token>();
-        for (var token : define.value) {
+        for (var defineToken : define.value) {
+            var token = defineToken.withLocation(macroInvocation.withMacroSourceLocation(defineToken.getLocation().withMacroName(define.name)));
             if (!token.is(Token.Type.IDENTIFIER) || token.getValue().equals(define.name)) {
                 expanded.add(token);
                 continue;
@@ -118,12 +124,12 @@ public class Preprocessor {
 
     @AllArgsConstructor
     private static class Define {
-       final String name;
-       final List<String> params;
-       final List<Token> value;
+        final String name;
+        final List<String> params;
+        final List<Token> value;
 
-       boolean isParameterized() {
-           return params != null;
-       }
+        boolean isParameterized() {
+            return params != null;
+        }
     }
 }
