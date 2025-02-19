@@ -28,9 +28,10 @@ public class CollectionUtil {
             }
             if (indices[0] != -1 && !predicate.test(list.get(i))) {
                 indices[1] = i;
+                return indices;
             }
         }
-        if (indices[0] != -1 && indices[1] == -1) {
+        if (indices[0] != -1) {
             indices[1] = list.size();
         }
         return indices;
