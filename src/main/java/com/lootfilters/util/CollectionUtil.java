@@ -27,7 +27,7 @@ public class CollectionUtil {
                 indices[0] = i;
             }
             if (indices[0] != -1 && !predicate.test(list.get(i))) {
-                indices[i] = i;
+                indices[1] = i;
             }
         }
         if (indices[0] != -1 && indices[1] == -1) {
