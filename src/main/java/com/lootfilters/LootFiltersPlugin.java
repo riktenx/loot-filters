@@ -12,6 +12,7 @@ import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.events.ClientTick;
 import net.runelite.api.events.CommandExecuted;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
@@ -233,6 +234,11 @@ public class LootFiltersPlugin extends Plugin {
 	@Subscribe
 	public void onGameTick(GameTick event) {
 		scanAreaFilter();
+	}
+
+	@Subscribe
+	public void onClientTick(ClientTick event) {
+		menuEntryComposer.onClientTick();
 	}
 
 	@Subscribe

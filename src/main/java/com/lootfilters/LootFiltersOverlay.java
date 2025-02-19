@@ -244,6 +244,13 @@ public class LootFiltersOverlay extends Overlay {
             itemCount += sz;
             screenY += 16;
         }
+        screenY = 32;
+        for (var entry : plugin.getMenuEntryComposer().lastTickEntries) {
+            var deprio = entry.isDeprioritized() ? "[d]" : "";
+            g.drawString(entry.getOption() + " " + entry.getTarget() + deprio, 128, screenY);
+            screenY += 16;
+        }
+
         g.setColor(Color.WHITE);
         g.drawString("items: " + itemCount + "," + plugin.getTileItemIndex().pointIndexSize(), 0, 32);
         g.drawString("lootbeams: " + plugin.getLootbeamIndex().size(), 0, 48);

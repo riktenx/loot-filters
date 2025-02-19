@@ -59,7 +59,7 @@ public class Lexer {
             var ch = input.charAt(offset);
             if (isWhitespace(ch)) {
                 tokenizeWhitespace();
-            } else if (isNumeric(ch)) {
+            } else if (isNumeric(ch) || ch == '-' && isNumeric(input.charAt(offset + 1))) {
                 tokenizeLiteralInt();
             } else if (ch == '"') {
                 tokenizeLiteralString();
@@ -116,7 +116,8 @@ public class Lexer {
     }
 
     private void tokenizeLiteralInt() {
-        for (int i = offset; i < input.length(); ++i) {
+        var start = input.charAt(offset) == '-' ? offset + 1 : offset;
+        for (int i = start; i < input.length(); ++i) {
             if (input.charAt(i) == '_') {
                 continue;
             }

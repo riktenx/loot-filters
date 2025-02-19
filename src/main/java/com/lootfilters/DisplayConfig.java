@@ -33,6 +33,7 @@ public class DisplayConfig {
     private final Color lootbeamColor;
     private final FontType fontType;
     private final Color menuTextColor;
+    private final Integer sort;
 
     public DisplayConfig(Color textColor) {
         this.textColor = textColor;
@@ -48,6 +49,7 @@ public class DisplayConfig {
         lootbeamColor = null;
         fontType = null;
         menuTextColor = null;
+        sort = null;
     }
 
     public Color getLootbeamColor() {
@@ -66,6 +68,10 @@ public class DisplayConfig {
             return menuTextColor;
         }
         return textColor != null && !textColor.equals(Color.WHITE) ? textColor : DEFAULT_MENU_TEXT_COLOR;
+    }
+
+    public int getSort() {
+        return sort != null ? sort : 0;
     }
 
     public Font getFont() {
@@ -96,6 +102,7 @@ public class DisplayConfig {
         if (other.lootbeamColor != null) { b.lootbeamColor(other.lootbeamColor); }
         if (other.fontType != null) { b.fontType(other.fontType); }
         if (other.menuTextColor != null) { b.menuTextColor(other.menuTextColor); }
+        if (other.sort != null) { b.sort(other.sort); }
         return b.build();
     }
 }
