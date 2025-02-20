@@ -193,6 +193,14 @@ public interface LootFiltersConfig extends Config {
             position = 24
     )
     default boolean highlightTiles() { return false; }
+    @ConfigItem(
+            keyName = "deprioritizeHidden",
+            name = "Deprioritize menu hidden items",
+            description = "Deprioritize menu entries for hidden items.",
+            section = displayOverrides,
+            position = 15
+    )
+    default boolean deprioritizeHidden() { return false; }
 
     @ConfigSection(
             name = "Item lists",

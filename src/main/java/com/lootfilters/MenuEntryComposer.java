@@ -6,7 +6,6 @@ import net.runelite.api.MenuEntry;
 import net.runelite.api.TileItem;
 import net.runelite.api.coords.WorldPoint;
 
-import java.awt.Color;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -28,7 +27,7 @@ public class MenuEntryComposer {
             return;
         }
 
-        entry.setDeprioritized(match.isHidden());
+        entry.setDeprioritized(plugin.getConfig().deprioritizeHidden() && match.isHidden());
         entry.setTarget(buildTargetText(item, match));
     }
 
