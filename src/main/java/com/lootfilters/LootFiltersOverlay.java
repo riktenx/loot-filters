@@ -7,6 +7,7 @@ import com.lootfilters.model.ValueDisplayType;
 import com.lootfilters.util.TextComponent;
 import net.runelite.api.Client;
 import net.runelite.api.ItemID;
+import net.runelite.api.Tile;
 import net.runelite.api.TileItem;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.client.game.ItemManager;
@@ -15,6 +16,7 @@ import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.components.ProgressPieComponent;
 
 import javax.inject.Inject;
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
@@ -25,6 +27,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
+import java.util.List;
 
 import static com.lootfilters.util.TextUtil.abbreviate;
 import static com.lootfilters.util.TextUtil.abbreviateValue;
@@ -32,6 +35,7 @@ import static com.lootfilters.util.TextUtil.withParentheses;
 import static java.util.stream.Collectors.counting;
 import static java.util.stream.Collectors.groupingBy;
 import static net.runelite.api.Perspective.getCanvasTextLocation;
+import static net.runelite.api.Perspective.getCanvasTilePoly;
 
 public class LootFiltersOverlay extends Overlay {
     private static final int Z_STACK_OFFSET = 16;
@@ -71,11 +75,13 @@ public class LootFiltersOverlay extends Overlay {
         var hoveredHighlight = new AtomicInteger(-1);
 
         for (var entry : plugin.getTileItemIndex().entrySet()) {
+            var tile = entry.getKey();
             var items = entry.getValue();
+            highlightTiles(g, tile, items);
+
             var itemCounts = items.stream()
                     .collect(groupingBy(TileItem::getId, counting()));
 
-            var tile = entry.getKey();
             var currentOffset = 0;
             var rendered = new ArrayList<Integer>();
             for (var item : items) {
@@ -321,5 +327,35 @@ public class LootFiltersOverlay extends Overlay {
         g.setColor(Color.WHITE);
         g.drawLine(show.x + 2, show.y + show.height / 2, show.x + show.width - 2, show.y + show.height / 2);
         g.drawLine(show.x + show.width / 2, show.y + 2, show.x + show.width / 2, show.y + show.height - 2);
+    }
+
+    private void highlightTiles(Graphics2D g, Tile tile, List<PluginTileItem> items) {
+        if (tile.getLocalLocation() == null) {
+            return;
+        }
+
+        for (var item : items) {
+            var match = plugin.getActiveFilter().findMatch(plugin, item);
+            if (match != null && match.isHighlightTile()) {
+                highlightTile(g, tile, match);
+            }
+        }
+    }
+
+    private void highlightTile(Graphics2D g, Tile tile, DisplayConfig display) {
+        var poly = getCanvasTilePoly(client, tile.getLocalLocation(), tile.getItemLayer().getHeight());
+        if (poly == null) {
+            return;
+        }
+
+        var origStroke = g.getStroke();
+        g.setColor(display.getTileStrokeColor());
+        g.setStroke(new BasicStroke(2));
+        g.draw(poly);
+        if (display.getTileFillColor() != null) {
+            g.setColor(display.getTileFillColor());
+            g.fill(poly);
+        }
+        g.setStroke(origStroke);
     }
 }

@@ -185,6 +185,12 @@ public class Parser {
                     builder.fontType(FontType.fromOrdinal(assign[1].expectInt())); break;
                 case "menuTextColor":
                     builder.menuTextColor(assign[1].expectColor()); break;
+                case "highlightTile":
+                    builder.highlightTile(assign[1].expectBoolean()); break;
+                case "tileStrokeColor":
+                    builder.tileStrokeColor(assign[1].expectColor()); break;
+                case "tileFillColor":
+                    builder.tileFillColor(assign[1].expectColor()); break;
                 default:
                     throw new ParseException("unexpected identifier in display config block", assign[0]);
             }
