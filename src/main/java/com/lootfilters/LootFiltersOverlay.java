@@ -74,14 +74,15 @@ public class LootFiltersOverlay extends Overlay {
         var hoveredHide = new AtomicInteger(-1);
         var hoveredHighlight = new AtomicInteger(-1);
 
+        for (var entry : plugin.getTileItemIndex().entrySet()) { // all tile draws have to go first so text is on top
+            highlightTiles(g, entry.getKey(), entry.getValue());
+        }
         for (var entry : plugin.getTileItemIndex().entrySet()) {
-            var tile = entry.getKey();
             var items = entry.getValue();
-            highlightTiles(g, tile, items);
-
             var itemCounts = items.stream()
                     .collect(groupingBy(TileItem::getId, counting()));
 
+            var tile = entry.getKey();
             var currentOffset = 0;
             var rendered = new ArrayList<Integer>();
             for (var item : items) {
