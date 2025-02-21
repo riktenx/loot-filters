@@ -87,7 +87,7 @@ public class TextUtil {
     }
 
     public static String toggleCsv(String csv, String item) {
-        if (csv.contains(item)) {
+        if (Arrays.stream(csv.split(",")).anyMatch(it -> it.trim().equalsIgnoreCase(item))) {
             return unsetCsv(csv, item);
         } else {
             return setCsv(csv, item);
