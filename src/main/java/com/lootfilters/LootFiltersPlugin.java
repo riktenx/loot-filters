@@ -85,6 +85,8 @@ public class LootFiltersPlugin extends Plugin {
 	private List<LootFilter> parsedUserFilters;
 
 	@Setter private int hoveredItem = -1;
+	@Setter private int hoveredHide = -1;
+	@Setter private int hoveredHighlight = -1;
 	@Setter private boolean hotkeyActive = false;
 	@Setter private boolean overlayEnabled = true;
 

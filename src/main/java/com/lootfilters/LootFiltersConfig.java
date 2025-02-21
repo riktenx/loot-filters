@@ -89,11 +89,27 @@ public interface LootFiltersConfig extends Config {
     )
     default boolean hotkeyShowHiddenItems() { return true; }
     @ConfigItem(
+            keyName = "hotkeyShowClickboxes",
+            name = "Press: Show hide/highlight box",
+            description = "Show hide/highlight boxes when hotkey is pressed.<p>You can still toggle hide/highlight when this is disabled with left/right/middle click over an item's overlay text.",
+            section = hotkey,
+            position = 2
+    )
+    default boolean hotkeyShowClickboxes() { return true; }
+    @ConfigItem(
+            keyName = "hotkeyShowValues",
+            name = "Press: Show item values",
+            description = "Show item values when the hotkey is pressed, even if they're otherwise disabled.",
+            section = hotkey,
+            position = 3
+    )
+    default boolean hotkeyShowValues() { return false; }
+    @ConfigItem(
             keyName = "hotkeyDoubleTapTogglesOverlay",
             name = "Double-tap: toggle overlay",
             description = "When enabled, double-tap the hotkey to toggle the entire ground items overlay.",
             section = hotkey,
-            position = 2
+            position = 12
     )
     default boolean hotkeyDoubleTapTogglesOverlay() { return true; }
     @ConfigItem(
@@ -101,7 +117,7 @@ public interface LootFiltersConfig extends Config {
             name = "Double-tap delay",
             description = "Period within which to register a hotkey double-tap.",
             section = hotkey,
-            position = 3
+            position = 13
     )
     @Units(Units.MILLISECONDS)
     default int hotkeyDoubleTapDelay() { return 250; }
