@@ -192,8 +192,8 @@ public class LootFiltersOverlay extends Overlay {
             return text;
         }
 
-        var ge = itemManager.getItemPrice(item.getId());
-        var ha = itemManager.getItemComposition(item.getId()).getHaPrice();
+        var ge = itemManager.getItemPrice(item.getId()) * item.getQuantity();
+        var ha = itemManager.getItemComposition(item.getId()).getHaPrice() * item.getQuantity();
         switch (showBecauseHotkey ? ValueDisplayType.BOTH : config.valueDisplayType()) {
             case HIGHEST:
                 return ge == 0 && ha == 0 ? text
