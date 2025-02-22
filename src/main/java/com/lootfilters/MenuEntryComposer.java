@@ -1,21 +1,52 @@
 package com.lootfilters;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import net.runelite.api.MenuAction;
 import net.runelite.api.MenuEntry;
 import net.runelite.api.TileItem;
 import net.runelite.api.coords.WorldPoint;
 
-import java.awt.Color;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.lootfilters.util.CollectionUtil.findBounds;
 import static net.runelite.client.util.ColorUtil.colorTag;
 
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class MenuEntryComposer {
     private final LootFiltersPlugin plugin;
+    public MenuEntry[] lastTickEntries = new MenuEntry[]{};
+
+    public void onClientTick() {
+        if (plugin.getClient().isMenuOpen()) {
+            return;
+        }
+
+        var menu = plugin.getClient().getMenu();
+        var entries = menu.getMenuEntries();
+        var bounds = findBounds(List.of(entries), MenuEntryComposer::isGroundItem);
+        if (bounds[0] != -1) {
+            var items = Arrays.copyOfRange(entries, bounds[0], bounds[1]);
+            var sorted = Arrays.stream(items).sorted((i, j) -> {
+                var itemI = getItemForEntry(i);
+                var itemJ = getItemForEntry(j);
+                var matchI = plugin.getActiveFilter().findMatch(plugin, itemI);
+                var matchJ = plugin.getActiveFilter().findMatch(plugin, itemJ);
+                var sortI = matchI != null ? matchI.getSort() : 0;
+                var sortJ = matchJ != null ? matchJ.getSort() : 0;
+                return sortI - sortJ;
+            }).collect(Collectors.toList());
+
+            for (var i = bounds[0]; i < bounds[1]; ++i) {
+                entries[i] = sorted.get(i - bounds[0]);
+            }
+            menu.setMenuEntries(entries);
+        }
+
+        lastTickEntries = entries;
+    }
 
     public void onMenuEntryAdded(MenuEntry entry) { // recolor/add quantity
         if (!isGroundItem(entry)) {
