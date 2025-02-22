@@ -198,7 +198,7 @@ public interface LootFiltersConfig extends Config {
             name = "Menu: deprioritize hidden items",
             description = "Deprioritize menu entries for hidden items.",
             section = displayOverrides,
-            position = 15
+            position = 90
     )
     default boolean deprioritizeHidden() { return false; }
     @ConfigItem(
@@ -206,7 +206,7 @@ public interface LootFiltersConfig extends Config {
             name = "Menu: recolor hidden items",
             description = "Recolor menu entries for hidden items.",
             section = displayOverrides,
-            position = 16
+            position = 91
     )
     default boolean recolorHidden() { return false; }
     @ConfigItem(
@@ -214,7 +214,7 @@ public interface LootFiltersConfig extends Config {
             name = "Hidden color",
             description = "Color for hidden items in text overlay and menu entries.",
             section = displayOverrides,
-            position = 17
+            position = 92
     )
     default Color hiddenColor() { return Color.GRAY; }
 
