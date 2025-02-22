@@ -18,7 +18,7 @@ import java.awt.Font;
 @EqualsAndHashCode
 @ToString
 public class DisplayConfig {
-    private static final Color DEFAULT_MENU_TEXT_COLOR = Color.decode("#ff9040");
+    public static final Color DEFAULT_MENU_TEXT_COLOR = Color.decode("#ff9040");
 
     private final Color textColor;
     private final Color backgroundColor;
