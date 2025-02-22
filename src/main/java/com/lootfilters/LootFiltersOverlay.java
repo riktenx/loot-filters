@@ -41,7 +41,6 @@ public class LootFiltersOverlay extends Overlay {
     private static final int Z_STACK_OFFSET = 16;
     private static final int BOX_PAD = 2;
     private static final int CLICKBOX_SIZE = 8;
-    private static final Color COLOR_HIDDEN = Color.GRAY.brighter();
 
     private final Client client;
     private final LootFiltersPlugin plugin;
@@ -125,7 +124,7 @@ public class LootFiltersOverlay extends Overlay {
 
                 var text = new TextComponent();
                 text.setText(displayText);
-                text.setColor(match.isHidden() ? COLOR_HIDDEN : match.getTextColor());
+                text.setColor(match.isHidden() ? config.hiddenColor() : match.getTextColor());
                 text.setPosition(new Point(textPoint.getX(), textPoint.getY() - currentOffset));
                 if (match.getTextAccentColor() != null) {
                     text.setAccentColor(match.getTextAccentColor());
@@ -150,7 +149,7 @@ public class LootFiltersOverlay extends Overlay {
                 if (plugin.isHotkeyActive() && boundingBox.contains(mouse.getX(), mouse.getY())) {
                     hoveredItem = item.getId();
 
-                    g.setColor(match.isHidden() ? COLOR_HIDDEN : Color.WHITE);
+                    g.setColor(match.isHidden() ? config.hiddenColor() : Color.WHITE);
                     g.drawRect(boundingBox.x, boundingBox.y, boundingBox.width, boundingBox.height);
                 }
                 if (config.hotkeyShowClickboxes() && plugin.isHotkeyActive()) {
@@ -312,7 +311,7 @@ public class LootFiltersOverlay extends Overlay {
             onHoverHide.accept(item.getId());
             g.setColor(Color.RED);
         } else {
-            g.setColor(display.isHidden() ? COLOR_HIDDEN : display.getTextColor());
+            g.setColor(display.isHidden() ? config.hiddenColor() : display.getTextColor());
         }
         g.drawRect(hide.x, hide.y, hide.width, hide.height);
         g.setColor(Color.WHITE);
@@ -322,7 +321,7 @@ public class LootFiltersOverlay extends Overlay {
             onHoverHighlight.accept(item.getId());
             g.setColor(Color.GREEN);
         } else {
-            g.setColor(display.isHidden() ? COLOR_HIDDEN : display.getTextColor());
+            g.setColor(display.isHidden() ? config.hiddenColor() : display.getTextColor());
         }
         g.drawRect(show.x, show.y, show.width, show.height);
         g.setColor(Color.WHITE);

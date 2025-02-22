@@ -195,12 +195,28 @@ public interface LootFiltersConfig extends Config {
     default boolean highlightTiles() { return false; }
     @ConfigItem(
             keyName = "deprioritizeHidden",
-            name = "Deprioritize menu hidden items",
+            name = "Menu: deprioritize hidden items",
             description = "Deprioritize menu entries for hidden items.",
             section = displayOverrides,
             position = 15
     )
     default boolean deprioritizeHidden() { return false; }
+    @ConfigItem(
+            keyName = "recolorHidden",
+            name = "Menu: recolor hidden items",
+            description = "Recolor menu entries for hidden items.",
+            section = displayOverrides,
+            position = 16
+    )
+    default boolean recolorHidden() { return false; }
+    @ConfigItem(
+            keyName = "hiddenColor",
+            name = "Hidden color",
+            description = "Color for hidden items in text overlay and menu entries.",
+            section = displayOverrides,
+            position = 17
+    )
+    default Color hiddenColor() { return Color.GRAY; }
 
     @ConfigSection(
             name = "Item lists",

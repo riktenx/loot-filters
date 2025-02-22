@@ -6,10 +6,12 @@ import net.runelite.api.MenuEntry;
 import net.runelite.api.TileItem;
 import net.runelite.api.coords.WorldPoint;
 
+import java.awt.Color;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.lootfilters.util.TextUtil.abbreviate;
 import static net.runelite.client.util.ColorUtil.colorTag;
 
 @AllArgsConstructor
@@ -24,11 +26,15 @@ public class MenuEntryComposer {
         var item = getItemForEntry(entry);
         var match = plugin.getActiveFilter().findMatch(plugin, item);
         if (match == null) {
+            entry.setTarget(buildTargetText(item, DisplayConfig.DEFAULT_MENU_TEXT_COLOR));
             return;
         }
 
         entry.setDeprioritized(plugin.getConfig().deprioritizeHidden() && match.isHidden());
-        entry.setTarget(buildTargetText(item, match));
+        var color = match.isHidden() && plugin.getConfig().recolorHidden()
+                ? plugin.getConfig().hiddenColor()
+                : match.getMenuTextColor();
+        entry.setTarget(buildTargetText(item, color));
     }
 
     public void onMenuOpened() { // collapse
@@ -60,14 +66,12 @@ public class MenuEntryComposer {
         return plugin.getTileItemIndex().findItem(point, entry.getIdentifier());
     }
 
-    private String buildTargetText(TileItem item, DisplayConfig display) {
+    private String buildTargetText(TileItem item, Color color) {
         var text = plugin.getItemName(item.getId());
         if (item.getQuantity() > 1) {
-            text += " (" + item.getQuantity() + ")";
+            text += " (" + abbreviate(item.getQuantity()) + ")";
         }
-
-        var colorTag = colorTag(display.getMenuTextColor());
-        return colorTag + text;
+        return colorTag(color) + text;
     }
 
     private static boolean isGroundItem(MenuEntry entry) {
