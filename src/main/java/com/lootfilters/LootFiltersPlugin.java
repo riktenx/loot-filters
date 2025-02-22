@@ -124,6 +124,10 @@ public class LootFiltersPlugin extends Plugin {
         var index = indexCfg == null || indexCfg.isEmpty()
 				? -1
 				: Integer.parseInt(indexCfg);
+		if (index > getUserFilters().size() -1) {
+			log.warn("User filter index {} is out of bounds, number of filters: {}", index, getUserFilters().size());
+			return -1;
+		}
 		return Math.max(index, -1);
 	}
 
