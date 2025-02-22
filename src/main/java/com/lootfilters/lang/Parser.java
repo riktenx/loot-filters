@@ -191,6 +191,8 @@ public class Parser {
                     builder.tileStrokeColor(assign[1].expectColor()); break;
                 case "tileFillColor":
                     builder.tileFillColor(assign[1].expectColor()); break;
+                case "hideOverlay":
+                    builder.hideOverlay(assign[1].expectBoolean()); break;
                 default:
                     throw new ParseException("unexpected identifier in display config block", assign[0]);
             }
