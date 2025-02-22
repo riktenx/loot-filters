@@ -26,7 +26,10 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
+import static com.lootfilters.lang.Location.UNKNOWN_SOURCE_NAME;
 import static com.lootfilters.util.CollectionUtil.append;
 import static com.lootfilters.util.FilterUtil.configToFilterSource;
 import static com.lootfilters.util.TextUtil.quote;
@@ -180,7 +183,7 @@ public class LootFiltersPanel extends PluginPanel {
 
         LootFilter newFilter;
         try {
-            newFilter = LootFilter.fromSource(newSrc);
+            newFilter = LootFilter.fromSourcesWithPreamble(Map.of("clipboard", newSrc));
         } catch (CompileException e) {
             plugin.addChatMessage("Failed to load filter from clipboard: " + e.getMessage());
             return;

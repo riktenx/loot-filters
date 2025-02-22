@@ -5,6 +5,8 @@ import lombok.Getter;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import static com.lootfilters.util.TextUtil.normalizeCrlf;
 
@@ -24,7 +26,7 @@ public class Sources {
             preamble = loadScriptResource(preambleStream);
             referenceSource = loadScriptResource(referenceSourceStream);
 
-            referenceFilter = LootFilter.fromSource(referenceSource);
+            referenceFilter = LootFilter.fromSourcesWithPreamble(Map.of("referenceFilter", referenceSource));
         } catch (IOException e) {
             throw new RuntimeException("init static sources", e);
         } catch (CompileException e) {
