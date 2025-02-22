@@ -192,6 +192,9 @@ public class TokenStream {
             } else if (head.is(Token.Type.EXPR_START)) {
                 var nestedExpr = expr.take(Token.Type.EXPR_START, Token.Type.EXPR_END, true);
                 current.addAll(nestedExpr.getTokens());
+            } else if (head.is(Token.Type.LIST_START)) {
+                var nestedExpr = expr.take(Token.Type.LIST_START, Token.Type.LIST_END, true);
+                current.addAll(nestedExpr.getTokens());
             } else {
                 current.add(expr.take());
             }
