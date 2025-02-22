@@ -51,34 +51,22 @@ public class FilterUtil {
                 config.notifyTier().ordinal() >= ValueTier.LOW.ordinal()));
         matchersWithConfig.add(MatcherConfig.hiddenTier(config.hideTierEnabled(), config.hideTierValue(), config.hideTierShowUntradeable()));
 
-        if (config.alwaysShowValue()) {
-            matchersWithConfig = matchersWithConfig.stream()
-                    .map(it -> new MatcherConfig(it.getRule(),
-                            it.getDisplay().toBuilder().showValue(true).build(),
-                            it.isTerminal()))
-                    .collect(Collectors.toCollection(ArrayList::new));
-        }
-        if (config.alwaysShowDespawn()) {
-            matchersWithConfig = matchersWithConfig.stream()
-                    .map(it -> new MatcherConfig(it.getRule(),
-                            it.getDisplay().toBuilder().showDespawn(true).build(),
-                            it.isTerminal()))
-                    .collect(Collectors.toCollection(ArrayList::new));
-        }
-        if (config.textAccent().ordinal() > TextAccent.USE_FILTER.ordinal()) {
-            matchersWithConfig = matchersWithConfig.stream()
-                    .map(it -> new MatcherConfig(it.getRule(),
-                            it.getDisplay().toBuilder().textAccent(config.textAccent()).build(),
-                            it.isTerminal()))
-                    .collect(Collectors.toCollection(ArrayList::new));
-        }
-        if (config.highlightTiles()) {
-            matchersWithConfig = matchersWithConfig.stream()
-                    .map(it -> new MatcherConfig(it.getRule(),
-                            it.getDisplay().toBuilder().highlightTile(true).build(),
-                            it.isTerminal()))
-                    .collect(Collectors.toCollection(ArrayList::new));
-        }
+        matchersWithConfig = matchersWithConfig.stream()
+                .map(it -> it.withDisplay(builder -> {
+                    if (config.alwaysShowValue()) {
+                        builder.showValue(true);
+                    }
+                    if (config.alwaysShowDespawn()) {
+                        builder.showDespawn(true);
+                    }
+                    if (config.textAccent().ordinal() > TextAccent.USE_FILTER.ordinal()) {
+                        builder.textAccent(config.textAccent());
+                    }
+                    if (config.highlightTiles()) {
+                        builder.highlightTile(true);
+                    }
+                }))
+                .collect(Collectors.toCollection(ArrayList::new));
 
         return new LootFilter(filter.getName(), filter.getDescription(), filter.getActivationArea(), matchersWithConfig);
     }

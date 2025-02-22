@@ -98,7 +98,7 @@ public class LootFiltersOverlay extends Overlay {
                 }
 
                 var overrideHidden = plugin.isHotkeyActive() && config.hotkeyShowHiddenItems();
-                if (match.isHidden() && !overrideHidden) {
+                if (match.isHideOverlay() && !overrideHidden) {
                     continue;
                 }
 

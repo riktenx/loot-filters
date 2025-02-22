@@ -33,6 +33,7 @@ public class DisplayConfig {
     private final Color lootbeamColor;
     private final FontType fontType;
     private final Color menuTextColor;
+    private final Boolean hideOverlay;
 
     private final Boolean highlightTile;
     private final Color tileStrokeColor;
@@ -55,6 +56,7 @@ public class DisplayConfig {
         highlightTile = null;
         tileStrokeColor = null;
         tileFillColor = null;
+        hideOverlay = null;
     }
 
     public Color getLootbeamColor() {
@@ -92,6 +94,7 @@ public class DisplayConfig {
     public boolean isShowDespawn() { return showDespawn != null && showDespawn; }
     public boolean isNotify() { return !isHidden() && notify != null && notify; }
     public boolean isHighlightTile() { return !isHidden() && highlightTile != null && highlightTile; }
+    public boolean isHideOverlay() { return isHidden() || (hideOverlay != null && hideOverlay); }
 
     public DisplayConfig merge(DisplayConfig other) {
         var b = toBuilder();
@@ -111,6 +114,7 @@ public class DisplayConfig {
         if (other.highlightTile != null) { b.highlightTile(other.highlightTile); }
         if (other.tileStrokeColor != null) { b.tileStrokeColor(other.tileStrokeColor); }
         if (other.tileFillColor != null) { b.tileFillColor(other.tileFillColor); }
+        if (other.hideOverlay != null) { b.hideOverlay(other.hideOverlay); }
         return b.build();
     }
 }
