@@ -34,6 +34,10 @@ public class DisplayConfig {
     private final FontType fontType;
     private final Color menuTextColor;
 
+    private final Boolean highlightTile;
+    private final Color tileStrokeColor;
+    private final Color tileFillColor;
+
     public DisplayConfig(Color textColor) {
         this.textColor = textColor;
         backgroundColor = null;
@@ -48,6 +52,9 @@ public class DisplayConfig {
         lootbeamColor = null;
         fontType = null;
         menuTextColor = null;
+        highlightTile = null;
+        tileStrokeColor = null;
+        tileFillColor = null;
     }
 
     public Color getLootbeamColor() {
@@ -75,11 +82,16 @@ public class DisplayConfig {
         return FontManager.getRunescapeFont();
     }
 
+    public Color getTileStrokeColor() {
+        return tileStrokeColor != null ? tileStrokeColor : textColor;
+    }
+
     public boolean isHidden() { return hidden != null && hidden; }
     public boolean isShowLootbeam() { return !isHidden() && showLootbeam != null && showLootbeam; }
     public boolean isShowValue() { return showValue != null && showValue; }
     public boolean isShowDespawn() { return showDespawn != null && showDespawn; }
     public boolean isNotify() { return !isHidden() && notify != null && notify; }
+    public boolean isHighlightTile() { return !isHidden() && highlightTile != null && highlightTile; }
 
     public DisplayConfig merge(DisplayConfig other) {
         var b = toBuilder();
@@ -96,6 +108,9 @@ public class DisplayConfig {
         if (other.lootbeamColor != null) { b.lootbeamColor(other.lootbeamColor); }
         if (other.fontType != null) { b.fontType(other.fontType); }
         if (other.menuTextColor != null) { b.menuTextColor(other.menuTextColor); }
+        if (other.highlightTile != null) { b.highlightTile(other.highlightTile); }
+        if (other.tileStrokeColor != null) { b.tileStrokeColor(other.tileStrokeColor); }
+        if (other.tileFillColor != null) { b.tileFillColor(other.tileFillColor); }
         return b.build();
     }
 }

@@ -72,6 +72,13 @@ public class FilterUtil {
                             it.isTerminal()))
                     .collect(Collectors.toCollection(ArrayList::new));
         }
+        if (config.highlightTiles()) {
+            matchersWithConfig = matchersWithConfig.stream()
+                    .map(it -> new MatcherConfig(it.getRule(),
+                            it.getDisplay().toBuilder().highlightTile(true).build(),
+                            it.isTerminal()))
+                    .collect(Collectors.toCollection(ArrayList::new));
+        }
 
         return new LootFilter(filter.getName(), filter.getDescription(), filter.getActivationArea(), matchersWithConfig);
     }

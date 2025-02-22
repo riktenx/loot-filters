@@ -182,9 +182,17 @@ public interface LootFiltersConfig extends Config {
             name = "Text accent",
             description = "Text accent type.",
             section = displayOverrides,
-            position = 14
+            position = 23
     )
     default TextAccent textAccent() { return TextAccent.USE_FILTER; }
+    @ConfigItem(
+            keyName = "highlightTiles",
+            name = "Highlight tiles",
+            description = "Always highlight tiles, regardless of filter config.",
+            section = displayOverrides,
+            position = 24
+    )
+    default boolean highlightTiles() { return false; }
 
     @ConfigSection(
             name = "Item lists",
