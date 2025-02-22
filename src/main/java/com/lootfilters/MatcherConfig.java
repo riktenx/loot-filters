@@ -16,6 +16,7 @@ import net.runelite.api.Varbits;
 
 import java.awt.Color;
 import java.util.Arrays;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @Getter
@@ -31,6 +32,12 @@ public class MatcherConfig {
         this.rule = rule;
         this.display = display;
         this.isTerminal = true;
+    }
+
+    public MatcherConfig withDisplay(Consumer<DisplayConfig.DisplayConfigBuilder> consumer) {
+        var builder = display.toBuilder();
+        consumer.accept(builder);
+        return new MatcherConfig(rule, builder.build(), isTerminal);
     }
 
     public static MatcherConfig ownershipFilter(boolean enabled) {
