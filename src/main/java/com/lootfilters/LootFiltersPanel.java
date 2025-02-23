@@ -109,8 +109,9 @@ public class LootFiltersPanel extends PluginPanel {
     private void initControls() throws IOException {
         var filters = plugin.getUserFilters();
         filterSelect.addItem(NONE_ITEM);
-        for (var filter : filters) {
-            filterSelect.addItem(LootFilter.fromSource(filter).getName());
+        for (var i = 0; i < filters.size(); ++i) {
+            var parsedName = LootFilter.fromSource(filters.get(i)).getName();
+            filterSelect.addItem(parsedName != null && !parsedName.isBlank() ? parsedName : "unnamed_filter_" + i);
         }
 
         var index = plugin.getUserFilterIndex();
