@@ -1,14 +1,12 @@
 package com.lootfilters.lang;
 
-import java.util.Arrays;
-import java.util.stream.Collectors;
-
 import lombok.AllArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /**
  * TokenStream wraps a list of Tokens to expose retrieval APIs suitable for parsing.
@@ -213,15 +211,33 @@ public class TokenStream {
      * Attempt to parse the entire token stream as a list of strings.
      */
     public List<String> expectStringList() {
-        var strings = new ArrayList<String>();
+        return expectList().stream()
+                .map(Token::expectString)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Attempt to parse the entire token stream as a list of integers.
+     */
+    public List<Integer> expectIntList() {
+        return expectList().stream()
+                .map(Token::expectInt)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Attempt to parse the entire token stream as a list of single, non-nested tokens.
+     */
+    public List<Token> expectList() {
+        var tokens = new ArrayList<Token>();
 
         takeExpect(Token.Type.LIST_START);
         while (isNotEmpty()) {
             if (peek().is(Token.Type.LIST_END)) {
-                return strings;
+                return tokens;
             }
 
-            strings.add(take().expectString());
+            tokens.add(take());
             if (peek().is(Token.Type.COMMA)) {
                 take();
             } else if (peek().is(Token.Type.LIST_END)) {
@@ -235,7 +251,7 @@ public class TokenStream {
             throw new ParseException("unterminated list");
         }
 
-        return strings;
+        return tokens;
     }
 
     public boolean isNotEmpty() { // this doesn't _currently_ need a version that checks non-semantic
