@@ -81,7 +81,10 @@ public class DisplayConfig {
         if (fontType == null || fontType == FontType.NORMAL) {
             return FontManager.getRunescapeSmallFont();
         }
-        return FontManager.getRunescapeFont();
+        if (fontType == FontType.LARGER) {
+            return FontManager.getRunescapeFont();
+        }
+        return FontManager.getRunescapeBoldFont();
     }
 
     public Color getTileStrokeColor() {
