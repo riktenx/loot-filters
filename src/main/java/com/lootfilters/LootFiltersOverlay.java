@@ -2,6 +2,7 @@ package com.lootfilters;
 
 import com.lootfilters.model.DespawnTimerType;
 import com.lootfilters.model.DualValueDisplayType;
+import com.lootfilters.model.FontMode;
 import com.lootfilters.model.PluginTileItem;
 import com.lootfilters.model.ValueDisplayType;
 import com.lootfilters.util.TextComponent;
@@ -110,7 +111,9 @@ public class LootFiltersOverlay extends Overlay {
                     continue;
                 }
 
-                g.setFont(match.getFont());
+                if (config.fontMode() == FontMode.PLUGIN) {
+                    g.setFont(match.getFont());
+                } // otherwise we don't have to do anything, the font is already set
 
                 var displayText = buildDisplayText(item, count, match);
                 var textPoint = getCanvasTextLocation(client, g, loc, displayText, tile.getItemLayer().getHeight() + Z_STACK_OFFSET);
@@ -118,7 +121,7 @@ public class LootFiltersOverlay extends Overlay {
                     continue;
                 }
 
-                var fm = g.getFontMetrics(match.getFont());
+                var fm = g.getFontMetrics(g.getFont());
                 var textWidth = fm.stringWidth(displayText);
                 var textHeight = fm.getHeight();
 
@@ -129,7 +132,7 @@ public class LootFiltersOverlay extends Overlay {
                 if (match.getTextAccentColor() != null) {
                     text.setAccentColor(match.getTextAccentColor());
                 }
-                if (match.getTextAccent() != null ) {
+                if (match.getTextAccent() != null) {
                     text.setTextAccent(match.getTextAccent());
                 }
 
@@ -258,7 +261,7 @@ public class LootFiltersOverlay extends Overlay {
             var coords = tile.getWorldLocation().getX() + ", " + tile.getWorldLocation().getY();
             var sz = items.size();
             g.setColor(errno > 0 ? Color.RED : Color.WHITE);
-            g.drawString(coords+" "+sz+" "+errs, 0, screenY);
+            g.drawString(coords + " " + sz + " " + errs, 0, screenY);
 
             itemCount += sz;
             screenY += 16;

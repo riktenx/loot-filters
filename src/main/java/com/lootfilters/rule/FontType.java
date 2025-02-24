@@ -6,8 +6,9 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public enum FontType {
     USE_FILTER("use filter"),
-    NORMAL("normal"),
-    LARGER("larger");
+    NORMAL("small"),
+    LARGER("regular"),
+    BOLD("bold");
 
     private final String value;
 
@@ -15,7 +16,9 @@ public enum FontType {
         switch (o) {
             case 1: return NORMAL;
             case 2: return LARGER;
-            default: throw new ParseException("unrecognized FontType ordinal " + o);
+            case 3: return BOLD;
+            default:
+                throw new ParseException("unrecognized FontType ordinal " + o);
         }
     }
 

@@ -2,6 +2,7 @@ package com.lootfilters;
 
 import com.lootfilters.model.DespawnTimerType;
 import com.lootfilters.model.DualValueDisplayType;
+import com.lootfilters.model.FontMode;
 import com.lootfilters.model.ValueDisplayType;
 import com.lootfilters.rule.TextAccent;
 import com.lootfilters.rule.ValueTier;
@@ -59,12 +60,20 @@ public interface LootFiltersConfig extends Config {
     default boolean itemSpawnFilter() { return false; }
     @ConfigItem(
             keyName = "valueType",
-            name = "Value type",
+            name = "Value mode",
             description = "The type of item value to use for rules and text overlay.",
             section = general,
             position = 5
     )
     default ValueType valueType() { return ValueType.HIGHEST; }
+    @ConfigItem(
+            keyName = "fontMode",
+            name = "Font mode",
+            description = "<p>[runelite]: Respect the font type set in RuneLite -> Overlay settings -> Dynamic overlay font. Filter settings for font type will be ignored.</p><p>[plugin]: Respect the font type set by filter rules. Filter display defaults to the small font type.</p>",
+            section = general,
+            position = 6
+    )
+    default FontMode fontMode() { return FontMode.RUNELITE; }
 
     @ConfigSection(
             name = "Hotkey",
