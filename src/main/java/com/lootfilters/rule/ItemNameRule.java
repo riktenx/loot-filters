@@ -29,7 +29,9 @@ public class ItemNameRule extends Rule {
     }
 
     private boolean test(String name, String target) {
-        if (target.startsWith("*")) {
+        if (target.startsWith("*") && target.endsWith("*")) {
+            return name.toLowerCase().contains(target.toLowerCase().substring(1, target.length() - 1));
+        } else if (target.startsWith("*")) {
             return name.toLowerCase().endsWith(target.toLowerCase().substring(1));
         } else if (target.endsWith("*")) {
             return name.toLowerCase().startsWith(target.toLowerCase().substring(0, target.length() - 1));
