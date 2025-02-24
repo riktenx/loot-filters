@@ -17,11 +17,11 @@ import com.lootfilters.rule.NotRule;
 import com.lootfilters.rule.OrRule;
 import com.lootfilters.rule.Rule;
 import com.lootfilters.rule.TextAccent;
+import lombok.RequiredArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
-import lombok.RequiredArgsConstructor;
 
 import static com.lootfilters.lang.Token.Type.APPLY;
 import static com.lootfilters.lang.Token.Type.ASSIGN;
@@ -223,8 +223,14 @@ public class Parser {
     }
 
     private ItemIdRule parseItemIdRule() {
-        var id = tokens.takeExpect(LITERAL_INT);
-        return new ItemIdRule(id.expectInt());
+        if (tokens.peek().is(LITERAL_INT)) {
+            return new ItemIdRule(tokens.take().expectInt());
+        } else if (tokens.peek().is(LIST_START)) {
+            var block = tokens.take(LIST_START, LIST_END, true);
+            return new ItemIdRule(block.expectIntList());
+        } else {
+            throw new ParseException("parse item id: unexpected argument token", tokens.peek());
+        }
     }
 
     private Rule parseItemNameRule() {
