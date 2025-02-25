@@ -6,19 +6,26 @@ import lombok.Getter;
 import lombok.ToString;
 import net.runelite.api.TileItem;
 
+import java.util.List;
+
 @Getter
 @EqualsAndHashCode(callSuper = false)
 @ToString
 public class ItemIdRule extends Rule {
-    private final int id;
+    private final List<Integer> ids;
+
+    public ItemIdRule(List<Integer> ids) {
+        super("item_id");
+        this.ids = ids;
+    }
 
     public ItemIdRule(int id) {
         super("item_id");
-        this.id = id;
+        this.ids = List.of(id);
     }
 
     @Override
     public boolean test(LootFiltersPlugin plugin, TileItem item) {
-        return item.getId() == id;
+        return ids.stream().anyMatch(it -> item.getId() == it);
     }
 }
