@@ -8,7 +8,8 @@ public enum TextAccent {
     USE_FILTER("use filter"),
     SHADOW("shadow"),
     OUTLINE("outline"),
-    NONE("none");
+    NONE("none"),
+    SHADOW_BOLD("shadow bold");
 
     private final String value;
 
@@ -17,6 +18,7 @@ public enum TextAccent {
             case 1: return SHADOW;
             case 2: return OUTLINE;
             case 3: return NONE;
+            case 4: return SHADOW_BOLD;
             default: throw new ParseException("unrecognized TextAccent ordinal " + o);
         }
     }
