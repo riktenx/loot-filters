@@ -73,6 +73,7 @@ public class TextUtil {
             return value;
         }
         return Stream.concat(Arrays.stream(csv.split(",")), Stream.of(value))
+                .map(String::toLowerCase)
                 .distinct()
                 .collect(Collectors.joining(","));
     }
@@ -82,7 +83,7 @@ public class TextUtil {
             return "";
         }
         return Arrays.stream(csv.split(","))
-                .filter(it -> !it.equals(value))
+                .filter(it -> !it.equalsIgnoreCase(value))
                 .collect(Collectors.joining(","));
     }
 
