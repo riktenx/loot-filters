@@ -35,7 +35,11 @@ public class LootFiltersHotkeyListener extends HotkeyListener {
     }
 
     private boolean shouldToggleOverlay(Instant now) {
-        return plugin.getConfig().hotkeyDoubleTapTogglesOverlay()
-                && Duration.between(lastPressed, now).toMillis() < plugin.getConfig().hotkeyDoubleTapDelay();
+        if (!plugin.getConfig().hotkeyDoubleTapTogglesOverlay()) {
+            return false;
+        }
+
+        return !plugin.isOverlayEnabled() && plugin.isHotkeyActive()
+                || Duration.between(lastPressed, now).toMillis() < plugin.getConfig().hotkeyDoubleTapDelay();
     }
 }
