@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.google.inject.Provides;
 import com.lootfilters.model.DisplayConfigIndex;
-import com.lootfilters.model.MockTileItem;
 import com.lootfilters.model.PluginTileItem;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,6 +17,7 @@ import net.runelite.api.events.CommandExecuted;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.ItemDespawned;
+import net.runelite.api.events.ItemQuantityChanged;
 import net.runelite.api.events.ItemSpawned;
 import net.runelite.api.events.MenuEntryAdded;
 import net.runelite.api.events.MenuOpened;
@@ -177,9 +177,7 @@ public class LootFiltersPlugin extends Plugin {
 	protected void shutDown() {
 		overlayManager.remove(overlay);
 
-		tileItemIndex.clear();
-		lootbeamIndex.clear();
-		displayIndex.clear();
+		clearIndices();
 
 		clientToolbar.removeNavigation(pluginPanelNav);
 		keyManager.unregisterKeyListener(hotkeyListener);
@@ -227,6 +225,12 @@ public class LootFiltersPlugin extends Plugin {
 	}
 
 	@Subscribe
+	public void onItemQuantityChanged(ItemQuantityChanged event) {
+		onItemDespawned(new ItemDespawned(event.getTile(), event.getItem()));
+		clientThread.invokeLater(() -> onItemSpawned(new ItemSpawned(event.getTile(), event.getItem())));
+	}
+
+	@Subscribe
 	public void onItemDespawned(ItemDespawned event) {
 		var tile = event.getTile();
 		var item = new PluginTileItem(this, event.getItem());
@@ -238,9 +242,7 @@ public class LootFiltersPlugin extends Plugin {
 	@Subscribe
 	public void onGameStateChanged(GameStateChanged event) {
 		if (event.getGameState() == GameState.LOADING) {
-			tileItemIndex.clear();
-			lootbeamIndex.clear();
-			displayIndex.clear();
+			clearIndices();
 		}
 	}
 
@@ -263,12 +265,6 @@ public class LootFiltersPlugin extends Plugin {
 	public void onCommandExecuted(CommandExecuted event) {
 		if (developerMode && event.getCommand().equals("lfDebug")) {
 			debugEnabled = !debugEnabled;
-			var tileGrid = client.getTopLevelWorldView().getScene().getTiles();
-			for (var tiles : tileGrid[0]) {
-				for (var tile : tiles) {
-					onItemSpawned(new ItemSpawned(tile, new MockTileItem()));
-				}
-			}
 		}
 	}
 
@@ -298,5 +294,11 @@ public class LootFiltersPlugin extends Plugin {
 			addChatMessage("Leaving area for filter " + quote(currentAreaFilter.getName()));
 			currentAreaFilter = null;
 		}
+	}
+
+	private void clearIndices() {
+		tileItemIndex.clear();
+		lootbeamIndex.clear();
+		displayIndex.clear();
 	}
 }
