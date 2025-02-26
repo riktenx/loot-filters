@@ -3,6 +3,8 @@ package com.lootfilters;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.google.inject.Provides;
+import com.lootfilters.model.DisplayConfigIndex;
+import com.lootfilters.model.MockTileItem;
 import com.lootfilters.model.PluginTileItem;
 import lombok.Getter;
 import lombok.Setter;
@@ -36,8 +38,6 @@ import net.runelite.client.ui.overlay.OverlayManager;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -80,6 +80,7 @@ public class LootFiltersPlugin extends Plugin {
 
 	private final TileItemIndex tileItemIndex = new TileItemIndex();
 	private final LootbeamIndex lootbeamIndex = new LootbeamIndex(this);
+	private final DisplayConfigIndex displayIndex = new DisplayConfigIndex(this);
 	private final MenuEntryComposer menuEntryComposer = new MenuEntryComposer(this);
 
 	private LootFilter activeFilter;
@@ -178,6 +179,7 @@ public class LootFiltersPlugin extends Plugin {
 
 		tileItemIndex.clear();
 		lootbeamIndex.clear();
+		displayIndex.clear();
 
 		clientToolbar.removeNavigation(pluginPanelNav);
 		keyManager.unregisterKeyListener(hotkeyListener);
@@ -199,6 +201,7 @@ public class LootFiltersPlugin extends Plugin {
 		if (!config.autoToggleFilters()) {
 			currentAreaFilter = null;
 		} // if we're transitioning TO enabled, do nothing - onGameTick() will handle it
+		displayIndex.reset();
 		clientThread.invoke(lootbeamIndex::reset);
 	}
 
@@ -213,6 +216,7 @@ public class LootFiltersPlugin extends Plugin {
 			return;
 		}
 
+		displayIndex.put(item, match);
 		if (match.isShowLootbeam()) {
 			var beam = new Lootbeam(client, clientThread, tile.getWorldLocation(), match.getLootbeamColor(), Lootbeam.Style.MODERN);
 			lootbeamIndex.put(tile, item, beam);
@@ -226,8 +230,9 @@ public class LootFiltersPlugin extends Plugin {
 	public void onItemDespawned(ItemDespawned event) {
 		var tile = event.getTile();
 		var item = new PluginTileItem(this, event.getItem());
-		tileItemIndex.remove(tile, item);
-		lootbeamIndex.remove(tile, item); // idempotent, we don't care if there wasn't a beam
+		tileItemIndex.remove(tile, item); // all of these are ultimately idempotent
+		lootbeamIndex.remove(tile, item);
+		displayIndex.remove(item);
 	}
 
 	@Subscribe
@@ -235,6 +240,7 @@ public class LootFiltersPlugin extends Plugin {
 		if (event.getGameState() == GameState.LOADING) {
 			tileItemIndex.clear();
 			lootbeamIndex.clear();
+			displayIndex.clear();
 		}
 	}
 
@@ -257,6 +263,12 @@ public class LootFiltersPlugin extends Plugin {
 	public void onCommandExecuted(CommandExecuted event) {
 		if (developerMode && event.getCommand().equals("lfDebug")) {
 			debugEnabled = !debugEnabled;
+			var tileGrid = client.getTopLevelWorldView().getScene().getTiles();
+			for (var tiles : tileGrid[0]) {
+				for (var tile : tiles) {
+					onItemSpawned(new ItemSpawned(tile, new MockTileItem()));
+				}
+			}
 		}
 	}
 
