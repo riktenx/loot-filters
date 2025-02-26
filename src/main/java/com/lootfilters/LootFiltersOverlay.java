@@ -68,7 +68,6 @@ public class LootFiltersOverlay extends Overlay {
             return null;
         }
 
-        var activeFilter = plugin.getActiveFilter();
         var mouse = client.getMouseCanvasPosition();
         var hoveredItem = -1;
         var hoveredHide = new AtomicInteger(-1);
@@ -93,7 +92,7 @@ public class LootFiltersOverlay extends Overlay {
 
                 var count = itemCounts.get(item.getId());
 
-                var match = activeFilter.findMatch(plugin, item);
+                var match = plugin.getDisplayIndex().get(item);
                 if (match == null) {
                     continue;
                 }
@@ -241,7 +240,7 @@ public class LootFiltersOverlay extends Overlay {
 
     private void renderDebugOverlay(Graphics2D g) {
         int itemCount = 0;
-        int screenY = 64;
+        int screenY = 80;
         for (var entry : plugin.getTileItemIndex().entrySet()) {
             var tile = entry.getKey();
             var items = entry.getValue();
@@ -263,12 +262,14 @@ public class LootFiltersOverlay extends Overlay {
             g.setColor(errno > 0 ? Color.RED : Color.WHITE);
             g.drawString(coords + " " + sz + " " + errs, 0, screenY);
 
+
             itemCount += sz;
             screenY += 16;
         }
         g.setColor(Color.WHITE);
         g.drawString("items: " + itemCount + "," + plugin.getTileItemIndex().pointIndexSize(), 0, 32);
         g.drawString("lootbeams: " + plugin.getLootbeamIndex().size(), 0, 48);
+        g.drawString("displays: " + plugin.getDisplayIndex().size(), 0, 64);
     }
 
     private void renderDespawnTimer(Graphics2D g, DespawnTimerType type, PluginTileItem item, net.runelite.api.Point textPoint, int textWidth, int textHeight, int yOffset) {
@@ -338,7 +339,7 @@ public class LootFiltersOverlay extends Overlay {
         }
 
         for (var item : items) {
-            var match = plugin.getActiveFilter().findMatch(plugin, item);
+            var match = plugin.getDisplayIndex().get(item);
             if (match != null && match.isHighlightTile()) {
                 highlightTile(g, tile, match);
             }
