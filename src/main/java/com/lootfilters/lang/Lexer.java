@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 
 import static com.lootfilters.util.TextUtil.isLegalIdent;
 import static com.lootfilters.util.TextUtil.isNumeric;
-import static com.lootfilters.util.TextUtil.isWhitespace;
 
 @RequiredArgsConstructor
 public class Lexer {
@@ -61,7 +60,7 @@ public class Lexer {
             }
 
             var ch = input.charAt(offset);
-            if (isWhitespace(ch)) {
+            if (isTokenWhitespace(ch)) {
                 tokenizeWhitespace();
             } else if (isNumeric(ch)) {
                 tokenizeLiteralInt();
@@ -116,7 +115,7 @@ public class Lexer {
 
     private void tokenizeWhitespace() {
         for (int i = offset; i < input.length(); ++i) {
-            if (!isWhitespace(input.charAt(i))) {
+            if (!isTokenWhitespace(input.charAt(i))) {
                 var ws = input.substring(offset, i);
                 tokens.add(new Token(Token.Type.WHITESPACE, ws, currentLocation()));
                 currentLineOffset += i - offset;
@@ -179,5 +178,9 @@ public class Lexer {
 
     private Location currentLocation() {
         return new Location(inputName, currentLineNumber, currentLineOffset);
+    }
+
+    private static boolean isTokenWhitespace(char c) { // newlines are tokenized separately
+        return c == ' ' || c == '\t';
     }
 }

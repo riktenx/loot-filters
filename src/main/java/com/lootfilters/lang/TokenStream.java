@@ -257,4 +257,9 @@ public class TokenStream {
     public boolean isNotEmpty() { // this doesn't _currently_ need a version that checks non-semantic
         return tokens.stream().anyMatch(Token::isSemantic);
     }
+
+    @Override
+    public String toString() {
+        return tokens.stream().map(Token::getValue).collect(Collectors.joining(""));
+    }
 }
