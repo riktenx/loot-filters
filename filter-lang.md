@@ -4,15 +4,19 @@
 
 A loot filter is a basic script that contains the following
 * Self-identifying metadata (filter name, description, etc.)
-* Any number of **matchers** - each being a tuple of condition and display config - that determines how to display items
+* Any number of **rules** - each being a pair of a condition and a display config - that determines how to display items
   on the ground.
 
-For example, this is a simple loot filter with two matchers: one that highlights anglerfish, and another that highlights
-coins with a lootbeam:
+For example, this is a simple loot filter:
 
 ```
 meta {
   name = "riktenx/test";
+}
+
+// if anything is worth more than 10k, give it a special border
+apply (value:>10_000) {
+  borderColor = "#ff80ff";
 }
 
 // we really care about anglerfish
@@ -89,56 +93,92 @@ There are several excellent web-based tools for finding map coordinates, such as
 
 For example, the coordinate pair `[2240, 4032, 0, 2303, 4095, 0]` describes the area for Vorkath.
 
-## Matchers
+## Rules
 
-A loot filter is written as a list of matchers. A matcher of a combination of conditions and display settings that
-controls when and how the text overlay for an item is displayed.
-
-Matchers are expressed as
+A loot filter is written as a list of rules, like so:
 
 ```
-if (<conditions...>) {
+(if|apply) (<conditions...>) {
     <display_property1> = <value>;
     <display_property2> = <value>;
     ...
 }
+... more rules
 ```
 
-Matchers evaluate top-down for a given ground item. The plugin selects display settings for the first matcher with rules
-that match an item being tested.
+There are **two (2)** top-level types of rules:
+* TERMINAL rules, expressed via the `if` keyword. The filter stops evaluating for an item when it matches a non-terminal
+  rule.
+* NON-TERMINAL rules, expressed via the `apply` keyword. Applies any display settings to the item when it matches, but
+  keeps evaluating the script.
+
+Rules evaluate top-down for a given ground item. The plugin terminates evaluation when a non-terminal rule with matching
+conditions is encountered.
+
+### Example: terminal vs non-terminal
+
+Consider the following filter:
+
+```
+apply (value:>100_000) {
+  borderColor = BLUE;
+  showLootbeam = true;
+}
+
+if (name:"*godsword") {
+  textColor = "#00ffff";
+}
+
+if (name:"bandos*") {
+  textColor = "#ffa500";
+  showLootbeam = false;
+}
+```
+
+As an exercise, think through how the following items would be displayed:
+* ancestral robe top
+* bandos tassets
+* bandos godsword
+* zamorak godsword
 
 ### Conditions
 
 Conditions are expressed in the form
 
 ```
-<condition type>:<arguments>
+(<condition type>:<arguments>)
 ```
 
 You can use logical operators to express compound conditions, such as
 
 ```
-name:"blue dragonhide" && quantity:>1
+(name:"blue dragonhide" && !quantity:==1)
 ```
 
-Matchers support the following conditions:
+Rules support the following conditions:
 
-#### name `name:"..."`
+#### name `name:"..."` or `name:["...", "...", <...>]`
 
-Match based on an item's name, case-insensitive. You can also match with a wildcard `*` on either side of the name (
-e.g. `"* dragonhide"` matches all dragonhide colors).
+Match against a name or list of names, case-insensitive. You can also match with a wildcard `*` on either or both sides
+of the name ( e.g. `"* dragonhide"` matches all dragonhide colors).
 
-#### id `id:995`
+As a special case, `name:"*"` will match against everything.
 
-Match based on an exact item ID.
+#### id `id:995` or `name:[1,2,3, <...>]`
 
-#### quantity `quantity:>500`
+Match based on an exact item ID or list of IDs.
 
-Match based on an item's quantity.
+#### quantity `quantity:>500`, `quantity:==500`, etc.
+
+Match based on an item's quantity. Comparison operator can be >, <, >=, <=, or ==.
+
+!= is NOT supported, use ! instead, e.g. `!quantity:==1`.
 
 #### value `value:>500`
 
-Match based on an item value. The value used for comparison is determined by plugin settings (GE, HA, or highest).
+Match based on an item value. Supports the same comparison operators used in `quantity`.
+
+The value used for comparison is determined by plugin settings (GE, HA, or highest).
 
 #### tradeable `tradeable:true` or `tradeable:false`
 
@@ -172,51 +212,61 @@ The following table lists the supported display settings for matchers:
 | fontType                     | enum                    | `FONTTYPE_*`   | Font used for the display:<li>1 = normal overlay text size (default)</li><li>2 = larger              |
 | menuTextColor                | string (ARGB color hex) |                | Color for the menu entry text. Defaults to the text color when unset.                                | 
 
-## Text macros
+# Macros
 
 Loot filters supports basic text-replacement style macros. The plugin will expand macros in the user-provided filter
-before parsing it for matchers.
+before parsing it.
 
 Macros are defined like so:
 
 ```
-#define ORANGE "ffFFA500"
-if (value:>1000) {
-    color = ORANGE;
-}
+#define <identifier> <definition>
+#define ORANGE "#ffa500"
 ```
+
+or, for multi-line macros
+
+```
+#define <identifier> <line1> \
+  <line2> \
+  ... \
+  <lineN>
+```
+
+Multi-line macros MUST end each line other than the last with a `\` character to "break" the newline.
 
 Macros can also have parameters. For example:
 
 ```
-#define HIGHLIGHT(_name, _color) if (name:_name) { color = _color; }
-HIGHLIGHT("dragon arrowtips", "ffff0000")
-```
-
-Expands to
-
-```
-if (name:"dragon arrowtips") { color = "ffff0000"; }
-```
-
-Note that you can override a previous definition of a macro by re-defining it on a subsequent line.
-
-### Multi-line macros
-
-You can use a backslash at the end of a line, any number of times, to "continue" a macro definition:
-
-```
-#define MATCH_VALUE_MULTILINE(_name, _vexpr, _color) if (name:_name && value:_vexpr) { \
+// define
+#define IMPORTANT(_name, _color) if (name:_name) {\
   color = _color; \
-  borderColor = _color; \
+  notify = true; \
 }
-```
 
-A comment **CANNOT** appear after an EOL backslash.
+// use
+IMPORTANT("twisted bow", GREEN)
+```
 
 ### Builtin macros
 
 The scripting language includes a number of builtin macros, such as the `HIGHLIGHT` example shown above, that can be
-useful for quickly scripting your own filters. This is accomplished by pre-pending a "preamble" script to the
-user-provided filter. You can see the full list of macros defined in the preamble
-[here](https://github.com/riktenx/loot-filters/blob/main/src/main/resources/com/lootfilters/scripts/preamble.rs2f).
+useful for quickly scripting your own filters.
+
+#### Basic builtins
+
+The following static macros are defined for ease-of-use:
+* RGB/CMYK primary colors (RED, GREEN, BLUE, CYAN, MAGENTA, YELLOW, WHITE, BLACk)
+* metal bar colors (e.g. BRONZE, BLURITE, IRON...) - as listed on the [wiki](https://oldschool.runescape.wiki/w/Bar#Types_of_bars)
+* Default colors for each original ground items tier (GROUNDITEMS_INSANE, GROUNDITEMS_HIGH, GROUNDITEMS_MEDIUM, GROUNDITEMS_LOW)
+
+#### Parameterized builtins
+
+| name      | parameters     | example                              | description                                                                                           |
+|-----------|----------------|--------------------------------------|-------------------------------------------------------------------------------------------------------|
+| HIGHLIGHT | name(s), color | `HIGHLIGHT("grimy*", GREEN)`         | Terminal rule, applies a simple text highlight to an item.                                            |
+| HIDE      | names(s)       | `HIDE("ashes")`                      | Terminal rule, hides an item.                                                                         |
+| RARE      | name(s), color | `RARE("godsword shard*", "#00ffff")` | Terminal rule, applies a text/border highlight.                                                       |
+| RARE2     | name(s), color | `RARE2("goblin mail", RED")`         | Terminal rule, applies a text/border highlight w/ a semi-transparent black background and a lootbeam. |
+
+You can see the full list of builtin macros [here](https://github.com/riktenx/loot-filters/blob/main/src/main/resources/com/lootfilters/scripts/preamble.rs2f).
