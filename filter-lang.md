@@ -192,25 +192,60 @@ Match based on whether an item is stackable (noted, coins, fishbait etc.).
 
 Match based on whether an item is a note.
 
-### Display settings
+## Display settings
 
-The following table lists the supported display settings for matchers:
+Display settings, expressed inside of curly braces after a rule's condition, control every aspect of how the plugin
+handles an item on the ground.
 
-| name                         | value type              | ordinal macros | description                                                                                          |
-|------------------------------|-------------------------|----------------|------------------------------------------------------------------------------------------------------|
-| hidden                       | boolean                 |                | Whether this item is hidden in the overlay. When set to true, other display settings have no effect. |
-| color, textColor             | string (ARGB color hex) |                | Color for the display text of the item.                                                              |
-| backgroundColor              | string (ARGB color hex) |                | Background color behind the display text.                                                            |
-| borderColor                  | string (ARGB color hex) |                | Border color around the display text.                                                                |
-| showLootbeam, showLootBeam   | boolean                 |                | Show an in-world lootbeam on the item's tile. The lootbeam color matches the configured text color.  |
-| showValue                    | boolean                 |                | Include an item's value in the text overlay. The highest value between GE and HA price is chosen.    |
-| showDespawn                  | boolean                 |                | Show a despawn timer, in game ticks, next to the text overlay.                                       |
-| notify                       | boolean                 |                | Fire a system notification when the matched item drops.                                              |
-| textAccent                   | enum                    | `TEXTACCENT_*` | Text accent to use:<li>1 = text shadow (default)</li><li>2 = outline</li><li>3 = none</li>           |
-| textAccentColor              | string (ARGB color hex) |                | Color for the text accent. Defaults to solid black.                                                  |
-| lootbeamColor, lootBeamColor | string (ARGB color hex) |                | Color for the lootbeam. Defaults to the text color when unset.                                       |
-| fontType                     | enum                    | `FONTTYPE_*`   | Font used for the display:<li>1 = normal overlay text size (default)</li><li>2 = larger              |
-| menuTextColor                | string (ARGB color hex) |                | Color for the menu entry text. Defaults to the text color when unset.                                | 
+Display settings control the following:
+* whether to hide an item in the text overlay
+* overlay text styles (font type, border, colors, etc.)
+* lootbeam
+* notifications
+* ground tile highlight
+
+For example:
+
+```
+if (name:"coins" && quantity:>100_000) {
+  textColor = YELLOW;
+  borderColor = YELLOW;
+  showLootbeam = true;
+  lootbeamColor = "#ffffff";
+}
+```
+
+The following table lists supported display settings:
+
+| name                         | value type   | ordinal macros | description                                                                                                                         |
+|------------------------------|--------------|----------------|-------------------------------------------------------------------------------------------------------------------------------------|
+| hidden                       | boolean      |                | Whether this item is comprehensively hidden. Setting hidden to true disables EVERYTHING else - no lootbeam, no tile highlight, etc. |
+| hideOverlay                  | boolean      |                | Whether this item is hidden in the overlay. Disables the text overlay but allows other features to work.                            |
+| color, textColor             | color string |                | Color for the display text of the item.                                                                                             |
+| backgroundColor              | color string |                | Background color behind the display text.                                                                                           |
+| borderColor                  | color string |                | Border color around the display text.                                                                                               |
+| showLootbeam, showLootBeam   | boolean      |                | Show an in-world lootbeam on the item's tile.                                                                                       |
+| showValue                    | boolean      |                | Include an item's value in the text overlay. The highest value between GE and HA price is chosen.                                   |
+| showDespawn                  | boolean      |                | Show a despawn timer next to the text overlay. The type of despawn timer is controlled by config.                                   |
+| notify                       | boolean      |                | Fire a system notification when the matched item drops.                                                                             |
+| textAccent                   | enum         | `TEXTACCENT_*` | Text accent to use:<li>1 = text shadow (default)</li><li>2 = outline</li><li>3 = none</li>                                          |
+| textAccentColor              | color string |                | Color for the text accent. Defaults to solid black.                                                                                 |
+| lootbeamColor, lootBeamColor | color string |                | Color for the lootbeam. Defaults to the text color when unset.                                                                      |
+| fontType                     | enum         | `FONTTYPE_*`   | Font used for the display:<li>1 = normal overlay text size (default)</li><li>2 = larger                                             |
+| menuTextColor                | color string |                | Color for the menu entry text. Defaults to the text color when unset.                                                               | 
+| highlightTile                | boolean      |                | Whether to highlight the tile the item is on.                                                                                       | 
+| tileStrokeColor              | color string |                | Color for tile outline. Defaults to text color when unset.                                                                          |
+| tileFillColor                | color string |                | Color for the tile fill. No fill when unset.                                                                                        |
+
+### Color strings
+
+Color strings can be expressed in any of the following ways:
+* "#rrggbb"
+* "#aarrggbb"
+* "rrggbb"
+* "aarrggbb"
+
+e.g. an "orange" color would be `"ffa500"`, with or without the #. Semi-transparent orange would be `"80ffa500"`.
 
 # Macros
 
