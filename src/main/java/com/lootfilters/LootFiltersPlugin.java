@@ -346,6 +346,10 @@ public class LootFiltersPlugin extends Plugin {
 	public void reloadFilters() {
 		parsedUserFilters = filterManager.loadFilters();
 		loadSelectedFilter();
+		clientThread.invoke(() -> {
+			displayIndex.reset();
+			lootbeamIndex.reset();
+		});
 	}
 
 	private void loadSelectedFilter() {
