@@ -7,6 +7,8 @@ ground items plugin.
 
 Join the Discord! https://discord.gg/ESbA28wPnt
 
+User guide, including how to make your own loot filters: [click here](https://github.com/riktenx/loot-filters/blob/userguide/README.md).
+
 ## Overview
 
 This plugin replicates the majority of the experience offered by the base version:
@@ -62,5 +64,3 @@ Loot filters work together with the basic config options to decide how to render
 Additionally, you can capture the current state of your config - your highlighted/hidden items, and your item value
 rules - and save them to a new filter which you can then re-load at a later date. This allows you to configure different
 filters for different in-game activities.
-
-For a comprehensive reference for writing your own loot filters, see [this guide](https://github.com/riktenx/loot-filters/blob/main/guides/loot-filters.md).
