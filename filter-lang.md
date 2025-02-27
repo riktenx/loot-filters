@@ -302,6 +302,6 @@ The following static macros are defined for ease-of-use:
 | HIGHLIGHT | name(s), color | `HIGHLIGHT("grimy*", GREEN)`         | Terminal rule, applies a simple text highlight to an item.                                            |
 | HIDE      | names(s)       | `HIDE("ashes")`                      | Terminal rule, hides an item.                                                                         |
 | RARE      | name(s), color | `RARE("godsword shard*", "#00ffff")` | Terminal rule, applies a text/border highlight.                                                       |
-| RARE2     | name(s), color | `RARE2("goblin mail", RED")`         | Terminal rule, applies a text/border highlight w/ a semi-transparent black background and a lootbeam. |
+| RARE2     | name(s), color | `RARE2("goblin mail", RED)`         | Terminal rule, applies a text/border highlight w/ a semi-transparent black background and a lootbeam. |
 
 You can see the full list of builtin macros [here](https://github.com/riktenx/loot-filters/blob/main/src/main/resources/com/lootfilters/scripts/preamble.rs2f).
