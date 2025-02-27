@@ -3,6 +3,7 @@ package com.lootfilters;
 import com.lootfilters.lang.CompileException;
 import com.lootfilters.lang.Sources;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.ui.FontManager;
 import net.runelite.client.ui.PluginPanel;
 
@@ -14,11 +15,11 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.Color;
+import java.awt.Desktop;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Toolkit;
@@ -26,10 +27,9 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
-import static com.lootfilters.lang.Location.UNKNOWN_SOURCE_NAME;
 import static com.lootfilters.util.CollectionUtil.append;
 import static com.lootfilters.util.FilterUtil.configToFilterSource;
 import static com.lootfilters.util.TextUtil.quote;
@@ -38,6 +38,7 @@ import static javax.swing.JOptionPane.showInputDialog;
 import static javax.swing.SwingUtilities.invokeLater;
 import static net.runelite.client.util.ImageUtil.loadImageResource;
 
+@Slf4j
 public class LootFiltersPanel extends PluginPanel {
     private static final String NONE_ITEM = "<none>";
     private static final String NONE_TEXT = "Select a filter to display its source.";
@@ -66,12 +67,11 @@ public class LootFiltersPanel extends PluginPanel {
         root.setLayout(new BoxLayout(root, BoxLayout.Y_AXIS));
 
         init();
-        initControls();
     }
 
     private void init() {
         var top = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        var textButtons = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        var mid = new JPanel(new FlowLayout(FlowLayout.LEFT));
         var textPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
         var label = new JLabel("Active filter:");
@@ -91,22 +91,29 @@ public class LootFiltersPanel extends PluginPanel {
         deleteAll.addActionListener(it -> onDeleteAll());
         saveChanges.addActionListener(it -> onSaveChanges());
 
-        top.add(label);
+        var reloadFilters = createIconButton("reload_icon",
+                "Reload filters from disk.",
+                this::onReloadFilters);
+        var browseFolder = createIconButton("folder_icon",
+                "View the filters directory in the system file browser.",
+                this::onBrowseFolder);
+
         top.add(createNew);
-        top.add(importClipboard);
         top.add(importConfig);
-        top.add(deleteActive);
-        textButtons.add(deleteAll);
-        textButtons.add(Box.createHorizontalStrut(50));
-        textButtons.add(saveChanges);
-        textPanel.add(new JScrollPane(filterText));
+        top.add(Box.createHorizontalStrut(130));
+        top.add(reloadFilters);
+        top.add(browseFolder);
+
+        mid.add(label);
 
         root.add(top);
+        root.add(mid);
         root.add(filterSelect);
-        root.add(textButtons);
         root.add(textPanel);
 
         add(root);
+
+        reflowFilterSelect(plugin.getFilterManager().loadFilters(), plugin.getSelectedFilterName());
     }
 
     private void initControls() throws IOException {
@@ -157,6 +164,10 @@ public class LootFiltersPanel extends PluginPanel {
         if (newName == null || newName.isBlank()) {
             return;
         }
+        if (plugin.hasFilter(newName)) {
+            plugin.addChatMessage("There's already a filter named " + quote(newName) + ", abort.");
+            return;
+        }
 
         String newSrc;
         if (template.equals(templateOptions[0])) {
@@ -167,11 +178,14 @@ public class LootFiltersPanel extends PluginPanel {
                     .replace("    name = \"loot-filters/filterscape\";", "name = " + quote(newName) + ";");
         }
 
-        if (tryUpdateExisting(newName, newSrc)) {
+        try {
+            plugin.getFilterManager().saveNewFilter(newName, newSrc);
+        } catch (Exception e) {
+            log.warn("create new filter", e);
             return;
         }
 
-        addNewFilter(newName, newSrc);
+        onReloadFilters();
     }
 
     private void onImportClipboard() {
@@ -214,21 +228,27 @@ public class LootFiltersPanel extends PluginPanel {
         if (finalName == null) {
             return;
         }
+        if (plugin.hasFilter(finalName)) {
+            plugin.addChatMessage("There's already a filter named " + quote(finalName) + ", abort.");
+            return;
+        }
 
         var src = configToFilterSource(plugin.getConfig(), finalName, TUTORIAL_TEXT);
-        if (tryUpdateExisting(finalName, src)) {
+        try {
+            plugin.getFilterManager().saveNewFilter(finalName, src);
+        } catch (Exception e) {
+            log.warn("import filter from config", e);
             return;
         }
 
         plugin.getConfig().setHighlightedItems("");
         plugin.getConfig().setHiddenItems("");
-        addNewFilter(finalName, src);
+        onReloadFilters();
     }
 
     private void onFilterSelect(ActionEvent event) {
-        var realIndex = filterSelect.getSelectedIndex() - 1;
-        plugin.setUserFilterIndex(realIndex);
-        updateFilterText(realIndex);
+        var selected = (String) filterSelect.getSelectedItem();
+        plugin.setSelectedFilterName(NONE_ITEM.equals(selected) ? null : selected);
     }
 
     private void onDeleteActive() {
@@ -345,5 +365,37 @@ public class LootFiltersPanel extends PluginPanel {
     private static ImageIcon icon(String name) {
         var img = loadImageResource(LootFiltersPanel.class, "/com/lootfilters/icons/" + name + ".png");
         return new ImageIcon(img);
+    }
+
+    private void onReloadFilters() {
+        plugin.reloadFilters();
+        reflowFilterSelect(plugin.getParsedUserFilters(), plugin.getSelectedFilterName());
+    }
+
+    private void onBrowseFolder() {
+        try {
+            Desktop.getDesktop().open(LootFilterManager.filterDirectory());
+        } catch (Exception e) {
+            log.warn("browse filters", e);
+        }
+    }
+
+    public void reflowFilterSelect(List<LootFilter> filters, String selected) {
+        for (var l : filterSelect.getActionListeners()) {
+            filterSelect.removeActionListener(l);
+        }
+
+        filterSelect.removeAllItems();
+        filterSelect.addItem(NONE_ITEM);
+        for (var filter : filters) {
+            filterSelect.addItem(filter.getName());
+        }
+
+        if (plugin.hasFilter(selected)) { // selected filter could be gone
+            filterSelect.setSelectedItem(selected);
+        } else {
+            plugin.setSelectedFilterName(null);
+        }
+        filterSelect.addActionListener(this::onFilterSelect);
     }
 }

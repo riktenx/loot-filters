@@ -1,9 +1,5 @@
 package com.lootfilters;
 
-import static com.lootfilters.lang.Location.UNKNOWN_SOURCE_NAME;
-import static com.lootfilters.util.TextUtil.normalizeCrlf;
-
-import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.lootfilters.lang.CompileException;
 import com.lootfilters.lang.Lexer;
@@ -15,7 +11,6 @@ import com.lootfilters.rule.Rule;
 import com.lootfilters.serde.ColorDeserializer;
 import com.lootfilters.serde.ColorSerializer;
 import com.lootfilters.serde.RuleDeserializer;
-
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -25,16 +20,22 @@ import net.runelite.api.TileItem;
 import net.runelite.api.coords.WorldPoint;
 
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static com.lootfilters.lang.Location.UNKNOWN_SOURCE_NAME;
+import static com.lootfilters.util.TextUtil.normalizeCrlf;
 
 @Getter
 @AllArgsConstructor
 @EqualsAndHashCode
 @ToString
 public class LootFilter {
+    public static final LootFilter Nop = new LootFilter("", "", null, new ArrayList<>());
+
     @Setter
     private String name; // anonymous filter can be imported, would need name
 
