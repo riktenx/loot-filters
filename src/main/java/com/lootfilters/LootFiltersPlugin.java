@@ -6,6 +6,7 @@ import com.google.inject.Provides;
 import com.lootfilters.migration.Migrate_133_140;
 import com.lootfilters.model.DisplayConfigIndex;
 import com.lootfilters.model.PluginTileItem;
+import com.lootfilters.util.AudioPlayer;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
@@ -23,7 +24,6 @@ import net.runelite.api.events.ItemSpawned;
 import net.runelite.api.events.MenuEntryAdded;
 import net.runelite.api.events.MenuOpened;
 import net.runelite.client.Notifier;
-import net.runelite.client.RuneLite;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
@@ -46,6 +46,7 @@ import java.util.Objects;
 
 import static com.lootfilters.util.FilterUtil.withConfigMatchers;
 import static com.lootfilters.util.TextUtil.quote;
+import static net.runelite.client.RuneLite.RUNELITE_DIR;
 import static net.runelite.client.util.ImageUtil.loadImageResource;
 
 @Slf4j
@@ -61,8 +62,10 @@ public class LootFiltersPlugin extends Plugin {
 	public static final String USER_FILTERS_KEY = "user-filters";
 	public static final String USER_FILTERS_INDEX_KEY = "user-filters-index";
 	public static final String SELECTED_FILTER_KEY = "selected-filter";
-	public static final String PLUGIN_DIR = "loot-filters";
-	public static final String FILTER_DIR = "filters";
+
+	public static final File PLUGIN_DIRECTORY = new File(RUNELITE_DIR, "loot-filters");
+	public static final File FILTER_DIRECTORY = new File(PLUGIN_DIRECTORY, "filters");
+	public static final File SOUND_DIRECTORY = new File(PLUGIN_DIRECTORY, "sounds");
 
 	@Inject private Client client;
 	@Inject private ClientThread clientThread;
@@ -89,6 +92,7 @@ public class LootFiltersPlugin extends Plugin {
 	private final DisplayConfigIndex displayIndex = new DisplayConfigIndex(this);
 	private final MenuEntryComposer menuEntryComposer = new MenuEntryComposer(this);
 	private final LootFilterManager filterManager = new LootFilterManager(this);
+	private final AudioPlayer audioPlayer = new AudioPlayer(); // remove when https://github.com/runelite/runelite/pull/18745 is merged
 
 	private LootFilter activeFilter;
 	private LootFilter currentAreaFilter;
@@ -217,10 +221,9 @@ public class LootFiltersPlugin extends Plugin {
 	}
 
 	private void initPluginDirectory() {
-		var root = new File(RuneLite.RUNELITE_DIR, PLUGIN_DIR);
-		var filters = new File(root, FILTER_DIR);
-		root.mkdir();
-		filters.mkdir();
+		PLUGIN_DIRECTORY.mkdir();
+		FILTER_DIRECTORY.mkdir();
+		SOUND_DIRECTORY.mkdir();
 	}
 
 	@Provides
@@ -262,6 +265,15 @@ public class LootFiltersPlugin extends Plugin {
 		}
 		if (match.isNotify()) {
 			notifier.notify(getItemName(item.getId()));
+		}
+		if (match.getSound() != null && config.soundVolume() > 0) {
+			try {
+				var soundFile = new File(SOUND_DIRECTORY, match.getSound());
+				var gain = 20f * (float) Math.log10(config.soundVolume() / 100f);
+				audioPlayer.play(soundFile, gain);
+			} catch (Exception e) {
+				log.warn("play audio {}", match.getSound(), e);
+			}
 		}
 	}
 
