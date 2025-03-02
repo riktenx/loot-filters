@@ -231,7 +231,7 @@ The following table lists supported display settings:
 | textAccent                   | enum         | `TEXTACCENT_*` | Text accent to use:<li>1 = text shadow (default)</li><li>2 = outline</li><li>3 = none</li>                                          |
 | textAccentColor              | color string |                | Color for the text accent. Defaults to solid black.                                                                                 |
 | lootbeamColor, lootBeamColor | color string |                | Color for the lootbeam. Defaults to the text color when unset.                                                                      |
-| fontType                     | enum         | `FONTTYPE_*`   | Font used for the display:<li>1 = normal overlay text size (default)</li><li>2 = larger                                             |
+| fontType                     | enum         | `FONTTYPE_*`   | Font used for the display:<li>1 = small (default)</li><li>2 = normal</li><li>3 = bold</li>                                          |
 | menuTextColor                | color string |                | Color for the menu entry text. Defaults to the text color when unset.                                                               | 
 | highlightTile                | boolean      |                | Whether to highlight the tile the item is on.                                                                                       | 
 | tileStrokeColor              | color string |                | Color for tile outline. Defaults to text color when unset.                                                                          |
