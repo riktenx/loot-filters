@@ -24,14 +24,40 @@ public class TextComponent implements RenderableEntity {
         var origColor = g.getColor();
 
         g.setColor(accentColor);
-        if (textAccent == TextAccent.SHADOW) {
-            g.drawString(text, position.x+1, position.y+1);
-        } else if (textAccent == TextAccent.OUTLINE) {
-            g.drawString(text, position.x+1, position.y);
-            g.drawString(text, position.x, position.y+1);
-            g.drawString(text, position.x-1, position.y);
-            g.drawString(text, position.x, position.y-1);
+
+        switch (textAccent) {
+            case SHADOW:
+                g.drawString(text, position.x + 1, position.y + 1);
+                break;
+            case OUTLINE:
+                g.drawString(text, position.x + 1, position.y);
+                g.drawString(text, position.x, position.y + 1);
+                g.drawString(text, position.x - 1, position.y);
+                g.drawString(text, position.x, position.y - 1);
+                break;
+            case SHADOW_BOLD:
+                g.drawString(text, position.x + 1, position.y);
+                g.drawString(text, position.x - 1, position.y);
+
+                g.drawString(text, position.x, position.y + 1);
+                g.drawString(text, position.x, position.y - 1);
+
+                g.drawString(text, position.x + 1, position.y + 1);
+                g.drawString(text, position.x - 1, position.y - 1);
+
+                g.drawString(text, position.x + 1, position.y - 1);
+                g.drawString(text, position.x - 1, position.y + 1);
+
+                g.drawString(text, position.x + 2, position.y);
+                g.drawString(text, position.x, position.y + 2);
+
+                g.drawString(text, position.x + 2, position.y + 1);
+                g.drawString(text, position.x + 1, position.y + 2);
+                break;
+            default:
+                break;
         }
+
         g.setColor(color);
         g.drawString(text, position.x, position.y);
 
