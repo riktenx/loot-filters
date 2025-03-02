@@ -374,7 +374,7 @@ public class LootFiltersPanel extends PluginPanel {
 
     private void onBrowseFolder() {
         try {
-            Desktop.getDesktop().open(LootFilterManager.filterDirectory());
+            Desktop.getDesktop().open(LootFiltersPlugin.FILTER_DIRECTORY);
         } catch (Exception e) {
             log.warn("browse filters", e);
         }

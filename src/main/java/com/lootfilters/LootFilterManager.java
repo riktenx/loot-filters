@@ -2,7 +2,6 @@ package com.lootfilters;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.client.RuneLite;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -19,15 +18,9 @@ import static com.lootfilters.util.TextUtil.quote;
 public class LootFilterManager {
     private final LootFiltersPlugin plugin;
 
-    public static java.io.File filterDirectory() {
-        return new java.io.File(
-                new java.io.File(RuneLite.RUNELITE_DIR, LootFiltersPlugin.PLUGIN_DIR), LootFiltersPlugin.FILTER_DIR
-        );
-    }
-
     public List<LootFilter> loadFilters() {
         var filters = new ArrayList<LootFilter>();
-        for (var file : filterDirectory().listFiles()) {
+        for (var file : LootFiltersPlugin.FILTER_DIRECTORY.listFiles()) {
             String src;
             try {
                 src = Files.readString(file.toPath());
@@ -59,7 +52,7 @@ public class LootFilterManager {
 
     public void saveNewFilter(String name, String src) throws IOException {
         var sanitized = toFilename(name);
-        var newFile = new File(filterDirectory(), toFilename(name));
+        var newFile = new File(LootFiltersPlugin.FILTER_DIRECTORY, toFilename(name));
         if (!newFile.createNewFile()) {
             throw new IOException("could not create file " + sanitized);
         }

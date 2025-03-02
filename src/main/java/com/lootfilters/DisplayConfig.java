@@ -39,6 +39,8 @@ public class DisplayConfig {
     private final Color tileStrokeColor;
     private final Color tileFillColor;
 
+    private final String sound;
+
     public DisplayConfig(Color textColor) {
         this.textColor = textColor;
         backgroundColor = null;
@@ -57,6 +59,7 @@ public class DisplayConfig {
         tileStrokeColor = null;
         tileFillColor = null;
         hideOverlay = null;
+        sound = null;
     }
 
     public Color getLootbeamColor() {
@@ -118,6 +121,7 @@ public class DisplayConfig {
         if (other.tileStrokeColor != null) { b.tileStrokeColor(other.tileStrokeColor); }
         if (other.tileFillColor != null) { b.tileFillColor(other.tileFillColor); }
         if (other.hideOverlay != null) { b.hideOverlay(other.hideOverlay); }
+        if (other.sound != null) { b.sound(other.sound); }
         return b.build();
     }
 }
