@@ -39,6 +39,9 @@ public class LootFilterManager {
             LootFilter filter;
             try {
                 filter = LootFilter.fromSourcesWithPreamble(Map.of(file.getName(), src));
+                if (filter.getName() == null || filter.getName().isBlank()) {
+                    filter.setName(file.getName());
+                }
             } catch (Exception e) {
                 plugin.addChatMessage("Failed to load filter from " + file.getName() + ": " + e.getMessage());
                 log.warn("parse file {}", file.getName(), e);
