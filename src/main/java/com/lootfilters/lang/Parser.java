@@ -239,11 +239,7 @@ public class Parser {
     }
 
     private ItemOwnershipRule parseItemOwnershipRule() {
-        if (tokens.peek().is(LITERAL_INT)) {
-            return new ItemOwnershipRule(tokens.take().expectInt());
-        } else {
-            throw new ParseException("parse item ownership: unexpected argument token", tokens.peek());
-        }
+        return new ItemOwnershipRule(tokens.takeExpect(LITERAL_INT).expectInt());
     }
 
     private Rule parseItemNameRule() {
