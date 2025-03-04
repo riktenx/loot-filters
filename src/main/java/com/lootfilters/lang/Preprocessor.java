@@ -1,7 +1,7 @@
 package com.lootfilters.lang;
 
-import static com.lootfilters.util.CollectionUtil.append;
-import static com.lootfilters.util.TextUtil.quote;
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
+import static com.lootfilters.util.CollectionUtil.append;
+import static com.lootfilters.util.TextUtil.quote;
 
 @RequiredArgsConstructor
 public class Preprocessor {
@@ -75,6 +75,10 @@ public class Preprocessor {
                 var define = defines.get(token.getValue());
                 if (define.isParameterized()) {
                     var args = tokens.takeArgList();
+                    if (args.size() != define.params.size()) {
+                        throw new PreprocessException(String.format("invalid macro expansion of %s (wanted %d args, got %d)",
+                                define.name, define.params.size(), args.size()));
+                    }
                     postproc.addAll(expandParameterizedDefine(append(visited, define.name), define, args, token.getLocation()));
                 } else {
                     var defineTokens = define.value.stream().map(
