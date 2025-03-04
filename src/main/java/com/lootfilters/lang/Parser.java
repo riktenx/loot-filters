@@ -15,6 +15,7 @@ import com.lootfilters.rule.ItemTradeableRule;
 import com.lootfilters.rule.ItemValueRule;
 import com.lootfilters.rule.NotRule;
 import com.lootfilters.rule.OrRule;
+import com.lootfilters.rule.ItemOwnershipRule;
 import com.lootfilters.rule.Rule;
 import com.lootfilters.rule.TextAccent;
 import lombok.RequiredArgsConstructor;
@@ -207,6 +208,8 @@ public class Parser {
         switch (first.getValue()) {
             case "id":
                 return parseItemIdRule();
+            case "ownership":
+                return parseItemOwnershipRule();
             case "name":
                 return parseItemNameRule();
             case "quantity":
@@ -233,6 +236,10 @@ public class Parser {
         } else {
             throw new ParseException("parse item id: unexpected argument token", tokens.peek());
         }
+    }
+
+    private ItemOwnershipRule parseItemOwnershipRule() {
+        return new ItemOwnershipRule(tokens.takeExpect(LITERAL_INT).expectInt());
     }
 
     private Rule parseItemNameRule() {
@@ -277,6 +284,7 @@ public class Parser {
         var operands = new Stack<Rule>();
         for (var rule : postfix) {
             if (rule instanceof ItemIdRule
+                    || rule instanceof ItemOwnershipRule
                     || rule instanceof ItemNameRule
                     || rule instanceof ItemQuantityRule
                     || rule instanceof ItemValueRule
