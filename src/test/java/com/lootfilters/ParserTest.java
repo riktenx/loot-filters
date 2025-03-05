@@ -2,7 +2,6 @@ package com.lootfilters;
 
 import com.lootfilters.lang.Lexer;
 import com.lootfilters.lang.Parser;
-import com.lootfilters.lang.TokenStream;
 import com.lootfilters.rule.AndRule;
 import com.lootfilters.rule.Comparator;
 import com.lootfilters.rule.ItemNameRule;
