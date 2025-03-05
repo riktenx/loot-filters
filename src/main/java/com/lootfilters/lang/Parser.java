@@ -5,6 +5,7 @@ import com.lootfilters.LootFilter;
 import com.lootfilters.MatcherConfig;
 import com.lootfilters.rule.AndRule;
 import com.lootfilters.rule.Comparator;
+import com.lootfilters.rule.ConstRule;
 import com.lootfilters.rule.FontType;
 import com.lootfilters.rule.ItemIdRule;
 import com.lootfilters.rule.ItemNameRule;
@@ -31,6 +32,7 @@ import static com.lootfilters.lang.Token.Type.COLON;
 import static com.lootfilters.lang.Token.Type.COMMA;
 import static com.lootfilters.lang.Token.Type.EXPR_END;
 import static com.lootfilters.lang.Token.Type.EXPR_START;
+import static com.lootfilters.lang.Token.Type.FALSE;
 import static com.lootfilters.lang.Token.Type.IDENTIFIER;
 import static com.lootfilters.lang.Token.Type.IF;
 import static com.lootfilters.lang.Token.Type.LIST_END;
@@ -42,6 +44,7 @@ import static com.lootfilters.lang.Token.Type.OP_AND;
 import static com.lootfilters.lang.Token.Type.OP_NOT;
 import static com.lootfilters.lang.Token.Type.OP_OR;
 import static com.lootfilters.lang.Token.Type.STMT_END;
+import static com.lootfilters.lang.Token.Type.TRUE;
 
 // Parser somewhat mixes canonical stages 2 (parse) and 3/4 (syntax/semantic analysis) but the filter language is
 // restricted enough that it should be fine for now.
@@ -130,6 +133,8 @@ public class Parser {
                 operators.push(it);
             } else if (it.is(OP_NOT)) {
                 operators.push(it);
+            } else if (it.is(TRUE) || it.is(FALSE)) {
+                rulesPostfix.add(new ConstRule(it.expectBoolean()));
             } else if (it.is(IDENTIFIER)) {
                 rulesPostfix.add(parseRule(it));
             } else {
@@ -277,6 +282,7 @@ public class Parser {
         var operands = new Stack<Rule>();
         for (var rule : postfix) {
             if (rule instanceof ItemIdRule
+                    || rule instanceof ConstRule
                     || rule instanceof ItemNameRule
                     || rule instanceof ItemQuantityRule
                     || rule instanceof ItemValueRule
