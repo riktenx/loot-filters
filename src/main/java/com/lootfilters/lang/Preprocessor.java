@@ -46,8 +46,11 @@ public class Preprocessor {
         if (params != null && params.isEmpty()) {
             throw new PreprocessException("#define " + quote(name) + " has empty param list found at " + nameToken.getLocation().toString());
         }
-        tokens.takeExpect(Token.Type.WHITESPACE, true);
-        defines.put(name, new Define(name, params, tokens.takeLine()));
+        var line = tokens.takeLine();
+        if (!line.isEmpty() && line.get(0).isWhitespace()) {
+            line.remove(0);
+        }
+        defines.put(name, new Define(name, params, line));
     }
 
     private List<String> parseDefineParams() {
