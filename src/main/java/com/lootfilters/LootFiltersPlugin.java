@@ -256,7 +256,7 @@ public class LootFiltersPlugin extends Plugin {
 	@Subscribe
 	public void onItemSpawned(ItemSpawned event) {
 		var tile = event.getTile();
-		var item = new PluginTileItem(this, event.getItem());
+		var item = new PluginTileItem(this, tile, event.getItem());
 		tileItemIndex.put(tile, item);
 
 		var match = getActiveFilter().findMatch(this, item);
@@ -286,7 +286,7 @@ public class LootFiltersPlugin extends Plugin {
 	@Subscribe
 	public void onItemDespawned(ItemDespawned event) {
 		var tile = event.getTile();
-		var item = new PluginTileItem(this, event.getItem());
+		var item = new PluginTileItem(this, tile, event.getItem());
 		tileItemIndex.remove(tile, item); // all of these are ultimately idempotent
 		lootbeamIndex.remove(tile, item);
 		displayIndex.remove(item);
