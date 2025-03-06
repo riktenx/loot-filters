@@ -116,9 +116,12 @@ public class Parser {
                         rulesPostfix.add(new AndRule(null));
                     } else if (op.is(OP_OR)) {
                         rulesPostfix.add(new OrRule(null));
-                    } else if (op.is(OP_NOT)) {
-                        rulesPostfix.add(new NotRule(null));
                     }
+                }
+                operators.pop(); // the (
+                if (!operators.isEmpty() && operators.peek().is(OP_NOT)) {
+                    operators.pop();
+                    rulesPostfix.add(new NotRule(null));
                 }
             } else if (it.is(OP_AND)) {
                 operators.push(it);
@@ -132,6 +135,10 @@ public class Parser {
                 operators.push(it);
             } else if (it.is(IDENTIFIER)) {
                 rulesPostfix.add(parseRule(it));
+                if (!operators.isEmpty() && operators.peek().is(OP_NOT)) {
+                    operators.pop();
+                    rulesPostfix.add(new NotRule(null));
+                }
             } else {
                 throw new ParseException("unexpected token in expression", it);
             }
