@@ -228,7 +228,7 @@ The following table lists supported display settings:
 | showValue                    | boolean      |                | Include an item's value in the text overlay. The highest value between GE and HA price is chosen.                                   |
 | showDespawn                  | boolean      |                | Show a despawn timer next to the text overlay. The type of despawn timer is controlled by config.                                   |
 | notify                       | boolean      |                | Fire a system notification when the matched item drops.                                                                             |
-| textAccent                   | enum         | `TEXTACCENT_*` | Text accent to use:<li>1 = text shadow (default)</li><li>2 = outline</li><li>3 = none</li>                                          |
+| textAccent                   | enum         | `TEXTACCENT_*` | Text accent to use:<li>1 = text shadow (default)</li><li>2 = outline</li><li>3 = none</li><li>4 = bold shadow</li>                  |
 | textAccentColor              | color string |                | Color for the text accent. Defaults to solid black.                                                                                 |
 | lootbeamColor, lootBeamColor | color string |                | Color for the lootbeam. Defaults to the text color when unset.                                                                      |
 | fontType                     | enum         | `FONTTYPE_*`   | Font used for the display:<li>1 = small (default)</li><li>2 = normal</li><li>3 = bold</li>                                          |
@@ -236,6 +236,14 @@ The following table lists supported display settings:
 | highlightTile                | boolean      |                | Whether to highlight the tile the item is on.                                                                                       | 
 | tileStrokeColor              | color string |                | Color for tile outline. Defaults to text color when unset.                                                                          |
 | tileFillColor                | color string |                | Color for the tile fill. No fill when unset.                                                                                        |
+| sound                        | string       |                | The name of a sound file (including the extension) in `.runelite/loot-filters/sounds` to play on item drop.                         |
+
+### Drop sounds
+
+Drop sounds are configured using the `sound` display property (see the table above). Some notes on drop sounds:
+* Sound files are placed in `.runelite/loot-filters/sounds`. The plugin will create this directory for you.
+* Not all formats are supported. MP3, for example, is not supported. When in doubt, use WAV.
+* The sound setting in your filter must include the file extension if present, e.g. `sound = "DropSound1.wav";`.
 
 ### Color strings
 
