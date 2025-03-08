@@ -37,7 +37,7 @@ public class MenuEntryComposer {
         entry.setTarget(buildTargetText(item, color));
     }
 
-    public void onMenuOpened() { // collapse
+    public void onClientTick() { // collapse
         var menu = plugin.getClient().getMenu();
         var entries = menu.getMenuEntries();
 

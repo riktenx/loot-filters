@@ -15,6 +15,7 @@ import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.events.ClientTick;
 import net.runelite.api.events.CommandExecuted;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
@@ -22,7 +23,6 @@ import net.runelite.api.events.ItemDespawned;
 import net.runelite.api.events.ItemQuantityChanged;
 import net.runelite.api.events.ItemSpawned;
 import net.runelite.api.events.MenuEntryAdded;
-import net.runelite.api.events.MenuOpened;
 import net.runelite.client.Notifier;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
@@ -310,8 +310,8 @@ public class LootFiltersPlugin extends Plugin {
 	}
 
 	@Subscribe
-	public void onMenuOpened(MenuOpened event) {
-		menuEntryComposer.onMenuOpened();
+	public void onClientTick(ClientTick event) {
+		menuEntryComposer.onClientTick();
 	}
 
 	@Subscribe
