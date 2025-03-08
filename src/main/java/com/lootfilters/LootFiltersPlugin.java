@@ -41,8 +41,12 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static com.lootfilters.util.FilterUtil.withConfigMatchers;
 import static com.lootfilters.util.TextUtil.quote;
@@ -93,6 +97,8 @@ public class LootFiltersPlugin extends Plugin {
 	private final MenuEntryComposer menuEntryComposer = new MenuEntryComposer(this);
 	private final LootFilterManager filterManager = new LootFilterManager(this);
 	private final AudioPlayer audioPlayer = new AudioPlayer(); // remove when https://github.com/runelite/runelite/pull/18745 is merged
+	private final ExecutorService audioDispatcher = Executors.newSingleThreadExecutor();
+	private final Set<String> queuedAudio = new HashSet<>();
 
 	private LootFilter activeFilter;
 	private LootFilter currentAreaFilter;
@@ -267,13 +273,7 @@ public class LootFiltersPlugin extends Plugin {
 			notifier.notify(getItemName(item.getId()));
 		}
 		if (match.getSound() != null && config.soundVolume() > 0) {
-			try {
-				var soundFile = new File(SOUND_DIRECTORY, match.getSound());
-				var gain = 20f * (float) Math.log10(config.soundVolume() / 100f);
-				audioPlayer.play(soundFile, gain);
-			} catch (Exception e) {
-				log.warn("play audio {}", match.getSound(), e);
-			}
+			queuedAudio.add(match.getSound());
 		}
 	}
 
@@ -312,6 +312,10 @@ public class LootFiltersPlugin extends Plugin {
 	@Subscribe
 	public void onClientTick(ClientTick event) {
 		menuEntryComposer.onClientTick();
+
+		if (!queuedAudio.isEmpty()) {
+			flushAudio();
+		}
 	}
 
 	@Subscribe
@@ -319,6 +323,21 @@ public class LootFiltersPlugin extends Plugin {
 		if (developerMode && event.getCommand().equals("lfDebug")) {
 			debugEnabled = !debugEnabled;
 		}
+	}
+
+	private void flushAudio() {
+		for (var filename : queuedAudio) {
+			audioDispatcher.execute(() -> {
+				try {
+					var soundFile = new File(SOUND_DIRECTORY, filename);
+					var gain = 20f * (float) Math.log10(config.soundVolume() / 100f);
+					audioPlayer.play(soundFile, gain);
+				} catch (Exception e) {
+					log.warn("play audio {}", filename, e);
+				}
+			});
+		}
+		queuedAudio.clear();
 	}
 
 	private void loadFilter() throws Exception {
