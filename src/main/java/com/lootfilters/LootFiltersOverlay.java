@@ -240,7 +240,7 @@ public class LootFiltersOverlay extends Overlay {
 
     private void renderDebugOverlay(Graphics2D g) {
         int itemCount = 0;
-        int screenY = 80;
+        int screenY = 96;
         for (var entry : plugin.getTileItemIndex().entrySet()) {
             var tile = entry.getKey();
             var items = entry.getValue();
@@ -270,6 +270,7 @@ public class LootFiltersOverlay extends Overlay {
         g.drawString("items: " + itemCount + "," + plugin.getTileItemIndex().pointIndexSize(), 0, 32);
         g.drawString("lootbeams: " + plugin.getLootbeamIndex().size(), 0, 48);
         g.drawString("displays: " + plugin.getDisplayIndex().size(), 0, 64);
+        g.drawString("audio: " + plugin.getQueuedAudio().size(), 0, 80);
     }
 
     private void renderDespawnTimer(Graphics2D g, DespawnTimerType type, PluginTileItem item, net.runelite.api.Point textPoint, int textWidth, int textHeight, int yOffset) {
