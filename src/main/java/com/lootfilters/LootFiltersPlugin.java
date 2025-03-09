@@ -9,7 +9,6 @@ import com.lootfilters.model.PluginTileItem;
 import com.lootfilters.util.AudioPlayer;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
@@ -150,17 +149,6 @@ public class LootFiltersPlugin extends Plugin {
         return gson.fromJson(configManager.getConfiguration(CONFIG_GROUP, USER_FILTERS_KEY), type);
 	}
 
-	@SneakyThrows // incoming user filters are vetted at this point, exceptions are a defect
-    public void setUserFilters(List<String> filters) {
-		parsedUserFilters = new ArrayList<>();
-		for (var filter : filters) {
-			parsedUserFilters.add(LootFilter.fromSource(filter));
-		}
-
-		var json = gson.toJson(filters);
-		configManager.setConfiguration(CONFIG_GROUP, USER_FILTERS_KEY, json);
-	}
-
 	public int getUserFilterIndex() {
 		var indexCfg = configManager.getConfiguration(CONFIG_GROUP, USER_FILTERS_INDEX_KEY);
         var index = indexCfg == null || indexCfg.isEmpty()
@@ -171,17 +159,6 @@ public class LootFiltersPlugin extends Plugin {
 			return -1;
 		}
 		return Math.max(index, -1);
-	}
-
-	public void setUserFilterIndex(int index) {
-		configManager.setConfiguration(CONFIG_GROUP, USER_FILTERS_INDEX_KEY, Integer.toString(index));
-	}
-
-	public String getUserActiveFilter() {
-		var filters = getUserFilters();
-		var index = getUserFilterIndex();
-		return filters.isEmpty() || index == -1 || index > filters.size()-1
-				? "" : filters.get(index);
 	}
 
 	public void addChatMessage(String msg) {
@@ -338,11 +315,6 @@ public class LootFiltersPlugin extends Plugin {
 			});
 		}
 		queuedAudio.clear();
-	}
-
-	private void loadFilter() throws Exception {
-		var userFilter = LootFilter.fromSource(getUserActiveFilter());
-		activeFilter = withConfigMatchers(userFilter, config);
 	}
 
 	private void scanAreaFilter() {
