@@ -1,7 +1,7 @@
 package com.lootfilters.rule;
 
 import com.lootfilters.LootFiltersPlugin;
-import net.runelite.api.TileItem;
+import com.lootfilters.model.PluginTileItem;
 
 public abstract class Rule {
     protected final String discriminator; // serde discriminator
@@ -10,5 +10,5 @@ public abstract class Rule {
         this.discriminator = discriminator;
     }
 
-    public abstract boolean test(LootFiltersPlugin plugin, TileItem item);
+    public abstract boolean test(LootFiltersPlugin plugin, PluginTileItem item);
 }

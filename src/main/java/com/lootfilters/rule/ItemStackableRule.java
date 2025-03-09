@@ -1,10 +1,9 @@
 package com.lootfilters.rule;
 
 import com.lootfilters.LootFiltersPlugin;
+import com.lootfilters.model.PluginTileItem;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import net.runelite.api.ItemID;
-import net.runelite.api.TileItem;
 
 @EqualsAndHashCode(callSuper = false)
 @ToString
@@ -17,7 +16,7 @@ public class ItemStackableRule extends Rule {
     }
 
     @Override
-    public boolean test(LootFiltersPlugin plugin, TileItem item) {
+    public boolean test(LootFiltersPlugin plugin, PluginTileItem item) {
         var comp = plugin.getItemManager().getItemComposition(item.getId());
 
         return target == comp.isStackable();

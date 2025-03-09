@@ -270,7 +270,7 @@ public class LootFiltersPlugin extends Plugin {
 			lootbeamIndex.put(tile, item, beam);
 		}
 		if (match.isNotify()) {
-			notifier.notify(getItemName(item.getId()));
+			notifier.notify(item.getName());
 		}
 		if (match.getSound() != null && config.soundVolume() > 0) {
 			queuedAudio.add(match.getSound());

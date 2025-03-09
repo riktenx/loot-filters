@@ -1,9 +1,9 @@
 package com.lootfilters.rule;
 
 import com.lootfilters.LootFiltersPlugin;
+import com.lootfilters.model.PluginTileItem;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import net.runelite.api.TileItem;
 
 import java.util.List;
 
@@ -23,7 +23,7 @@ public class AndRule extends Rule {
     }
 
     @Override
-    public boolean test(LootFiltersPlugin plugin, TileItem item) {
+    public boolean test(LootFiltersPlugin plugin, PluginTileItem item) {
         return rules.stream().allMatch(it -> it.test(plugin, item));
     }
 }

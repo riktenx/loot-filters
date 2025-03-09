@@ -7,6 +7,7 @@ import com.lootfilters.lang.Parser;
 import com.lootfilters.lang.Preprocessor;
 import com.lootfilters.lang.Sources;
 import com.lootfilters.lang.TokenStream;
+import com.lootfilters.model.PluginTileItem;
 import com.lootfilters.rule.Rule;
 import com.lootfilters.serde.ColorDeserializer;
 import com.lootfilters.serde.ColorSerializer;
@@ -16,7 +17,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import net.runelite.api.TileItem;
 import net.runelite.api.coords.WorldPoint;
 
 import java.awt.Color;
@@ -94,7 +94,7 @@ public class LootFilter {
         return ggson.toJson(this);
     }
 
-    public DisplayConfig findMatch(LootFiltersPlugin plugin, TileItem item) {
+    public DisplayConfig findMatch(LootFiltersPlugin plugin, PluginTileItem item) {
         DisplayConfig display = null;
         for (var matcher : matchers) {
             if (!matcher.getRule().test(plugin, item)) {

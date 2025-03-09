@@ -1,5 +1,6 @@
 package com.lootfilters;
 
+import com.lootfilters.model.PluginTileItem;
 import com.lootfilters.rule.AndRule;
 import com.lootfilters.rule.Comparator;
 import com.lootfilters.rule.ItemNameRule;
@@ -42,7 +43,7 @@ public class MatcherConfig {
 
     public static MatcherConfig ownershipFilter(boolean enabled) {
         var rule = new Rule("") {
-            @Override public boolean test(LootFiltersPlugin plugin, TileItem item) {
+            @Override public boolean test(LootFiltersPlugin plugin, PluginTileItem item) {
                 var accountType = plugin.getClient().getVarbitValue(Varbits.ACCOUNT_TYPE);
                 return enabled && accountType != 0 && item.getOwnership() == TileItem.OWNERSHIP_OTHER;
             }
@@ -55,7 +56,7 @@ public class MatcherConfig {
 
     public static MatcherConfig itemSpawnFilter(boolean enabled) {
         var rule = new Rule("") {
-            @Override public boolean test(LootFiltersPlugin plugin, TileItem item) {
+            @Override public boolean test(LootFiltersPlugin plugin, PluginTileItem item) {
                 return enabled && item.getOwnership() == TileItem.OWNERSHIP_NONE;
             }
         };
@@ -67,7 +68,7 @@ public class MatcherConfig {
 
     public static MatcherConfig showUnmatched(boolean enabled) {
         var rule = new Rule("") {
-            @Override public boolean test(LootFiltersPlugin plugin, TileItem item) {
+            @Override public boolean test(LootFiltersPlugin plugin, PluginTileItem item) {
                 return enabled;
             }
         };
@@ -80,7 +81,7 @@ public class MatcherConfig {
     public static MatcherConfig valueTier(boolean enabled, int value, Color color, boolean showLootbeam, boolean notify) {
         var inner = new ItemValueRule(value, Comparator.GT_EQ);
         var rule = new Rule("") {
-            @Override public boolean test(LootFiltersPlugin plugin, TileItem item) {
+            @Override public boolean test(LootFiltersPlugin plugin, PluginTileItem item) {
                 return enabled && inner.test(plugin, item);
             }
         };
@@ -98,7 +99,7 @@ public class MatcherConfig {
                 ? new AndRule(valueRule, new ItemTradeableRule(true))
                 : valueRule;
         var rule = new Rule("") {
-            @Override public boolean test(LootFiltersPlugin plugin, TileItem item) {
+            @Override public boolean test(LootFiltersPlugin plugin, PluginTileItem item) {
                 return enabled && inner.test(plugin, item);
             }
         };
