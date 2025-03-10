@@ -79,7 +79,7 @@ public class LootFiltersPanel extends PluginPanel {
                 "Create a new empty filter.",
                 this::onCreateEmptyFilter);
         var importClipboard = createIconButton("paste_icon",
-                "Import new filter from clipboard.",
+                "Import filter from clipboard.",
                 this::onImportClipboard);
         var importConfig = createIconButton("import_config",
                 "Import item highlight and hide lists into a new filter. Doing this will also reset those lists.",
@@ -98,9 +98,10 @@ public class LootFiltersPanel extends PluginPanel {
                 "View the filters directory in the system file browser.",
                 this::onBrowseFolder);
 
+        top.add(importClipboard);
         top.add(createNew);
         top.add(importConfig);
-        top.add(Box.createHorizontalStrut(130));
+        top.add(Box.createHorizontalStrut(110));
         top.add(reloadFilters);
         top.add(browseFolder);
 
@@ -191,7 +192,7 @@ public class LootFiltersPanel extends PluginPanel {
     private void onImportClipboard() {
         var newSrc = getClipboard();
         if (newSrc == null) {
-            plugin.addChatMessage("No text in clipboard.");
+            plugin.addChatMessage("Import failed: no text in clipboard.");
             return;
         }
 
@@ -199,24 +200,43 @@ public class LootFiltersPanel extends PluginPanel {
         try {
             newFilter = LootFilter.fromSourcesWithPreamble(Map.of("clipboard", newSrc));
         } catch (CompileException e) {
-            plugin.addChatMessage("Failed to load filter from clipboard: " + e.getMessage());
+            plugin.addChatMessage("Import failed: " + e.getMessage());
             return;
         }
 
         if (newFilter.getName() == null || newFilter.getName().isBlank()) {
-            var newName = showInputDialog(this, "This filter does not have a name. Enter one:");
-            if (newName == null || newName.isBlank()) {
-                return;
-            }
-            newSrc = "meta { name = " + quote(newName) + "; }\n" + newSrc;
-            newFilter.setName(newName);
-        }
-
-        if (tryUpdateExisting(newFilter.getName(), newSrc)) {
+            plugin.addChatMessage("Import failed: this filter does not have a name.");
             return;
         }
 
-        addNewFilter(newFilter.getName(), newSrc);
+        var existing = plugin.getParsedUserFilters();
+        for (var filter : existing) {
+            if (!filter.getName().equals(newFilter.getName())) {
+                continue;
+            }
+            if (!confirm("Filter " + quote(filter.getName()) + " already exists in " + quote(filter.getFilename()) + ". Update it?")) {
+                return;
+            }
+
+            try {
+                plugin.getFilterManager().updateFilter(filter.getFilename(), newSrc);
+            } catch (Exception e) {
+                plugin.addChatMessage("Import failed: " + e.getMessage());
+                return;
+            }
+
+            onReloadFilters();
+            return;
+        }
+
+        try {
+            plugin.getFilterManager().saveNewFilter(newFilter.getName(), newSrc);
+        } catch (Exception e) {
+            plugin.addChatMessage("Import failed: " + e.getMessage());
+            return;
+        }
+
+        onReloadFilters();
     }
 
     @SneakyThrows
