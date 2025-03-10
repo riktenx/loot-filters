@@ -4,6 +4,7 @@ import com.lootfilters.DisplayConfig;
 import com.lootfilters.LootFilter;
 import com.lootfilters.MatcherConfig;
 import com.lootfilters.rule.AndRule;
+import com.lootfilters.rule.AreaRule;
 import com.lootfilters.rule.Comparator;
 import com.lootfilters.rule.ConstRule;
 import com.lootfilters.rule.FontType;
@@ -19,6 +20,7 @@ import com.lootfilters.rule.OrRule;
 import com.lootfilters.rule.Rule;
 import com.lootfilters.rule.TextAccent;
 import lombok.RequiredArgsConstructor;
+import net.runelite.api.coords.WorldPoint;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -231,6 +233,8 @@ public class Parser {
                 return parseItemStackableRule();
             case "noted":
                 return parseItemNotedRule();
+            case "area":
+                return parseAreaRule();
             default:
                 throw new ParseException("unknown rule identifier", first);
         }
@@ -285,6 +289,16 @@ public class Parser {
         return new ItemNotedRule((op.expectBoolean()));
     }
 
+    private AreaRule parseAreaRule() {
+        var start = tokens.peek();
+        var coords = tokens.take(LIST_START, LIST_END, true).expectIntList();
+        if (coords.size() != 6) {
+            throw new ParseException("incorrect list size for area argument", start);
+        }
+        return new AreaRule(new WorldPoint(coords.get(0), coords.get(1), coords.get(2)),
+                new WorldPoint(coords.get(3), coords.get(4), coords.get(5)));
+    }
+
     private Rule buildRule(List<Rule> postfix) {
         var operands = new Stack<Rule>();
         for (var rule : postfix) {
@@ -295,7 +309,8 @@ public class Parser {
                     || rule instanceof ItemValueRule
                     || rule instanceof ItemTradeableRule
                     || rule instanceof ItemStackableRule
-                    || rule instanceof ItemNotedRule) {
+                    || rule instanceof ItemNotedRule
+                    || rule instanceof AreaRule) {
                 operands.push(rule);
             } else if (rule instanceof AndRule) {
                 operands.push(new AndRule(operands.pop(), operands.pop()));
@@ -307,7 +322,7 @@ public class Parser {
         }
 
         if (operands.size() != 1) {
-            throw new ParseException("invalid rule postfix");
+            throw new ParseException("invalid rule postfix"); // did you add a new rule but not handle it above?
         }
         return operands.pop();
     }
