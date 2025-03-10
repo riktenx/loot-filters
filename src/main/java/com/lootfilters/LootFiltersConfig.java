@@ -3,12 +3,10 @@ package com.lootfilters;
 import com.lootfilters.model.DespawnTimerType;
 import com.lootfilters.model.DualValueDisplayType;
 import com.lootfilters.model.FontMode;
-import com.lootfilters.model.ItemValueRulesMode;
 import com.lootfilters.model.OverlayPriority;
 import com.lootfilters.model.ValueDisplayType;
 import com.lootfilters.rule.TextAccent;
-import com.lootfilters.rule.ValueTier;
-import com.lootfilters.rule.ValueType;
+import net.runelite.client.config.Alpha;
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
@@ -324,9 +322,33 @@ public interface LootFiltersConfig extends Config {
     default boolean highlightNotify() { return false; }
 
     @ConfigSection(
+            name = "Advanced highlight display",
+            description = "Configure advanced item highlight display. Not all filter-based display properties are supported.",
+            position = 9
+    )
+    String hdd = "Highlight display";
+    @ConfigItem(position = 0, section = hdd,
+            keyName = "hdBackgroundColor", name = "Background", description = "")
+    @Alpha default Color higlightBackgroundColor() { return null; }
+    @ConfigItem(position = 1, section = hdd,
+            keyName = "hdBorderColor", name = "Border", description = "")
+    @Alpha default Color highlightBorderColor() { return null; }
+    @ConfigItem(position = 2, section = hdd,
+            keyName = "hdLootbeamColor", name = "Lootbeam", description = "")
+    @Alpha default Color highlightLootbeamColor() { return null; }
+    @ConfigItem(position = 3, section = hdd,
+            keyName = "hdMenuTextColor", name = "Menu text", description = "")
+    @Alpha default Color highlightMenuTextColor() { return null; }
+    @ConfigItem(position = 4, section = hdd, keyName = "hdMenuSort", name = "Menu sort priority", description = "")
+    default int highlightMenuSort() { return 0; }
+    @ConfigItem(position = 9, section = hdd,
+            keyName = "hdSound", name = "Sound", description = "Can be one of two types of values:<br><br>A number: play a game sound effect by ID<br>A string: play a custom audio file from .runelite/loot-filters/sounds, not all sound formats are supported")
+    default String highlightSound() { return ""; }
+
+    @ConfigSection(
             name = "Item value rules",
             description = "These have been removed. See the readme hover below.",
-            position = 9
+            position = 99
     )
     String itemValueRules = "itemValueRules";
     @ConfigItem(
