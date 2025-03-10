@@ -1,6 +1,7 @@
 package com.lootfilters.rule;
 
 import com.lootfilters.LootFiltersPlugin;
+import com.lootfilters.model.PluginTileItem;
 import lombok.ToString;
 import net.runelite.api.TileItem;
 
@@ -16,7 +17,7 @@ public abstract class ComparatorRule extends Rule {
     }
 
     @Override
-    public final boolean test(LootFiltersPlugin plugin, TileItem item) {
+    public final boolean test(LootFiltersPlugin plugin, PluginTileItem item) {
         var lhs = getLhs(plugin, item);
         switch (cmp) {
             case GT:

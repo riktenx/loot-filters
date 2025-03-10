@@ -4,7 +4,9 @@ import com.lootfilters.DisplayConfig;
 import com.lootfilters.LootFilter;
 import com.lootfilters.MatcherConfig;
 import com.lootfilters.rule.AndRule;
+import com.lootfilters.rule.AreaRule;
 import com.lootfilters.rule.Comparator;
+import com.lootfilters.rule.ConstRule;
 import com.lootfilters.rule.FontType;
 import com.lootfilters.rule.ItemIdRule;
 import com.lootfilters.rule.ItemNameRule;
@@ -19,6 +21,7 @@ import com.lootfilters.rule.ItemOwnershipRule;
 import com.lootfilters.rule.Rule;
 import com.lootfilters.rule.TextAccent;
 import lombok.RequiredArgsConstructor;
+import net.runelite.api.coords.WorldPoint;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +35,7 @@ import static com.lootfilters.lang.Token.Type.COLON;
 import static com.lootfilters.lang.Token.Type.COMMA;
 import static com.lootfilters.lang.Token.Type.EXPR_END;
 import static com.lootfilters.lang.Token.Type.EXPR_START;
+import static com.lootfilters.lang.Token.Type.FALSE;
 import static com.lootfilters.lang.Token.Type.IDENTIFIER;
 import static com.lootfilters.lang.Token.Type.IF;
 import static com.lootfilters.lang.Token.Type.LIST_END;
@@ -43,6 +47,7 @@ import static com.lootfilters.lang.Token.Type.OP_AND;
 import static com.lootfilters.lang.Token.Type.OP_NOT;
 import static com.lootfilters.lang.Token.Type.OP_OR;
 import static com.lootfilters.lang.Token.Type.STMT_END;
+import static com.lootfilters.lang.Token.Type.TRUE;
 
 // Parser somewhat mixes canonical stages 2 (parse) and 3/4 (syntax/semantic analysis) but the filter language is
 // restricted enough that it should be fine for now.
@@ -117,9 +122,12 @@ public class Parser {
                         rulesPostfix.add(new AndRule(null));
                     } else if (op.is(OP_OR)) {
                         rulesPostfix.add(new OrRule(null));
-                    } else if (op.is(OP_NOT)) {
-                        rulesPostfix.add(new NotRule(null));
                     }
+                }
+                operators.pop(); // the (
+                if (!operators.isEmpty() && operators.peek().is(OP_NOT)) {
+                    operators.pop();
+                    rulesPostfix.add(new NotRule(null));
                 }
             } else if (it.is(OP_AND)) {
                 operators.push(it);
@@ -131,8 +139,14 @@ public class Parser {
                 operators.push(it);
             } else if (it.is(OP_NOT)) {
                 operators.push(it);
+            } else if (it.is(TRUE) || it.is(FALSE)) {
+                rulesPostfix.add(new ConstRule(it.expectBoolean()));
             } else if (it.is(IDENTIFIER)) {
                 rulesPostfix.add(parseRule(it));
+                if (!operators.isEmpty() && operators.peek().is(OP_NOT)) {
+                    operators.pop();
+                    rulesPostfix.add(new NotRule(null));
+                }
             } else {
                 throw new ParseException("unexpected token in expression", it);
             }
@@ -222,6 +236,8 @@ public class Parser {
                 return parseItemStackableRule();
             case "noted":
                 return parseItemNotedRule();
+            case "area":
+                return parseAreaRule();
             default:
                 throw new ParseException("unknown rule identifier", first);
         }
@@ -280,17 +296,29 @@ public class Parser {
         return new ItemNotedRule((op.expectBoolean()));
     }
 
+    private AreaRule parseAreaRule() {
+        var start = tokens.peek();
+        var coords = tokens.take(LIST_START, LIST_END, true).expectIntList();
+        if (coords.size() != 6) {
+            throw new ParseException("incorrect list size for area argument", start);
+        }
+        return new AreaRule(new WorldPoint(coords.get(0), coords.get(1), coords.get(2)),
+                new WorldPoint(coords.get(3), coords.get(4), coords.get(5)));
+    }
+
     private Rule buildRule(List<Rule> postfix) {
         var operands = new Stack<Rule>();
         for (var rule : postfix) {
             if (rule instanceof ItemIdRule
                     || rule instanceof ItemOwnershipRule
+                    || rule instanceof ConstRule
                     || rule instanceof ItemNameRule
                     || rule instanceof ItemQuantityRule
                     || rule instanceof ItemValueRule
                     || rule instanceof ItemTradeableRule
                     || rule instanceof ItemStackableRule
-                    || rule instanceof ItemNotedRule) {
+                    || rule instanceof ItemNotedRule
+                    || rule instanceof AreaRule) {
                 operands.push(rule);
             } else if (rule instanceof AndRule) {
                 operands.push(new AndRule(operands.pop(), operands.pop()));
@@ -302,7 +330,7 @@ public class Parser {
         }
 
         if (operands.size() != 1) {
-            throw new ParseException("invalid rule postfix");
+            throw new ParseException("invalid rule postfix"); // did you add a new rule but not handle it above?
         }
         return operands.pop();
     }

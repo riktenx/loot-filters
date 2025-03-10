@@ -1,9 +1,9 @@
 package com.lootfilters;
 
+import com.lootfilters.model.PluginTileItem;
 import lombok.AllArgsConstructor;
 import net.runelite.api.MenuAction;
 import net.runelite.api.MenuEntry;
-import net.runelite.api.TileItem;
 import net.runelite.api.coords.WorldPoint;
 
 import java.awt.Color;
@@ -37,7 +37,7 @@ public class MenuEntryComposer {
         entry.setTarget(buildTargetText(item, color));
     }
 
-    public void onMenuOpened() { // collapse
+    public void onClientTick() { // collapse
         var menu = plugin.getClient().getMenu();
         var entries = menu.getMenuEntries();
 
@@ -60,14 +60,14 @@ public class MenuEntryComposer {
                 : entry;
     }
 
-    private TileItem getItemForEntry(MenuEntry entry) {
+    private PluginTileItem getItemForEntry(MenuEntry entry) {
         var wv = plugin.getClient().getTopLevelWorldView();
         var point = WorldPoint.fromScene(wv, entry.getParam0(), entry.getParam1(), wv.getPlane());
         return plugin.getTileItemIndex().findItem(point, entry.getIdentifier());
     }
 
-    private String buildTargetText(TileItem item, Color color) {
-        var text = plugin.getItemName(item.getId());
+    private String buildTargetText(PluginTileItem item, Color color) {
+        var text = item.getName();
         if (item.getQuantity() > 1) {
             text += " (" + abbreviate(item.getQuantity()) + ")";
         }

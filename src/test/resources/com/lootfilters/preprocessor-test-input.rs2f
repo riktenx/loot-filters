@@ -4,6 +4,8 @@
 #define B A
 #define HIDE(_name) if (name:_name) { hidden = true; } // comment
 #define HIGHLIGHT(_name, _color) if (name:_name) { color = _color; }
+#define USERSTYLE
+#define USERSTYLE2 // comment
 
 #define HIGHLIGHT2(_name, _color) \
 if (name:_name) { \
@@ -16,6 +18,9 @@ if (value:>10000000) {
     textColor = green;
     showLootbeam = true;
 }
+
+USERSTYLE
+USERSTYLE2
 
 HIDE("dragon crossbow")
 HIGHLIGHT("zaryte crossbow", GREEN)

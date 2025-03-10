@@ -11,7 +11,6 @@ import net.runelite.api.ItemID;
 import net.runelite.api.Tile;
 import net.runelite.api.TileItem;
 import net.runelite.api.coords.LocalPoint;
-import net.runelite.client.game.ItemManager;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.components.ProgressPieComponent;
@@ -26,9 +25,9 @@ import java.awt.Rectangle;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
-import java.util.List;
 
 import static com.lootfilters.util.TextUtil.abbreviate;
 import static com.lootfilters.util.TextUtil.abbreviateValue;
@@ -46,9 +45,6 @@ public class LootFiltersOverlay extends Overlay {
     private final Client client;
     private final LootFiltersPlugin plugin;
     private final LootFiltersConfig config;
-
-    @Inject
-    private ItemManager itemManager;
 
     @Inject
     public LootFiltersOverlay(Client client, LootFiltersPlugin plugin, LootFiltersConfig config) {
@@ -185,8 +181,8 @@ public class LootFiltersOverlay extends Overlay {
         return Color.GREEN;
     }
 
-    private String buildDisplayText(TileItem item, long unstackedCount, DisplayConfig display) {
-        var text = itemManager.getItemComposition(item.getId()).getName();
+    private String buildDisplayText(PluginTileItem item, long unstackedCount, DisplayConfig display) {
+        var text = item.getName();
 
         if (item.getQuantity() > 1) {
             text += " (" + abbreviate(item.getQuantity()) + ")";
@@ -200,8 +196,8 @@ public class LootFiltersOverlay extends Overlay {
             return text;
         }
 
-        var ge = itemManager.getItemPrice(item.getId()) * item.getQuantity();
-        var ha = itemManager.getItemComposition(item.getId()).getHaPrice() * item.getQuantity();
+        var ge = item.getGePrice() * item.getQuantity();
+        var ha = item.getHaPrice() * item.getQuantity();
         switch (showBecauseHotkey ? ValueDisplayType.BOTH : config.valueDisplayType()) {
             case HIGHEST:
                 return ge == 0 && ha == 0 ? text
@@ -240,7 +236,7 @@ public class LootFiltersOverlay extends Overlay {
 
     private void renderDebugOverlay(Graphics2D g) {
         int itemCount = 0;
-        int screenY = 80;
+        int screenY = 96;
         for (var entry : plugin.getTileItemIndex().entrySet()) {
             var tile = entry.getKey();
             var items = entry.getValue();
@@ -270,6 +266,7 @@ public class LootFiltersOverlay extends Overlay {
         g.drawString("items: " + itemCount + "," + plugin.getTileItemIndex().pointIndexSize(), 0, 32);
         g.drawString("lootbeams: " + plugin.getLootbeamIndex().size(), 0, 48);
         g.drawString("displays: " + plugin.getDisplayIndex().size(), 0, 64);
+        g.drawString("audio: " + plugin.getQueuedAudio().size(), 0, 80);
     }
 
     private void renderDespawnTimer(Graphics2D g, DespawnTimerType type, PluginTileItem item, net.runelite.api.Point textPoint, int textWidth, int textHeight, int yOffset) {

@@ -15,6 +15,7 @@ import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.events.ClientTick;
 import net.runelite.api.events.CommandExecuted;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
@@ -22,7 +23,6 @@ import net.runelite.api.events.ItemDespawned;
 import net.runelite.api.events.ItemQuantityChanged;
 import net.runelite.api.events.ItemSpawned;
 import net.runelite.api.events.MenuEntryAdded;
-import net.runelite.api.events.MenuOpened;
 import net.runelite.client.Notifier;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
@@ -41,8 +41,12 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static com.lootfilters.util.FilterUtil.withConfigMatchers;
 import static com.lootfilters.util.TextUtil.quote;
@@ -93,6 +97,8 @@ public class LootFiltersPlugin extends Plugin {
 	private final MenuEntryComposer menuEntryComposer = new MenuEntryComposer(this);
 	private final LootFilterManager filterManager = new LootFilterManager(this);
 	private final AudioPlayer audioPlayer = new AudioPlayer(); // remove when https://github.com/runelite/runelite/pull/18745 is merged
+	private final ExecutorService audioDispatcher = Executors.newSingleThreadExecutor();
+	private final Set<String> queuedAudio = new HashSet<>();
 
 	private LootFilter activeFilter;
 	private LootFilter currentAreaFilter;
@@ -250,7 +256,7 @@ public class LootFiltersPlugin extends Plugin {
 	@Subscribe
 	public void onItemSpawned(ItemSpawned event) {
 		var tile = event.getTile();
-		var item = new PluginTileItem(this, event.getItem());
+		var item = new PluginTileItem(this, tile, event.getItem());
 		tileItemIndex.put(tile, item);
 
 		var match = getActiveFilter().findMatch(this, item);
@@ -264,16 +270,10 @@ public class LootFiltersPlugin extends Plugin {
 			lootbeamIndex.put(tile, item, beam);
 		}
 		if (match.isNotify()) {
-			notifier.notify(getItemName(item.getId()));
+			notifier.notify(item.getName());
 		}
 		if (match.getSound() != null && config.soundVolume() > 0) {
-			try {
-				var soundFile = new File(SOUND_DIRECTORY, match.getSound());
-				var gain = 20f * (float) Math.log10(config.soundVolume() / 100f);
-				audioPlayer.play(soundFile, gain);
-			} catch (Exception e) {
-				log.warn("play audio {}", match.getSound(), e);
-			}
+			queuedAudio.add(match.getSound());
 		}
 	}
 
@@ -286,7 +286,7 @@ public class LootFiltersPlugin extends Plugin {
 	@Subscribe
 	public void onItemDespawned(ItemDespawned event) {
 		var tile = event.getTile();
-		var item = new PluginTileItem(this, event.getItem());
+		var item = new PluginTileItem(this, tile, event.getItem());
 		tileItemIndex.remove(tile, item); // all of these are ultimately idempotent
 		lootbeamIndex.remove(tile, item);
 		displayIndex.remove(item);
@@ -310,8 +310,12 @@ public class LootFiltersPlugin extends Plugin {
 	}
 
 	@Subscribe
-	public void onMenuOpened(MenuOpened event) {
-		menuEntryComposer.onMenuOpened();
+	public void onClientTick(ClientTick event) {
+		menuEntryComposer.onClientTick();
+
+		if (!queuedAudio.isEmpty()) {
+			flushAudio();
+		}
 	}
 
 	@Subscribe
@@ -319,6 +323,21 @@ public class LootFiltersPlugin extends Plugin {
 		if (developerMode && event.getCommand().equals("lfDebug")) {
 			debugEnabled = !debugEnabled;
 		}
+	}
+
+	private void flushAudio() {
+		for (var filename : queuedAudio) {
+			audioDispatcher.execute(() -> {
+				try {
+					var soundFile = new File(SOUND_DIRECTORY, filename);
+					var gain = 20f * (float) Math.log10(config.soundVolume() / 100f);
+					audioPlayer.play(soundFile, gain);
+				} catch (Exception e) {
+					log.warn("play audio {}", filename, e);
+				}
+			});
+		}
+		queuedAudio.clear();
 	}
 
 	private void loadFilter() throws Exception {

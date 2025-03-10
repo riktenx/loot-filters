@@ -42,9 +42,9 @@ if (!name:"foo") {
 if (!(name:"foo")) {
     hidden = true;
 }
-if (name:"foo" || !name:"bar") {
+if (!name:"foo" || name:"bar") {
     hidden = true;
 }
-if (name:"foo" && !(name:"bar" && !name:"baz")) {
+if (!(name:"bar" && !name:"baz") && name:"foo") {
     hidden = true;
 }

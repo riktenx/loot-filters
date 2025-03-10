@@ -2,7 +2,6 @@ package com.lootfilters;
 
 import com.lootfilters.lang.Lexer;
 import com.lootfilters.lang.Parser;
-import com.lootfilters.lang.TokenStream;
 import com.lootfilters.rule.AndRule;
 import com.lootfilters.rule.Comparator;
 import com.lootfilters.rule.ItemNameRule;
@@ -63,17 +62,17 @@ public class ParserTest {
                         DisplayConfig.builder().hidden(true).build()),
                 new MatcherConfig(new NotRule(new ItemNameRule("foo")),
                         DisplayConfig.builder().hidden(true).build()),
-                new MatcherConfig(new OrRule(new NotRule(new ItemNameRule("bar")), new ItemNameRule("foo")),
+                new MatcherConfig(new OrRule(new ItemNameRule("bar"), new NotRule(new ItemNameRule("foo"))),
                         DisplayConfig.builder().hidden(true).build()),
                 new MatcherConfig(
                         new AndRule(
+                                new ItemNameRule("foo"),
                                 new NotRule(
                                         new AndRule(
                                                 new NotRule(new ItemNameRule("baz")),
                                                 new ItemNameRule("bar")
                                         )
-                                ),
-                                new ItemNameRule("foo")
+                                )
                         ),
                         DisplayConfig.builder().hidden(true).build())
         );

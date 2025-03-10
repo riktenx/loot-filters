@@ -20,7 +20,8 @@ public class LootFilterManager {
 
     public List<LootFilter> loadFilters() {
         var filters = new ArrayList<LootFilter>();
-        for (var file : LootFiltersPlugin.FILTER_DIRECTORY.listFiles()) {
+        var files = LootFiltersPlugin.FILTER_DIRECTORY.listFiles();
+        for (var file : files) {
             String src;
             try {
                 src = Files.readString(file.toPath());
@@ -47,6 +48,8 @@ public class LootFilterManager {
 
             filters.add(filter);
         }
+        plugin.addChatMessage(String.format("Reloaded <col=%s>%d/%d</col> loot filters.",
+                filters.size() == files.length ? "00FF00" : "FF0000", filters.size(), files.length));
         return filters;
     }
 

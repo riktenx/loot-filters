@@ -1,10 +1,10 @@
 package com.lootfilters.rule;
 
 import com.lootfilters.LootFiltersPlugin;
+import com.lootfilters.model.PluginTileItem;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
-import net.runelite.api.TileItem;
 
 import java.util.List;
 
@@ -25,7 +25,7 @@ public class ItemIdRule extends Rule {
     }
 
     @Override
-    public boolean test(LootFiltersPlugin plugin, TileItem item) {
+    public boolean test(LootFiltersPlugin plugin, PluginTileItem item) {
         return ids.stream().anyMatch(it -> item.getId() == it);
     }
 }
