@@ -11,6 +11,7 @@ import com.lootfilters.rule.ItemNameRule;
 import com.lootfilters.rule.ItemQuantityRule;
 import com.lootfilters.rule.ItemValueRule;
 import com.lootfilters.rule.OrRule;
+import com.lootfilters.rule.ItemOwnershipRule;
 import com.lootfilters.rule.Rule;
 import lombok.AllArgsConstructor;
 
@@ -27,6 +28,8 @@ public class RuleDeserializer implements JsonDeserializer<Rule> {
         switch (discriminator) {
             case "item_id":
                 return gson.fromJson(object, ItemIdRule.class);
+            case "item_ownership":
+                return gson.fromJson(object, ItemOwnershipRule.class);
             case "item_name":
                 return gson.fromJson(object, ItemNameRule.class);
             case "item_value":
