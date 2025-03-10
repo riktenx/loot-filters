@@ -1,10 +1,10 @@
 package com.lootfilters.rule;
 
 import com.lootfilters.LootFiltersPlugin;
+import com.lootfilters.model.PluginTileItem;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
-import net.runelite.api.TileItem;
 
 @Getter
 @EqualsAndHashCode(callSuper = false)
@@ -18,7 +18,7 @@ public class ConstRule extends Rule {
     }
 
     @Override
-    public boolean test(LootFiltersPlugin plugin, TileItem item) {
+    public boolean test(LootFiltersPlugin plugin, PluginTileItem item) {
         return target;
     }
 }
