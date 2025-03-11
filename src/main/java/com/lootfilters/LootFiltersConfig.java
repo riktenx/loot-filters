@@ -214,6 +214,14 @@ public interface LootFiltersConfig extends Config {
     )
     default boolean highlightTiles() { return false; }
     @ConfigItem(
+            keyName = "collapseEntries",
+            name = "Menu: collapse entries",
+            description = "Collapse menu entries for multiples of unstacked items.",
+            section = displayOverrides,
+            position = 89
+    )
+    default boolean collapseEntries() { return true; }
+    @ConfigItem(
             keyName = "deprioritizeHidden",
             name = "Menu: deprioritize hidden items",
             description = "Deprioritize menu entries for hidden items.",

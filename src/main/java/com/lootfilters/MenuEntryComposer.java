@@ -38,6 +38,10 @@ public class MenuEntryComposer {
     }
 
     public void onClientTick() { // collapse
+        if (!plugin.getConfig().collapseEntries()) {
+            return;
+        }
+
         var menu = plugin.getClient().getMenu();
         var entries = menu.getMenuEntries();
 
