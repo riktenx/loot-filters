@@ -11,13 +11,13 @@ import com.lootfilters.rule.FontType;
 import com.lootfilters.rule.ItemIdRule;
 import com.lootfilters.rule.ItemNameRule;
 import com.lootfilters.rule.ItemNotedRule;
+import com.lootfilters.rule.ItemOwnershipRule;
 import com.lootfilters.rule.ItemQuantityRule;
 import com.lootfilters.rule.ItemStackableRule;
 import com.lootfilters.rule.ItemTradeableRule;
 import com.lootfilters.rule.ItemValueRule;
 import com.lootfilters.rule.NotRule;
 import com.lootfilters.rule.OrRule;
-import com.lootfilters.rule.ItemOwnershipRule;
 import com.lootfilters.rule.Rule;
 import com.lootfilters.rule.TextAccent;
 import lombok.RequiredArgsConstructor;
@@ -125,10 +125,7 @@ public class Parser {
                     }
                 }
                 operators.pop(); // the (
-                if (!operators.isEmpty() && operators.peek().is(OP_NOT)) {
-                    operators.pop();
-                    rulesPostfix.add(new NotRule(null));
-                }
+                unwindUnary(operators, rulesPostfix);
             } else if (it.is(OP_AND)) {
                 operators.push(it);
             } else if (it.is(OP_OR)) {
@@ -141,12 +138,10 @@ public class Parser {
                 operators.push(it);
             } else if (it.is(TRUE) || it.is(FALSE)) {
                 rulesPostfix.add(new ConstRule(it.expectBoolean()));
+                unwindUnary(operators, rulesPostfix);
             } else if (it.is(IDENTIFIER)) {
                 rulesPostfix.add(parseRule(it));
-                if (!operators.isEmpty() && operators.peek().is(OP_NOT)) {
-                    operators.pop();
-                    rulesPostfix.add(new NotRule(null));
-                }
+                unwindUnary(operators, rulesPostfix);
             } else {
                 throw new ParseException("unexpected token in expression", it);
             }
@@ -215,6 +210,13 @@ public class Parser {
         tokens.takeExpect(BLOCK_END);
 
         matchers.add(new MatcherConfig(buildRule(rulesPostfix), builder.build(), isTerminal));
+    }
+
+    private void unwindUnary(Stack<Token> operators, ArrayList<Rule> postfix) {
+        while (!operators.isEmpty() && operators.peek().is(OP_NOT)) {
+            operators.pop();
+            postfix.add(new NotRule(null));
+        }
     }
 
     private Rule parseRule(Token first) {
