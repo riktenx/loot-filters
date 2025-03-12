@@ -20,7 +20,6 @@ import net.runelite.api.events.CommandExecuted;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.ItemDespawned;
-import net.runelite.api.events.ItemQuantityChanged;
 import net.runelite.api.events.ItemSpawned;
 import net.runelite.api.events.MenuEntryAdded;
 import net.runelite.client.Notifier;
@@ -275,12 +274,6 @@ public class LootFiltersPlugin extends Plugin {
 		if (match.getSound() != null && config.soundVolume() > 0) {
 			queuedAudio.add(match.getSound());
 		}
-	}
-
-	@Subscribe
-	public void onItemQuantityChanged(ItemQuantityChanged event) {
-		onItemDespawned(new ItemDespawned(event.getTile(), event.getItem()));
-		clientThread.invokeLater(() -> onItemSpawned(new ItemSpawned(event.getTile(), event.getItem())));
 	}
 
 	@Subscribe
