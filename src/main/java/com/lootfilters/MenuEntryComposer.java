@@ -89,6 +89,6 @@ public class MenuEntryComposer {
     }
 
     private static String entrySlug(MenuEntry entry) {
-        return entry.getType().toString() + entry.getIdentifier();
+        return entry.getType().toString() + entry.getIdentifier() + entry.getParam0() + entry.getParam1();
     }
 }
