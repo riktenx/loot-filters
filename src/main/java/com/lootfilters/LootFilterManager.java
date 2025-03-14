@@ -33,6 +33,7 @@ public class LootFilterManager {
             LootFilter filter;
             try {
                 filter = LootFilter.fromSourcesWithPreamble(Map.of(file.getName(), src));
+                filter.setFilename(file.getName());
                 if (filter.getName() == null || filter.getName().isBlank()) {
                     filter.setName(file.getName());
                 }
@@ -61,6 +62,17 @@ public class LootFilterManager {
         }
 
         try (var writer = new FileWriter(newFile)) {
+            writer.write(src);
+        }
+    }
+
+    public void updateFilter(String filename, String src) throws IOException {
+        var file = new File(LootFiltersPlugin.FILTER_DIRECTORY, filename);
+        if (!file.exists()) {
+            throw new IOException("attempt to update nonexistent file " + quote(filename));
+        }
+
+        try (var writer = new FileWriter(file)) {
             writer.write(src);
         }
     }

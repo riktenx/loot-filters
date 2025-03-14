@@ -12,7 +12,6 @@ import com.lootfilters.rule.Rule;
 import com.lootfilters.serde.ColorDeserializer;
 import com.lootfilters.serde.ColorSerializer;
 import com.lootfilters.serde.RuleDeserializer;
-import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -30,7 +29,6 @@ import static com.lootfilters.lang.Location.UNKNOWN_SOURCE_NAME;
 import static com.lootfilters.util.TextUtil.normalizeCrlf;
 
 @Getter
-@AllArgsConstructor
 @EqualsAndHashCode
 @ToString
 public class LootFilter {
@@ -42,6 +40,16 @@ public class LootFilter {
     private final String description;
     private final int[] activationArea;
     private final List<MatcherConfig> matchers;
+
+    @Setter
+    private String filename;
+
+    public LootFilter(String name, String description, int[] activationArea, List<MatcherConfig> matchers) {
+        this.name = name;
+        this.description = description;
+        this.activationArea = activationArea;
+        this.matchers = matchers;
+    }
 
     public static LootFilter fromJson(Gson gson, String json) {
         var ggson = gson.newBuilder()
