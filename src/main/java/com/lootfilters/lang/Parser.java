@@ -203,6 +203,8 @@ public class Parser {
                     builder.hideOverlay(assign[1].expectBoolean()); break;
                 case "sound":
                     builder.sound(assign[1].expectString()); break;
+                case "menuSort":
+                    builder.menuSort(assign[1].expectInt()); break;
                 default:
                     throw new ParseException("unexpected identifier in display config block", assign[0]);
             }
