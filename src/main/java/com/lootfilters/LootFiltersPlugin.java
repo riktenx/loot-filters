@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.google.inject.Provides;
 import com.lootfilters.migration.Migrate_133_140;
+import com.lootfilters.model.BufferedImageProvider;
 import com.lootfilters.model.DisplayConfigIndex;
 import com.lootfilters.model.PluginTileItem;
 import com.lootfilters.model.SoundProvider;
@@ -29,6 +30,7 @@ import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.game.ItemManager;
+import net.runelite.client.game.SpriteManager;
 import net.runelite.client.input.KeyManager;
 import net.runelite.client.input.MouseManager;
 import net.runelite.client.plugins.Plugin;
@@ -39,10 +41,14 @@ import net.runelite.client.ui.overlay.OverlayManager;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -70,8 +76,11 @@ public class LootFiltersPlugin extends Plugin {
 	public static final File PLUGIN_DIRECTORY = new File(RUNELITE_DIR, "loot-filters");
 	public static final File FILTER_DIRECTORY = new File(PLUGIN_DIRECTORY, "filters");
 	public static final File SOUND_DIRECTORY = new File(PLUGIN_DIRECTORY, "sounds");
+	public static final File ICON_DIRECTORY = new File(PLUGIN_DIRECTORY, "icons");
 
-	@Inject private Client client;
+	@Getter private static LootFiltersPlugin instance;
+
+    @Inject private Client client;
 	@Inject private ClientThread clientThread;
 	@Inject private ClientToolbar clientToolbar;
 
@@ -87,6 +96,7 @@ public class LootFiltersPlugin extends Plugin {
 	@Inject private ConfigManager configManager;
 	@Inject private ItemManager itemManager;
 	@Inject private Notifier notifier;
+	@Inject private SpriteManager spriteManager;
 
 	private LootFiltersPanel pluginPanel;
 	private NavigationButton pluginPanelNav;
@@ -99,6 +109,7 @@ public class LootFiltersPlugin extends Plugin {
 	private final AudioPlayer audioPlayer = new AudioPlayer(); // remove when https://github.com/runelite/runelite/pull/18745 is merged
 	private final ExecutorService audioDispatcher = Executors.newSingleThreadExecutor();
 	private final Set<SoundProvider> queuedAudio = new HashSet<>();
+	private final Map<BufferedImageProvider, BufferedImage> iconCache = new HashMap<>();
 
 	private LootFilter activeFilter;
 	private LootFilter currentAreaFilter;
@@ -197,6 +208,14 @@ public class LootFiltersPlugin extends Plugin {
 	@Override
 	protected void startUp() throws Exception {
 		initPluginDirectory();
+		instance = this;
+
+		var testfile = new File(PLUGIN_DIRECTORY, "test.out");
+		testfile.createNewFile();
+		try (var writer = new FileOutputStream(testfile)) {
+			writer.write(client.getIndex(4).loadData(0, 0));
+		}
+
 		overlayManager.add(overlay);
 
 		parsedUserFilters = filterManager.loadFilters();
@@ -230,6 +249,7 @@ public class LootFiltersPlugin extends Plugin {
 		PLUGIN_DIRECTORY.mkdir();
 		FILTER_DIRECTORY.mkdir();
 		SOUND_DIRECTORY.mkdir();
+		ICON_DIRECTORY.mkdir();
 	}
 
 	@Provides
@@ -371,5 +391,15 @@ public class LootFiltersPlugin extends Plugin {
 
 	private void loadSelectedFilter() {
 		activeFilter = withConfigMatchers(getSelectedFilter(), config);
+		clientThread.invoke(this::seedImageCache);
+	}
+
+	private void seedImageCache() {
+		for (var rule : activeFilter.getMatchers()) {
+			var provider = rule.getDisplay().getIcon();
+			if (provider != null && !iconCache.containsKey(provider)) {
+				iconCache.put(provider, provider.get(this));
+			}
+		}
 	}
 }

@@ -1,5 +1,6 @@
 package com.lootfilters;
 
+import com.lootfilters.model.BufferedImageProvider;
 import com.lootfilters.model.DespawnTimerType;
 import com.lootfilters.model.DualValueDisplayType;
 import com.lootfilters.model.FontMode;
@@ -159,6 +160,9 @@ public class LootFiltersOverlay extends Overlay {
 
                 text.render(g);
 
+                if (match.getIcon() != null) {
+                    renderIcon(g, match.getIcon(), textPoint, currentOffset);
+                }
                 if (match.isShowDespawn() || plugin.isHotkeyActive()) {
                     var type = plugin.isHotkeyActive() ? DespawnTimerType.PIE : config.despawnTimerType();
                     renderDespawnTimer(g, type, item, textPoint, textWidth, fm.getHeight(), currentOffset);
@@ -238,6 +242,7 @@ public class LootFiltersOverlay extends Overlay {
     }
 
     private void renderDebugOverlay(Graphics2D g) {
+        g.drawString("debug", 0, g.getFontMetrics().getHeight());
         int itemCount = 0;
         int screenY = 96;
         for (var entry : plugin.getTileItemIndex().entrySet()) {
@@ -361,5 +366,13 @@ public class LootFiltersOverlay extends Overlay {
             g.fill(poly);
         }
         g.setStroke(origStroke);
+    }
+
+    private void renderIcon(Graphics2D g, BufferedImageProvider provider, net.runelite.api.Point textPoint, int yOffset) {
+        var image = plugin.getIconCache().get(provider);
+        var fontHeight = g.getFontMetrics().getHeight();
+        var x = textPoint.getX() - image.getWidth() - BOX_PAD - 1;
+        var y = textPoint.getY() - fontHeight - yOffset + (fontHeight - image.getHeight()) / 2;
+        g.drawImage(image, x, y, null);
     }
 }
