@@ -107,13 +107,14 @@ A loot filter is written as a list of rules, like so:
 ```
 
 There are **two (2)** top-level types of rules:
-* TERMINAL rules, expressed via the `if` keyword. The filter stops evaluating for an item when it matches a non-terminal
-  rule.
-* NON-TERMINAL rules, expressed via the `apply` keyword. Applies any display settings to the item when it matches, but
-  keeps evaluating the script.
+* TERMINAL rules, expressed via the `if` keyword. The filter stops evaluating
+  for an item when it matches a terminal rule.
+* NON-TERMINAL rules, expressed via the `apply` keyword. Applies any display
+  settings to the item when it matches, but keeps evaluating the script.
 
-Rules evaluate top-down for a given ground item. The plugin terminates evaluation when a non-terminal rule with matching
-conditions is encountered.
+Rules evaluate top-down for a given ground item. The plugin terminates
+evaluation when the first terminal rule with a matching condition is
+encountered.
 
 ### Example: terminal vs non-terminal
 
