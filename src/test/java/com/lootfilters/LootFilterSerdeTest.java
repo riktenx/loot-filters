@@ -8,6 +8,7 @@ import com.lootfilters.rule.ItemNameRule;
 import com.lootfilters.rule.ItemQuantityRule;
 import com.lootfilters.rule.ItemValueRule;
 import com.lootfilters.rule.OrRule;
+import com.lootfilters.rule.ValueType;
 import org.junit.Test;
 
 import java.awt.Color;
@@ -25,7 +26,7 @@ public class LootFilterSerdeTest {
                 List.of(
                         new MatcherConfig(new ItemIdRule(1), new DisplayConfig(Color.RED)),
                         new MatcherConfig(new ItemNameRule("bandos-crossbow"), new DisplayConfig(Color.GREEN)),
-                        new MatcherConfig(new ItemValueRule(1_000, Comparator.LT), new DisplayConfig(Color.BLUE)),
+                        new MatcherConfig(new ItemValueRule(1_000, Comparator.LT, ValueType.HIGHEST), new DisplayConfig(Color.BLUE)),
                         new MatcherConfig(new ItemQuantityRule(1_000, Comparator.LT), new DisplayConfig(Color.WHITE)),
                         new MatcherConfig(
                                 new AndRule(List.of(

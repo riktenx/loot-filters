@@ -9,8 +9,11 @@ import net.runelite.api.TileItem;
 @EqualsAndHashCode(callSuper = false)
 @ToString(callSuper = true)
 public class ItemValueRule extends ComparatorRule {
-    public ItemValueRule(int value, Comparator cmp) {
+    private final ValueType valueType;
+
+    public ItemValueRule(int value, Comparator cmp, ValueType valueType) {
        super("item_value", value, cmp);
+       this.valueType = valueType;
     }
 
     @Override
@@ -28,7 +31,7 @@ public class ItemValueRule extends ComparatorRule {
     private int getValue(LootFiltersPlugin plugin, TileItem item) {
         var ge = plugin.getItemManager().getItemPrice(item.getId());
         var ha = plugin.getItemManager().getItemComposition(item.getId()).getHaPrice();
-        switch (plugin.getConfig().valueType()) {
+        switch (valueType) {
             case HIGHEST: return Math.max(ge, ha);
             case GE: return ge;
             default: return ha;

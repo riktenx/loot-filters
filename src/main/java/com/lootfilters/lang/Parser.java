@@ -20,6 +20,7 @@ import com.lootfilters.rule.NotRule;
 import com.lootfilters.rule.OrRule;
 import com.lootfilters.rule.Rule;
 import com.lootfilters.rule.TextAccent;
+import com.lootfilters.rule.ValueType;
 import lombok.RequiredArgsConstructor;
 import net.runelite.api.coords.WorldPoint;
 
@@ -282,7 +283,7 @@ public class Parser {
     private ItemValueRule parseItemValueRule() {
         var op = tokens.take();
         var value = tokens.takeExpect(LITERAL_INT);
-        return new ItemValueRule(value.expectInt(), Comparator.fromToken(op));
+        return new ItemValueRule(value.expectInt(), Comparator.fromToken(op), ValueType.HIGHEST);
     }
 
     private ItemTradeableRule parseItemTradeableRule() {

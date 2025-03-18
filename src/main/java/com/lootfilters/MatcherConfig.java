@@ -8,6 +8,7 @@ import com.lootfilters.rule.ItemTradeableRule;
 import com.lootfilters.rule.ItemValueRule;
 import com.lootfilters.rule.OrRule;
 import com.lootfilters.rule.Rule;
+import com.lootfilters.rule.ValueType;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -78,8 +79,8 @@ public class MatcherConfig {
         return new MatcherConfig(rule, display, false);
     }
 
-    public static MatcherConfig valueTier(boolean enabled, int value, Color color, boolean showLootbeam, boolean notify) {
-        var inner = new ItemValueRule(value, Comparator.GT_EQ);
+    public static MatcherConfig valueTier(boolean enabled, int value, Color color, boolean showLootbeam, boolean notify, ValueType valueType) {
+        var inner = new ItemValueRule(value, Comparator.GT_EQ, valueType);
         var rule = new Rule("") {
             @Override public boolean test(LootFiltersPlugin plugin, PluginTileItem item) {
                 return enabled && inner.test(plugin, item);
@@ -93,8 +94,8 @@ public class MatcherConfig {
         return new MatcherConfig(rule, display);
     }
 
-    public static MatcherConfig hiddenTier(boolean enabled, int value, boolean showUntradeable) {
-        var valueRule = new ItemValueRule(value, Comparator.LT);
+    public static MatcherConfig hiddenTier(boolean enabled, int value, boolean showUntradeable, ValueType valueType) {
+        var valueRule = new ItemValueRule(value, Comparator.LT, valueType);
         var inner = showUntradeable
                 ? new AndRule(valueRule, new ItemTradeableRule(true))
                 : valueRule;
