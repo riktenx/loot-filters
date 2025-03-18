@@ -234,7 +234,11 @@ public class Parser {
             case "quantity":
                 return parseItemQuantityRule();
             case "value":
-                return parseItemValueRule();
+                return parseItemValueRule(ValueType.HIGHEST);
+            case "gevalue":
+                return parseItemValueRule(ValueType.GE);
+            case "havalue":
+                return parseItemValueRule(ValueType.HA);
             case "tradeable":
                 return parseItemTradeableRule();
             case "stackable":
@@ -280,10 +284,10 @@ public class Parser {
         return new ItemQuantityRule(value.expectInt(), Comparator.fromToken(op));
     }
 
-    private ItemValueRule parseItemValueRule() {
+    private ItemValueRule parseItemValueRule(ValueType valueType) {
         var op = tokens.take();
         var value = tokens.takeExpect(LITERAL_INT);
-        return new ItemValueRule(value.expectInt(), Comparator.fromToken(op), ValueType.HIGHEST);
+        return new ItemValueRule(value.expectInt(), Comparator.fromToken(op), valueType);
     }
 
     private ItemTradeableRule parseItemTradeableRule() {

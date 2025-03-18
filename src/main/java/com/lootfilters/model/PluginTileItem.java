@@ -2,6 +2,7 @@ package com.lootfilters.model;
 
 import com.lootfilters.LootFiltersPlugin;
 import lombok.Getter;
+import net.runelite.api.ItemID;
 import net.runelite.api.Model;
 import net.runelite.api.Node;
 import net.runelite.api.Tile;
@@ -13,7 +14,7 @@ import java.time.Instant;
 public class PluginTileItem implements TileItem {
     private final TileItem item;
     @Getter private final String name;
-    @Getter private final int gePrice;
+    private final int gePrice;
     @Getter private final int haPrice;
     @Getter private final WorldPoint worldPoint;
     @Getter private final int spawnTime;
@@ -29,6 +30,17 @@ public class PluginTileItem implements TileItem {
         this.worldPoint = WorldPoint.fromLocalInstance(plugin.getClient(), tile.getLocalLocation());
         this.spawnTime = plugin.getClient().getTickCount();
         this.despawnInstant = Instant.now().plusMillis((getDespawnTime() - spawnTime) * 600L);
+    }
+
+    public int getGePrice() {
+        switch (getId()) {
+            case ItemID.COINS_995:
+                return 1;
+            case ItemID.PLATINUM_TOKEN:
+                return 1000;
+            default:
+                return gePrice;
+        }
     }
 
     @Override

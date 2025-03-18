@@ -29,12 +29,12 @@ public class ParserTest {
         var expectDesc = "loot tiers like the ground items builtin";
         var expectArea = new int[]{1,2,3,4,5,6};
         var expectMatchers = List.of(
-                new MatcherConfig(new ItemValueRule(10_000_000, Comparator.GT, ValueType.HIGHEST),
+                new MatcherConfig(new ItemValueRule(10_000_000, Comparator.GT, ValueType.GE),
                         DisplayConfig.builder()
                                 .textColor(new Color(0xff,0x80,0x00, 0xff))
                                 .showLootbeam(true)
                                 .build()),
-                new MatcherConfig(new ItemValueRule(1_000_000, Comparator.GT, ValueType.HIGHEST),
+                new MatcherConfig(new ItemValueRule(1_000_000, Comparator.GT, ValueType.HA),
                         DisplayConfig.builder()
                                 .textColor(new Color(0xa3,0x35,0xee, 0xff))
                                 .showLootbeam(true)
