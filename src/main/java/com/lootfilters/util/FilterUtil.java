@@ -31,25 +31,28 @@ public class FilterUtil {
                 config.highlightedItems(), config.highlightColor(), config.highlightLootbeam(), config.highlightNotify()));
         matchersWithConfig.add(MatcherConfig.hide(config.hiddenItems()));
 
-        matchersWithConfig.addAll(filter.getMatchers());
+        if (config.itemValueRulesEnabled()) {
+            var valueType = config.valueType();
+            matchersWithConfig.add(MatcherConfig.valueTier(
+                    config.enableInsaneItemValueTier(), config.insaneValue(), config.insaneValueColor(),
+                    config.lootbeamTier().ordinal() >= ValueTier.INSANE.ordinal(),
+                    config.notifyTier().ordinal() >= ValueTier.INSANE.ordinal(), valueType));
+            matchersWithConfig.add(MatcherConfig.valueTier(
+                    config.enableHighItemValueTier(), config.highValue(), config.highValueColor(),
+                    config.lootbeamTier().ordinal() >= ValueTier.HIGH.ordinal(),
+                    config.notifyTier().ordinal() >= ValueTier.HIGH.ordinal(), valueType));
+            matchersWithConfig.add(MatcherConfig.valueTier(
+                    config.enableMediumItemValueTier(), config.mediumValue(), config.mediumValueColor(),
+                    config.lootbeamTier().ordinal() >= ValueTier.MEDIUM.ordinal(),
+                    config.notifyTier().ordinal() >= ValueTier.MEDIUM.ordinal(), valueType));
+            matchersWithConfig.add(MatcherConfig.valueTier(
+                    config.enableLowItemValueTier(), config.lowValue(), config.lowValueColor(),
+                    config.lootbeamTier().ordinal() >= ValueTier.LOW.ordinal(),
+                    config.notifyTier().ordinal() >= ValueTier.LOW.ordinal(), valueType));
+            matchersWithConfig.add(MatcherConfig.hiddenTier(config.hideTierEnabled(), config.hideTierValue(), config.hideTierShowUntradeable(), valueType));
+        }
 
-        matchersWithConfig.add(MatcherConfig.valueTier(
-                config.enableInsaneItemValueTier(), config.insaneValue(), config.insaneValueColor(),
-        config.lootbeamTier().ordinal() >= ValueTier.INSANE.ordinal(),
-                config.notifyTier().ordinal() >= ValueTier.INSANE.ordinal()));
-        matchersWithConfig.add(MatcherConfig.valueTier(
-                config.enableHighItemValueTier(), config.highValue(), config.highValueColor(),
-                config.lootbeamTier().ordinal() >= ValueTier.HIGH.ordinal(),
-                config.notifyTier().ordinal() >= ValueTier.HIGH.ordinal()));
-        matchersWithConfig.add(MatcherConfig.valueTier(
-                config.enableMediumItemValueTier(), config.mediumValue(), config.mediumValueColor(),
-                config.lootbeamTier().ordinal() >= ValueTier.MEDIUM.ordinal(),
-                config.notifyTier().ordinal() >= ValueTier.MEDIUM.ordinal()));
-        matchersWithConfig.add(MatcherConfig.valueTier(
-                config.enableLowItemValueTier(), config.lowValue(), config.lowValueColor(),
-                config.lootbeamTier().ordinal() >= ValueTier.LOW.ordinal(),
-                config.notifyTier().ordinal() >= ValueTier.LOW.ordinal()));
-        matchersWithConfig.add(MatcherConfig.hiddenTier(config.hideTierEnabled(), config.hideTierValue(), config.hideTierShowUntradeable()));
+        matchersWithConfig.addAll(filter.getMatchers());
 
         matchersWithConfig = matchersWithConfig.stream()
                 .map(it -> it.withDisplay(builder -> {

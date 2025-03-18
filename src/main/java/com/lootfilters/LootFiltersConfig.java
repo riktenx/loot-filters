@@ -60,14 +60,6 @@ public interface LootFiltersConfig extends Config {
     )
     default boolean itemSpawnFilter() { return false; }
     @ConfigItem(
-            keyName = "valueType",
-            name = "Value mode",
-            description = "The type of item value to use for rules and text overlay.",
-            section = general,
-            position = 5
-    )
-    default ValueType valueType() { return ValueType.HIGHEST; }
-    @ConfigItem(
             keyName = "fontMode",
             name = "Font mode",
             description = "<p>[runelite]: Respect the font type set in RuneLite -> Overlay settings -> Dynamic overlay font. Filter settings for font type will be ignored.</p><p>[plugin]: Respect the font type set by filter rules. Filter display defaults to the small font type.</p>",
@@ -300,16 +292,32 @@ public interface LootFiltersConfig extends Config {
 
     @ConfigSection(
             name = "Item value rules",
-            description = "Configure default rules for showing based on item value. These rules are checked AFTER both the active filter and the global highlight/hide lists.",
+            description = "Configure default rules for showing based on item value.<br>These rules take precedence over the active filter. If you are using a filter that implements its own rules for item value, you will probably want to disable these.",
             position = 9
     )
     String itemValueRules = "itemValueRules";
+    @ConfigItem(
+            keyName = "itemValueRulesEnabled",
+            name = "Enabled",
+            description = "Globally enable/disable these rules.",
+            section = itemValueRules,
+            position = 0
+    )
+    default boolean itemValueRulesEnabled() { return true; }
+    @ConfigItem(
+            keyName = "valueType",
+            name = "Value mode",
+            description = "The type of item value to use for these value tiers. This does not control item value rules in the active filter.",
+            section = itemValueRules,
+            position = 1
+    )
+    default ValueType valueType() { return ValueType.HIGHEST; }
     @ConfigItem(
             keyName = "lootbeamTier",
             name = "Lootbeam tier",
             description = "Minimum tier at which to show a lootbeam.",
             section = itemValueRules,
-            position = 0
+            position = 2
     )
     default ValueTier lootbeamTier() { return ValueTier.HIGH; }
     @ConfigItem(
@@ -317,9 +325,9 @@ public interface LootFiltersConfig extends Config {
             name = "Notification tier",
             description = "Minimum tier at which to fire a system notification.",
             section = itemValueRules,
-            position = 0
+            position = 3
     )
-    default ValueTier notifyTier() { return ValueTier.HIGH; }
+    default ValueTier notifyTier() { return ValueTier.NONE; }
     @ConfigItem(
             keyName = "enableInsaneItemValueTier",
             name = "Insane tier",

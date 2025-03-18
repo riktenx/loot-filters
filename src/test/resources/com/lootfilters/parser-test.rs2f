@@ -8,11 +8,11 @@ meta {
 }
 
 // insane items
-if (value:>10_000_000) {
+if (gevalue:>10_000_000) {
     color="ff8000";
     showLootbeam=true; // lootbeam
 }
-if (value:>1_000_000) {
+if (havalue:>1_000_000) {
     color="#a335ee";
     showLootbeam=true;
 }

@@ -3,7 +3,6 @@ package com.lootfilters.rule;
 import com.lootfilters.LootFiltersPlugin;
 import com.lootfilters.model.PluginTileItem;
 import lombok.ToString;
-import net.runelite.api.TileItem;
 
 @ToString
 public abstract class ComparatorRule extends Rule {
@@ -34,5 +33,5 @@ public abstract class ComparatorRule extends Rule {
         return false;
     }
 
-    public abstract int getLhs(LootFiltersPlugin plugin, TileItem item);
+    public abstract int getLhs(LootFiltersPlugin plugin, PluginTileItem item);
 }

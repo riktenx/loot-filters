@@ -20,6 +20,7 @@ import com.lootfilters.rule.NotRule;
 import com.lootfilters.rule.OrRule;
 import com.lootfilters.rule.Rule;
 import com.lootfilters.rule.TextAccent;
+import com.lootfilters.rule.ValueType;
 import lombok.RequiredArgsConstructor;
 import net.runelite.api.coords.WorldPoint;
 
@@ -233,7 +234,11 @@ public class Parser {
             case "quantity":
                 return parseItemQuantityRule();
             case "value":
-                return parseItemValueRule();
+                return parseItemValueRule(ValueType.HIGHEST);
+            case "gevalue":
+                return parseItemValueRule(ValueType.GE);
+            case "havalue":
+                return parseItemValueRule(ValueType.HA);
             case "tradeable":
                 return parseItemTradeableRule();
             case "stackable":
@@ -279,10 +284,10 @@ public class Parser {
         return new ItemQuantityRule(value.expectInt(), Comparator.fromToken(op));
     }
 
-    private ItemValueRule parseItemValueRule() {
+    private ItemValueRule parseItemValueRule(ValueType valueType) {
         var op = tokens.take();
         var value = tokens.takeExpect(LITERAL_INT);
-        return new ItemValueRule(value.expectInt(), Comparator.fromToken(op));
+        return new ItemValueRule(value.expectInt(), Comparator.fromToken(op), valueType);
     }
 
     private ItemTradeableRule parseItemTradeableRule() {

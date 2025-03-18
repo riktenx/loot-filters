@@ -1,9 +1,9 @@
 package com.lootfilters.rule;
 
 import com.lootfilters.LootFiltersPlugin;
+import com.lootfilters.model.PluginTileItem;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import net.runelite.api.TileItem;
 
 @EqualsAndHashCode(callSuper = false)
 @ToString(callSuper = true)
@@ -13,7 +13,7 @@ public class ItemQuantityRule extends ComparatorRule {
     }
 
     @Override
-    public int getLhs(LootFiltersPlugin plugin, TileItem item) {
+    public int getLhs(LootFiltersPlugin plugin, PluginTileItem item) {
         return item.getQuantity();
     }
 }
