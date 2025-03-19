@@ -82,6 +82,8 @@ public class LootFiltersOverlay extends Overlay {
             var currentOffset = 0;
             var rendered = new ArrayList<Integer>();
             for (var item : items) {
+                var leftOffset = 0;
+
                 if (rendered.contains(item.getId())) {
                     continue;
                 }
@@ -158,11 +160,12 @@ public class LootFiltersOverlay extends Overlay {
                 text.render(g);
 
                 if (match.getIcon() != null) {
-                    renderIcon(g, match.getIcon(), textPoint, currentOffset);
+                    var d = renderIcon(g, match.getIcon(), textPoint, currentOffset);
+                    leftOffset += d.width;
                 }
                 if (match.isShowDespawn() || plugin.isHotkeyActive()) {
                     var type = plugin.isHotkeyActive() ? DespawnTimerType.PIE : config.despawnTimerType();
-                    renderDespawnTimer(g, type, item, textPoint, textWidth, fm.getHeight(), currentOffset);
+                    renderDespawnTimer(g, type, item, textPoint, textWidth, fm.getHeight(), currentOffset, leftOffset);
                 }
 
                 currentOffset += textHeight + BOX_PAD + 3;
@@ -274,7 +277,7 @@ public class LootFiltersOverlay extends Overlay {
         g.drawString("audio: " + plugin.getQueuedAudio().size(), 0, 80);
     }
 
-    private void renderDespawnTimer(Graphics2D g, DespawnTimerType type, PluginTileItem item, net.runelite.api.Point textPoint, int textWidth, int textHeight, int yOffset) {
+    private void renderDespawnTimer(Graphics2D g, DespawnTimerType type, PluginTileItem item, net.runelite.api.Point textPoint, int textWidth, int textHeight, int yOffset, int leftOffset) {
         var ticksRemaining = item.getDespawnTime() - client.getTickCount();
         if (ticksRemaining < 0) { // doesn't despawn
             return;
@@ -296,7 +299,7 @@ public class LootFiltersOverlay extends Overlay {
             var total = item.getDespawnTime() - item.getSpawnTime();
             var remaining = item.getDespawnTime() - plugin.getClient().getTickCount();
             var radius = textHeight / 2;
-            timer.setPosition(new net.runelite.api.Point(textPoint.getX() - radius - BOX_PAD - 2,
+            timer.setPosition(new net.runelite.api.Point(textPoint.getX() - radius - BOX_PAD - 2 - leftOffset,
                     textPoint.getY() - yOffset - radius));
             timer.setProgress(remaining / (double) total);
             timer.setDiameter(textHeight);
@@ -365,11 +368,12 @@ public class LootFiltersOverlay extends Overlay {
         g.setStroke(origStroke);
     }
 
-    private void renderIcon(Graphics2D g, BufferedImageProvider provider, net.runelite.api.Point textPoint, int yOffset) {
+    private Dimension renderIcon(Graphics2D g, BufferedImageProvider provider, net.runelite.api.Point textPoint, int yOffset) {
         var image = plugin.getIconCache().get(provider);
         var fontHeight = g.getFontMetrics().getHeight();
         var x = textPoint.getX() - image.getWidth() - BOX_PAD - 1;
         var y = textPoint.getY() - fontHeight - yOffset + (fontHeight - image.getHeight()) / 2;
         g.drawImage(image, x, y, null);
+        return new Dimension(image.getWidth(), image.getHeight());
     }
 }
