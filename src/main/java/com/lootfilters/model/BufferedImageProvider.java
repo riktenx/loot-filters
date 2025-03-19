@@ -23,7 +23,12 @@ public abstract class BufferedImageProvider {
 
         @Override
         public BufferedImage get(LootFiltersPlugin plugin) {
-            return plugin.getSpriteManager().getSprite(spriteId, index);
+            try {
+                return plugin.getSpriteManager().getSprite(spriteId, index);
+            } catch (ArrayIndexOutOfBoundsException e) {
+                log.warn("sprite index out of bounds", e);
+                return null;
+            }
         }
     }
 

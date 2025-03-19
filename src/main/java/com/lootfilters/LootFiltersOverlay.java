@@ -277,7 +277,7 @@ public class LootFiltersOverlay extends Overlay {
         g.drawString("items: " + itemCount + "," + plugin.getTileItemIndex().pointIndexSize(), 0, 32);
         g.drawString("lootbeams: " + plugin.getLootbeamIndex().size(), 0, 48);
         g.drawString("displays: " + plugin.getDisplayIndex().size(), 0, 64);
-        g.drawString("audio: " + plugin.getQueuedAudio().size(), 0, 80);
+        g.drawString("audio: " + plugin.getQueuedAudio().size() + ", icon: " + plugin.getIconCache().size(), 0, 80);
     }
 
     private void renderDespawnTimer(Graphics2D g, DespawnTimerType type, PluginTileItem item, net.runelite.api.Point textPoint, int textWidth, int textHeight, int yOffset, int leftOffset) {
@@ -373,10 +373,14 @@ public class LootFiltersOverlay extends Overlay {
 
     private Dimension renderIcon(Graphics2D g, BufferedImageProvider provider, net.runelite.api.Point textPoint, int yOffset) {
         var image = plugin.getIconCache().get(provider);
+        if (image == null) {
+            return new Dimension(0, 0);
+        }
+
         var fontHeight = g.getFontMetrics().getHeight();
         var x = textPoint.getX() - image.getWidth() - BOX_PAD - 1;
         var y = textPoint.getY() - fontHeight - yOffset + (fontHeight - image.getHeight()) / 2;
         g.drawImage(image, x, y, null);
-        return new Dimension(image.getWidth(), image.getHeight());
+        return new Dimension(image.getWidth() + BOX_PAD, image.getHeight());
     }
 }

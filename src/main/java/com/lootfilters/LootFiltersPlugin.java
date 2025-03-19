@@ -395,6 +395,7 @@ public class LootFiltersPlugin extends Plugin {
 	}
 
 	private void seedImageCache() {
+		iconCache.clear();
 		for (var rule : activeFilter.getMatchers()) {
 			var provider = rule.getDisplay().getIcon();
 			if (provider != null && !iconCache.containsKey(provider)) {
