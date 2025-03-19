@@ -7,6 +7,8 @@ import lombok.ToString;
 
 import java.util.List;
 
+import static com.lootfilters.util.TextUtil.isInfixWildcard;
+
 @EqualsAndHashCode(callSuper = false)
 @ToString
 public class ItemNameRule extends Rule {
@@ -36,6 +38,12 @@ public class ItemNameRule extends Rule {
             return name.toLowerCase().endsWith(target.toLowerCase().substring(1));
         } else if (target.endsWith("*")) {
             return name.toLowerCase().startsWith(target.toLowerCase().substring(0, target.length() - 1));
+        } else if (isInfixWildcard(target)) {
+            var lowercase = name.toLowerCase();
+            var index = target.indexOf('*');
+            var before = target.substring(0, index).toLowerCase();
+            var after = target.substring(index + 1).toLowerCase();
+            return lowercase.startsWith(before) && lowercase.endsWith(after);
         }
         return name.equalsIgnoreCase(target);
     }

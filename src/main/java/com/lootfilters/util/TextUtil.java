@@ -94,4 +94,17 @@ public class TextUtil {
             return setCsv(csv, item);
         }
     }
+
+    public static boolean isInfixWildcard(String str) {
+        var index = -1;
+        for (var i = 0; i < str.length(); ++i) {
+            if (str.charAt(i) == '*') {
+                if (index != -1) {
+                    return false;
+                }
+                index = i;
+            }
+        }
+        return index != -1 && index < str.length() - 1;
+    }
 }
