@@ -1,5 +1,6 @@
 package com.lootfilters;
 
+import com.lootfilters.model.BufferedImageProvider;
 import com.lootfilters.rule.FontType;
 import com.lootfilters.rule.TextAccent;
 import lombok.AllArgsConstructor;
@@ -41,6 +42,7 @@ public class DisplayConfig {
 
     private final String sound;
     private final Integer menuSort;
+    private final BufferedImageProvider icon;
 
     public DisplayConfig(Color textColor) {
         this.textColor = textColor;
@@ -62,6 +64,7 @@ public class DisplayConfig {
         hideOverlay = null;
         sound = null;
         menuSort = null;
+        icon = null;
     }
 
     public Color getLootbeamColor() {
@@ -129,6 +132,7 @@ public class DisplayConfig {
         if (other.hideOverlay != null) { b.hideOverlay(other.hideOverlay); }
         if (other.sound != null) { b.sound(other.sound); }
         if (other.menuSort != null) { b.menuSort(other.menuSort); }
+        if (other.icon != null) { b.icon(other.icon); }
         return b.build();
     }
 }
