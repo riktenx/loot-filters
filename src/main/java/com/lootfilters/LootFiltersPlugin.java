@@ -6,6 +6,7 @@ import com.google.inject.Provides;
 import com.lootfilters.migration.Migrate_133_140;
 import com.lootfilters.model.DisplayConfigIndex;
 import com.lootfilters.model.PluginTileItem;
+import com.lootfilters.model.SoundProvider;
 import com.lootfilters.util.AudioPlayer;
 import lombok.Getter;
 import lombok.Setter;
@@ -97,7 +98,7 @@ public class LootFiltersPlugin extends Plugin {
 	private final LootFilterManager filterManager = new LootFilterManager(this);
 	private final AudioPlayer audioPlayer = new AudioPlayer(); // remove when https://github.com/runelite/runelite/pull/18745 is merged
 	private final ExecutorService audioDispatcher = Executors.newSingleThreadExecutor();
-	private final Set<String> queuedAudio = new HashSet<>();
+	private final Set<SoundProvider> queuedAudio = new HashSet<>();
 
 	private LootFilter activeFilter;
 	private LootFilter currentAreaFilter;
@@ -319,16 +320,8 @@ public class LootFiltersPlugin extends Plugin {
 	}
 
 	private void flushAudio() {
-		for (var filename : queuedAudio) {
-			audioDispatcher.execute(() -> {
-				try {
-					var soundFile = new File(SOUND_DIRECTORY, filename);
-					var gain = 20f * (float) Math.log10(config.soundVolume() / 100f);
-					audioPlayer.play(soundFile, gain);
-				} catch (Exception e) {
-					log.warn("play audio {}", filename, e);
-				}
-			});
+		for (var provider : queuedAudio) {
+			audioDispatcher.execute(() -> provider.play(this));
 		}
 		queuedAudio.clear();
 	}
