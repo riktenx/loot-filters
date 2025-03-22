@@ -193,6 +193,20 @@ Match based on whether an item is stackable (noted, coins, fishbait etc.).
 
 Match based on whether an item is a note.
 
+#### ownership (`ownership:1`, `ownership:OWNERSHIP_SELF`, etc.)
+
+Match based on item ownership state:
+1. `0` or `OWNERSHIP_NONE` - typically this is for world spawns or byproducts like ashes (1*)
+1. `1` or `OWNERSHIP_SELF` - item dropped by you / monster killed by you
+1. `2` or `OWNERSHIP_OTHER` - item dropped by someone else / someone else's monster kill (2*)
+1. `3` or `OWNERSHIP_GROUP` - item dropped by someone / monster kill in your ironman group
+
+(1*) Some people have reported that monster drops in CoX have this ownership value, regardless of who got the kill
+credit for the monster.
+
+(2*) Dawnbringer in ToB, when dropped by another player, appears to have a value of `2` / `OWNERSHIP_OTHER` but you can
+still pick it up even if you're an ironman. This appears to be the only item in the game that works this way.
+
 ## Display settings
 
 Display settings, expressed inside of curly braces after a rule's condition, control every aspect of how the plugin
@@ -311,6 +325,6 @@ The following static macros are defined for ease-of-use:
 | HIGHLIGHT | name(s), color | `HIGHLIGHT("grimy*", GREEN)`         | Terminal rule, applies a simple text highlight to an item.                                            |
 | HIDE      | names(s)       | `HIDE("ashes")`                      | Terminal rule, hides an item.                                                                         |
 | RARE      | name(s), color | `RARE("godsword shard*", "#00ffff")` | Terminal rule, applies a text/border highlight.                                                       |
-| RARE2     | name(s), color | `RARE2("goblin mail", RED)`         | Terminal rule, applies a text/border highlight w/ a semi-transparent black background and a lootbeam. |
+| RARE2     | name(s), color | `RARE2("goblin mail", RED)`          | Terminal rule, applies a text/border highlight w/ a semi-transparent black background and a lootbeam. |
 
 You can see the full list of builtin macros [here](https://github.com/riktenx/loot-filters/blob/main/src/main/resources/com/lootfilters/scripts/preamble.rs2f).
