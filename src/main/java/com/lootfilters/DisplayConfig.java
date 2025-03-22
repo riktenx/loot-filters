@@ -1,5 +1,6 @@
 package com.lootfilters;
 
+import com.lootfilters.model.SoundProvider;
 import com.lootfilters.rule.FontType;
 import com.lootfilters.rule.TextAccent;
 import lombok.AllArgsConstructor;
@@ -39,7 +40,7 @@ public class DisplayConfig {
     private final Color tileStrokeColor;
     private final Color tileFillColor;
 
-    private final String sound;
+    private final SoundProvider sound;
     private final Integer menuSort;
 
     public DisplayConfig(Color textColor) {
