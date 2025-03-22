@@ -55,7 +55,7 @@ import static net.runelite.client.util.ImageUtil.loadImageResource;
 @Slf4j
 @PluginDescriptor(
 	name = "Loot Filters",
-	description = "Alternative implementation of the ground items plugin with scriptable loot filters.",
+	description = "Improved ground items plugin with scriptable loot filters.",
 	tags = {"loot", "filters", "improved", "ground", "items"},
 	conflicts = {"Ground Items"}
 )
