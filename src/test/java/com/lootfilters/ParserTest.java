@@ -11,6 +11,7 @@ import com.lootfilters.rule.ItemTradeableRule;
 import com.lootfilters.rule.ItemValueRule;
 import com.lootfilters.rule.NotRule;
 import com.lootfilters.rule.OrRule;
+import com.lootfilters.rule.ValueType;
 import org.junit.Test;
 
 import java.awt.Color;
@@ -28,21 +29,21 @@ public class ParserTest {
         var expectDesc = "loot tiers like the ground items builtin";
         var expectArea = new int[]{1,2,3,4,5,6};
         var expectMatchers = List.of(
-                new MatcherConfig(new ItemValueRule(10_000_000, Comparator.GT),
+                new MatcherConfig(new ItemValueRule(10_000_000, Comparator.GT, ValueType.GE),
                         DisplayConfig.builder()
                                 .textColor(new Color(0xff,0x80,0x00, 0xff))
                                 .showLootbeam(true)
                                 .build()),
-                new MatcherConfig(new ItemValueRule(1_000_000, Comparator.GT),
+                new MatcherConfig(new ItemValueRule(1_000_000, Comparator.GT, ValueType.HA),
                         DisplayConfig.builder()
                                 .textColor(new Color(0xa3,0x35,0xee, 0xff))
                                 .showLootbeam(true)
                                 .build()),
-                new MatcherConfig(new ItemValueRule(100_000, Comparator.GT),
+                new MatcherConfig(new ItemValueRule(100_000, Comparator.GT, ValueType.HIGHEST),
                         DisplayConfig.builder()
                                 .textColor(new Color(0x00,0x70,0xdd, 0xff))
                                 .build()),
-                new MatcherConfig(new ItemValueRule(10_000, Comparator.GT),
+                new MatcherConfig(new ItemValueRule(10_000, Comparator.GT, ValueType.HIGHEST),
                         DisplayConfig.builder()
                                 .textColor(new Color(0x1e,0xff,0x00, 0xff))
                                 .build()),
