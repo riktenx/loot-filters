@@ -4,6 +4,7 @@ import com.lootfilters.DisplayConfig;
 import com.lootfilters.LootFilter;
 import com.lootfilters.MatcherConfig;
 import com.lootfilters.model.SoundProvider;
+import com.lootfilters.model.BufferedImageProvider;
 import com.lootfilters.rule.AndRule;
 import com.lootfilters.rule.AreaRule;
 import com.lootfilters.rule.Comparator;
@@ -164,6 +165,12 @@ public class Parser {
         tokens.takeExpect(BLOCK_START);
         var builder = DisplayConfig.builder();
         while (!tokens.peek().is(BLOCK_END)) { // TokenStream.traverseBlock?
+            var property = tokens.peek();
+            if (property.getValue().equals("icon")) {
+                parseIcon(builder);
+                continue;
+            }
+
             var assign = parseAssignment();
             switch (assign[0].getValue()) {
                 case "textColor":
@@ -351,5 +358,35 @@ public class Parser {
         var value = tokens.takeExpectLiteral();
         tokens.takeExpect(STMT_END);
         return new Token[]{ident, value};
+    }
+
+    private void parseIcon(DisplayConfig.DisplayConfigBuilder builder) {
+        tokens.takeExpect(IDENTIFIER);
+        tokens.takeExpect(ASSIGN);
+        var type = tokens.takeExpect(IDENTIFIER);
+        var args = tokens.takeArgList();
+        if (type.getValue().equals("Sprite")) {
+            if (args.size() != 2) {
+                throw new ParseException("incorrect arg length in icon Sprite() expr", type);
+            }
+            var spriteId = args.get(0).takeExpect(LITERAL_INT).expectInt();
+            var index = args.get(1).takeExpect(LITERAL_INT).expectInt();
+            builder.icon(new BufferedImageProvider.Sprite(spriteId, index));
+        } else if (type.getValue().equals("Item")) {
+            if (args.size() != 1) {
+                throw new ParseException("incorrect arg length in icon Item() expr", type);
+            }
+            var itemId = args.get(0).takeExpect(LITERAL_INT).expectInt();
+            builder.icon(new BufferedImageProvider.Item(itemId));
+        } else if (type.getValue().equals("File")) {
+            if (args.size() != 1) {
+                throw new ParseException("incorrect arg length in icon File() expr", type);
+            }
+            var filename = args.get(0).take().expectString();
+            builder.icon(new BufferedImageProvider.File(filename));
+        } else {
+            throw new ParseException("unrecognized icon type", type);
+        }
+        tokens.takeExpect(STMT_END);
     }
 }
