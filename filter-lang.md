@@ -177,9 +177,15 @@ Match based on an item's quantity. Comparison operator can be >, <, >=, <=, or =
 
 #### value `value:>500`
 
-Match based on an item value. Supports the same comparison operators used in `quantity`.
+Match based on an item's highest value (GE vs. HA). Supports the same comparison operators used in `quantity`.
 
-The value used for comparison is determined by plugin settings (GE, HA, or highest).
+#### gevalue `gevalue:>100_000`
+
+Match based on an item's GE value.
+
+#### havalue `gevalue:>40_000`
+
+Match based on an item's high alchemy (HA) value.
 
 #### tradeable `tradeable:true` or `tradeable:false`
 
@@ -232,33 +238,69 @@ if (name:"coins" && quantity:>100_000) {
 
 The following table lists supported display settings:
 
-| name                         | value type   | ordinal macros | description                                                                                                                         |
-|------------------------------|--------------|----------------|-------------------------------------------------------------------------------------------------------------------------------------|
-| hidden                       | boolean      |                | Whether this item is comprehensively hidden. Setting hidden to true disables EVERYTHING else - no lootbeam, no tile highlight, etc. |
-| hideOverlay                  | boolean      |                | Whether this item is hidden in the overlay. Disables the text overlay but allows other features to work.                            |
-| color, textColor             | color string |                | Color for the display text of the item.                                                                                             |
-| backgroundColor              | color string |                | Background color behind the display text.                                                                                           |
-| borderColor                  | color string |                | Border color around the display text.                                                                                               |
-| showLootbeam, showLootBeam   | boolean      |                | Show an in-world lootbeam on the item's tile.                                                                                       |
-| showValue                    | boolean      |                | Include an item's value in the text overlay. The highest value between GE and HA price is chosen.                                   |
-| showDespawn                  | boolean      |                | Show a despawn timer next to the text overlay. The type of despawn timer is controlled by config.                                   |
-| notify                       | boolean      |                | Fire a system notification when the matched item drops.                                                                             |
-| textAccent                   | enum         | `TEXTACCENT_*` | Text accent to use:<li>1 = text shadow (default)</li><li>2 = outline</li><li>3 = none</li><li>4 = bold shadow</li>                  |
-| textAccentColor              | color string |                | Color for the text accent. Defaults to solid black.                                                                                 |
-| lootbeamColor, lootBeamColor | color string |                | Color for the lootbeam. Defaults to the text color when unset.                                                                      |
-| fontType                     | enum         | `FONTTYPE_*`   | Font used for the display:<li>1 = small (default)</li><li>2 = normal</li><li>3 = bold</li>                                          |
-| menuTextColor                | color string |                | Color for the menu entry text. Defaults to the text color when unset.                                                               | 
-| highlightTile                | boolean      |                | Whether to highlight the tile the item is on.                                                                                       | 
-| tileStrokeColor              | color string |                | Color for tile outline. Defaults to text color when unset.                                                                          |
-| tileFillColor                | color string |                | Color for the tile fill. No fill when unset.                                                                                        |
-| sound                        | string       |                | The name of a sound file (including the extension) in `.runelite/loot-filters/sounds` to play on item drop.                         |
+| name                         | value type        | ordinal macros | description                                                                                                                         |
+|------------------------------|-------------------|----------------|-------------------------------------------------------------------------------------------------------------------------------------|
+| hidden                       | boolean           |                | Whether this item is comprehensively hidden. Setting hidden to true disables EVERYTHING else - no lootbeam, no tile highlight, etc. |
+| hideOverlay                  | boolean           |                | Whether this item is hidden in the overlay. Disables the text overlay but allows other features to work.                            |
+| color, textColor             | color string      |                | Color for the display text of the item.                                                                                             |
+| backgroundColor              | color string      |                | Background color behind the display text.                                                                                           |
+| borderColor                  | color string      |                | Border color around the display text.                                                                                               |
+| showLootbeam, showLootBeam   | boolean           |                | Show an in-world lootbeam on the item's tile.                                                                                       |
+| showValue                    | boolean           |                | Include an item's value in the text overlay. The highest value between GE and HA price is chosen.                                   |
+| showDespawn                  | boolean           |                | Show a despawn timer next to the text overlay. The type of despawn timer is controlled by config.                                   |
+| notify                       | boolean           |                | Fire a system notification when the matched item drops.                                                                             |
+| textAccent                   | enum              | `TEXTACCENT_*` | Text accent to use:<li>1 = text shadow (default)</li><li>2 = outline</li><li>3 = none</li><li>4 = bold shadow</li>                  |
+| textAccentColor              | color string      |                | Color for the text accent. Defaults to solid black.                                                                                 |
+| lootbeamColor, lootBeamColor | color string      |                | Color for the lootbeam. Defaults to the text color when unset.                                                                      |
+| fontType                     | enum              | `FONTTYPE_*`   | Font used for the display:<li>1 = small (default)</li><li>2 = normal</li><li>3 = bold</li>                                          |
+| menuTextColor                | color string      |                | Color for the menu entry text. Defaults to the text color when unset.                                                               | 
+| highlightTile                | boolean           |                | Whether to highlight the tile the item is on.                                                                                       | 
+| tileStrokeColor              | color string      |                | Color for tile outline. Defaults to text color when unset.                                                                          |
+| tileFillColor                | color string      |                | Color for the tile fill. No fill when unset.                                                                                        |
+| sound                        | [dynamic](#sound) |                | Play a sound on item drop. See [#sound](#sound) for details.                                                                        |
+| icon                         | [dynamic](#icon)  |                | An icon to display next to the text overlay. See [#icon](#icon) for details.                                                        |
 
-### Drop sounds
+### `sound`
 
-Drop sounds are configured using the `sound` display property (see the table above). Some notes on drop sounds:
-* Sound files are placed in `.runelite/loot-filters/sounds`. The plugin will create this directory for you.
-* Not all formats are supported. MP3, for example, is not supported. When in doubt, use WAV.
-* The sound setting in your filter must include the file extension if present, e.g. `sound = "DropSound1.wav";`.
+Drop sounds are configured using the `sound` display property. The value can be one of two types:
+* integer e.g. `sound = 7600;` - play a sound effect directly from the game cache
+  * [The wiki contains a list of known Jagex-associated "names" for sound effects](https://oldschool.runescape.wiki/w/List_of_sound_IDs).
+    These effects are not "officially" named, but Jagex sometimes transmits names for them on accident during game
+    updates.
+* string e.g. `sound = "CustomDropSound.wav";` - play a sound effect from a user-provided sound file in `.runelite/loot-filters/sounds`.
+
+#### custom sound files
+
+Sound files are placed in `.runelite/loot-filters/sounds`. The plugin will create this directory for you. The folder
+icon in the plugin panel will open a file browser into `.runelite/loot-filters/filters`, which you can use to quickly
+navigate to other plugin directories including sounds.
+
+**Not all formats are supported**. MP3, for example, is not supported. When in doubt, use WAV.
+
+### `icon`
+
+Icons are configured using the `icon` display property. The value can be any of the following "function-style"
+expressions:
+
+| name     | inputs   | example                             | description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+|----------|----------|-------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `Sprite` | int, int | `Sprite(15, 0)`<br>`Sprite(440, 2)` | Display an icon directly from the game sprite cache. Use https://abextm.github.io/cache2/#/viewer/sprite to find icons.<br><br>The 1st parameter is the "index" of the sprite as seen in the cache viewer. Most entries only have a single sprite.<br>The 2nd parameter is the "image index" within the cache entry. For example, all of the prayer icons are in a single entry at index 440. `Sprite(440, 0)` is protect from melee, `Sprite(440, 1)` is protect from missiles.<br><br>You **MUST** always provide both arguments, even if the cache entry only has one sprite. |
+| `Item`   | int      | `Item(1004)`                        | Display the icon for an item using the provided item ID.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| `File`   | string   | `File("icon.png")`                  | Display an icon using a custom file from `.runelite/loot-filters/icons`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+
+**The plugin does not "resize" icons to fit the size of the overlay text.** At pixel sizes this low, scaling does not
+look good. If there's an icon you want to use you should generally look to find one of the appropriate size in cache.
+For example, sprite 0 is a 40x40px version of the Wind strike spell, which is too large, but sprite 15 is a natively
+drawn 24x24px version of the same icon, which is a good size for the text overlay. This is common throughout the sprite
+cache.
+
+#### custom icons
+
+Image files for custom icons are placed in `.runelite/loot-filters/icons`. The plugin will create this directory for
+you. The folder icon in the plugin panel will open a file browser into `.runelite/loot-filters/filters`, which you can
+use to quickly navigate to other plugin directories including icons.
+
+**Not all formats are guaranteed to be supported**. PNG will definitely work.
 
 ### Color strings
 
