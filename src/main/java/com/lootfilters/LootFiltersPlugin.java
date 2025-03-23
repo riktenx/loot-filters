@@ -43,7 +43,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -78,9 +77,7 @@ public class LootFiltersPlugin extends Plugin {
 	public static final File SOUND_DIRECTORY = new File(PLUGIN_DIRECTORY, "sounds");
 	public static final File ICON_DIRECTORY = new File(PLUGIN_DIRECTORY, "icons");
 
-	@Getter private static LootFiltersPlugin instance;
-
-    @Inject private Client client;
+	@Inject private Client client;
 	@Inject private ClientThread clientThread;
 	@Inject private ClientToolbar clientToolbar;
 
@@ -208,14 +205,6 @@ public class LootFiltersPlugin extends Plugin {
 	@Override
 	protected void startUp() throws Exception {
 		initPluginDirectory();
-		instance = this;
-
-		var testfile = new File(PLUGIN_DIRECTORY, "test.out");
-		testfile.createNewFile();
-		try (var writer = new FileOutputStream(testfile)) {
-			writer.write(client.getIndex(4).loadData(0, 0));
-		}
-
 		overlayManager.add(overlay);
 
 		parsedUserFilters = filterManager.loadFilters();
