@@ -3,6 +3,7 @@ package com.lootfilters.lang;
 import com.lootfilters.DisplayConfig;
 import com.lootfilters.LootFilter;
 import com.lootfilters.MatcherConfig;
+import com.lootfilters.model.SoundProvider;
 import com.lootfilters.rule.AndRule;
 import com.lootfilters.rule.AreaRule;
 import com.lootfilters.rule.Comparator;
@@ -202,7 +203,7 @@ public class Parser {
                 case "hideOverlay":
                     builder.hideOverlay(assign[1].expectBoolean()); break;
                 case "sound":
-                    builder.sound(assign[1].expectString()); break;
+                    builder.sound(SoundProvider.fromExpr(assign[1])); break;
                 case "menuSort":
                     builder.menuSort(assign[1].expectInt()); break;
                 default:
