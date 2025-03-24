@@ -256,10 +256,7 @@ public class LootFiltersPlugin extends Plugin {
 		if (!config.autoToggleFilters()) {
 			currentAreaFilter = null;
 		} // if we're transitioning TO enabled, do nothing - onGameTick() will handle it
-		clientThread.invoke(() -> {
-			displayIndex.reset();
-			lootbeamIndex.reset();
-		});
+		resetDisplay();
 	}
 
 	@Subscribe
@@ -357,9 +354,11 @@ public class LootFiltersPlugin extends Plugin {
 		if (match != null && (currentAreaFilter == null || !Objects.equals(match.getName(), currentAreaFilter.getName()))) {
 			addChatMessage("Entering area for filter " + quote(match.getName()));
 			currentAreaFilter = withConfigMatchers(match, config);
+			resetDisplay();
 		} else if (match == null && currentAreaFilter != null) {
 			addChatMessage("Leaving area for filter " + quote(currentAreaFilter.getName()));
 			currentAreaFilter = null;
+			resetDisplay();
 		}
 	}
 
@@ -372,10 +371,7 @@ public class LootFiltersPlugin extends Plugin {
 	public void reloadFilters() {
 		parsedUserFilters = filterManager.loadFilters();
 		loadSelectedFilter();
-		clientThread.invoke(() -> {
-			displayIndex.reset();
-			lootbeamIndex.reset();
-		});
+		resetDisplay();
 	}
 
 	private void loadSelectedFilter() {
@@ -391,5 +387,12 @@ public class LootFiltersPlugin extends Plugin {
 				iconCache.put(provider, provider.get(this));
 			}
 		}
+	}
+
+	private void resetDisplay() {
+		clientThread.invoke(() -> {
+			displayIndex.reset();
+			lootbeamIndex.reset();
+		});
 	}
 }
