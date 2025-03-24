@@ -3,6 +3,7 @@ package com.lootfilters;
 import com.lootfilters.model.DespawnTimerType;
 import com.lootfilters.model.DualValueDisplayType;
 import com.lootfilters.model.FontMode;
+import com.lootfilters.model.ItemValueRulesMode;
 import com.lootfilters.model.ValueDisplayType;
 import com.lootfilters.rule.TextAccent;
 import com.lootfilters.rule.ValueTier;
@@ -297,13 +298,13 @@ public interface LootFiltersConfig extends Config {
     )
     String itemValueRules = "itemValueRules";
     @ConfigItem(
-            keyName = "itemValueRulesEnabled",
+            keyName = "itemValueRulesMode",
             name = "Enabled",
-            description = "Globally enable/disable these rules.",
+            description = "How item value tiers are checked.<br><br>[before filter]: Value tiers override the active filter. Use this if you want to control the display of valuable items exclusively through config.<br><br>[after filter]: Value tiers are checked after the active filter. If a filter matches an item that your value tier settings would otherwise match,<br>the latter will be ignored, as the filter takes precedence. Use this if you want the filter to take precedence, but have these as a failsafe.<br><br>[off]: Globally disable item value tiers. If you're using a filter that supports its own value tiers, you probably want this mode.<br>",
             section = itemValueRules,
             position = 0
     )
-    default boolean itemValueRulesEnabled() { return true; }
+    default ItemValueRulesMode itemValueRulesMode() { return ItemValueRulesMode.BEFORE_FILTER; }
     @ConfigItem(
             keyName = "valueType",
             name = "Value mode",
