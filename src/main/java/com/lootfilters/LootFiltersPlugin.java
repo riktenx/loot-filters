@@ -53,7 +53,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import static com.lootfilters.util.FilterUtil.withConfigMatchers;
+import static com.lootfilters.util.FilterUtil.withConfigRules;
 import static com.lootfilters.util.TextUtil.quote;
 import static net.runelite.client.RuneLite.RUNELITE_DIR;
 import static net.runelite.client.util.ImageUtil.loadImageResource;
@@ -334,7 +334,7 @@ public class LootFiltersPlugin extends Plugin {
 
 	private void loadFilter() throws Exception {
 		var userFilter = LootFilter.fromSource(getUserActiveFilter());
-		activeFilter = withConfigMatchers(userFilter, config);
+		activeFilter = withConfigRules(userFilter, config);
 	}
 
 	private void scanAreaFilter() {
@@ -353,7 +353,7 @@ public class LootFiltersPlugin extends Plugin {
 				.findFirst().orElse(null);
 		if (match != null && (currentAreaFilter == null || !Objects.equals(match.getName(), currentAreaFilter.getName()))) {
 			addChatMessage("Entering area for filter " + quote(match.getName()));
-			currentAreaFilter = withConfigMatchers(match, config);
+			currentAreaFilter = withConfigRules(match, config);
 			resetDisplay();
 		} else if (match == null && currentAreaFilter != null) {
 			addChatMessage("Leaving area for filter " + quote(currentAreaFilter.getName()));
@@ -375,7 +375,7 @@ public class LootFiltersPlugin extends Plugin {
 	}
 
 	private void loadSelectedFilter() {
-		activeFilter = withConfigMatchers(getSelectedFilter(), config);
+		activeFilter = withConfigRules(getSelectedFilter(), config);
 		clientThread.invoke(this::seedImageCache);
 	}
 
