@@ -2,6 +2,7 @@ package com.lootfilters;
 
 import com.lootfilters.model.DespawnTimerType;
 import com.lootfilters.model.DualValueDisplayType;
+import com.lootfilters.model.DisplayLayer;
 import com.lootfilters.model.FontMode;
 import com.lootfilters.model.ItemValueRulesMode;
 import com.lootfilters.model.ValueDisplayType;
@@ -15,6 +16,7 @@ import net.runelite.client.config.ConfigSection;
 import net.runelite.client.config.Keybind;
 import net.runelite.client.config.Range;
 import net.runelite.client.config.Units;
+import net.runelite.client.ui.overlay.OverlayLayer;
 
 import java.awt.Color;
 
@@ -238,6 +240,31 @@ public interface LootFiltersConfig extends Config {
             position = 92
     )
     default Color hiddenColor() { return Color.GRAY; }
+
+    String CONFIG_KEY_DISPLAY_LAYER = "displayLayer";
+    @ConfigItem(
+            keyName = CONFIG_KEY_DISPLAY_LAYER,
+            name = "Overlay order",
+            description = "Changes the draw order of the overlay." +
+            "<br>Default: Above hitsplats, hp bars, and overhead prayers (under widgets)." +
+            "<br>Below: Below hitsplats, hp bars, overhead prayers (above scene)." +
+            "<br>Above: Same as Default, but also above interfaces (above widgets).",
+            section = displayOverrides,
+            position = 93
+    )
+    default DisplayLayer displayLayer() { return DisplayLayer.fromOverlayLayer(OverlayLayer.UNDER_WIDGETS); }
+
+    String CONFIG_KEY_DISPLAY_PRIORITY = "displayPriority";
+    @ConfigItem(
+            keyName = CONFIG_KEY_DISPLAY_PRIORITY,
+            name = "Overlay priority",
+            description = "Changes the draw priority of the overlay." +
+            "<br>Only relative to overlays with the same order as this one.",
+            section = displayOverrides,
+            position = 94
+    )
+    @Range(max = 100)
+    default int displayPriority() { return (int) (LootFiltersOverlay.PRIORITY_DEFAULT * 100); }
 
     @ConfigSection(
             name = "Item lists",

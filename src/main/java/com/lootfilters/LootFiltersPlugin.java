@@ -252,6 +252,12 @@ public class LootFiltersPlugin extends Plugin {
 			return;
 		}
 
+		if (event.getKey().equals(LootFiltersConfig.CONFIG_KEY_DISPLAY_LAYER) || event.getKey().equals(LootFiltersConfig.CONFIG_KEY_DISPLAY_PRIORITY)) {
+			overlay.setLayer(config.displayLayer().toOverlayLayer());
+			overlay.setPriority((float) config.displayPriority() / 100);
+			overlayManager.resetOverlay(overlay);
+		}
+
 		loadSelectedFilter();
 		if (!config.autoToggleFilters()) {
 			currentAreaFilter = null;
