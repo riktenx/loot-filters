@@ -49,6 +49,7 @@ import static com.lootfilters.lang.Token.Type.META;
 import static com.lootfilters.lang.Token.Type.OP_AND;
 import static com.lootfilters.lang.Token.Type.OP_NOT;
 import static com.lootfilters.lang.Token.Type.OP_OR;
+import static com.lootfilters.lang.Token.Type.RULE;
 import static com.lootfilters.lang.Token.Type.STMT_END;
 import static com.lootfilters.lang.Token.Type.TRUE;
 
@@ -68,7 +69,7 @@ public class Parser {
             var tok = tokens.take();
             if (tok.is(META)) {
                 parseMeta();
-            } else if (tok.is(IF)) {
+            } else if (tok.is(IF) || tok.is(RULE)) {
                 parseMatcher(true);
             } else if (tok.is(APPLY)) {
                 parseMatcher(false);

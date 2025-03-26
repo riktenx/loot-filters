@@ -11,7 +11,7 @@ import java.awt.Color;
 public class Token {
     public enum Type {
         WHITESPACE, NEWLINE,
-        IF, APPLY,
+        IF, APPLY, RULE,
         META,
         COLON, COMMA,
         TRUE, FALSE,
