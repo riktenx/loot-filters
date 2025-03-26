@@ -50,8 +50,8 @@ public class LootFiltersOverlay extends Overlay {
     @Inject
     public LootFiltersOverlay(Client client, LootFiltersPlugin plugin, LootFiltersConfig config) {
         setPosition(OverlayPosition.DYNAMIC);
-        setLayer(config.displayLayer().toOverlayLayer());
-        setPriority((float) config.displayPriority() / 100);
+        setLayer(config.overlayLayer());
+        setPriority(config.overlayPriority().getValue());
         this.client = client;
         this.plugin = plugin;
         this.config = config;
