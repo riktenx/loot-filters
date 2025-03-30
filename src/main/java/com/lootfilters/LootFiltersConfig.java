@@ -4,6 +4,7 @@ import com.lootfilters.model.DespawnTimerType;
 import com.lootfilters.model.DualValueDisplayType;
 import com.lootfilters.model.FontMode;
 import com.lootfilters.model.ItemValueRulesMode;
+import com.lootfilters.model.OverlayPriority;
 import com.lootfilters.model.ValueDisplayType;
 import com.lootfilters.rule.TextAccent;
 import com.lootfilters.rule.ValueTier;
@@ -15,6 +16,7 @@ import net.runelite.client.config.ConfigSection;
 import net.runelite.client.config.Keybind;
 import net.runelite.client.config.Range;
 import net.runelite.client.config.Units;
+import net.runelite.client.ui.overlay.OverlayLayer;
 
 import java.awt.Color;
 
@@ -238,6 +240,28 @@ public interface LootFiltersConfig extends Config {
             position = 92
     )
     default Color hiddenColor() { return Color.GRAY; }
+
+    String CONFIG_KEY_OVERLAY_LAYER = "overlayLayer";
+    @ConfigItem(
+            keyName = CONFIG_KEY_OVERLAY_LAYER,
+            name = "Overlay layer",
+            description = "Changes the draw order of the overlay." +
+                    "<br>Setting this to Manual will not render the overlay.",
+            section = displayOverrides,
+            position = 93
+    )
+    default OverlayLayer overlayLayer() { return OverlayLayer.UNDER_WIDGETS; }
+
+    String CONFIG_KEY_OVERLAY_PRIORITY = "overlayPriority";
+    @ConfigItem(
+            keyName = CONFIG_KEY_OVERLAY_PRIORITY,
+            name = "Overlay priority",
+            description = "Changes the draw priority of the overlay." +
+            "<br>Only relative to overlays with the same order as this one.",
+            section = displayOverrides,
+            position = 94
+    )
+    default OverlayPriority overlayPriority() { return OverlayPriority.DEFAULT; }
 
     @ConfigSection(
             name = "Item lists",
