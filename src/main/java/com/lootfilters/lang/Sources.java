@@ -1,32 +1,22 @@
 package com.lootfilters.lang;
 
-import com.lootfilters.LootFilter;
 import lombok.Getter;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 import static com.lootfilters.util.TextUtil.normalizeCrlf;
 
 public class Sources {
     @Getter private static String preamble;
-    @Getter private static String referenceSource;
-
-    @Getter private static LootFilter referenceFilter;
 
     private Sources() {}
 
     static {
         try (
             var preambleStream = Sources.class.getResourceAsStream("/com/lootfilters/scripts/preamble.rs2f");
-            var referenceSourceStream = Sources.class.getResourceAsStream("/com/lootfilters/scripts/filterscape.rs2f");
         ) {
             preamble = loadScriptResource(preambleStream);
-            referenceSource = loadScriptResource(referenceSourceStream);
-
-            referenceFilter = LootFilter.fromSourcesWithPreamble(Map.of("referenceFilter", referenceSource));
         } catch (IOException e) {
             throw new RuntimeException("init static sources", e);
         } catch (CompileException e) {

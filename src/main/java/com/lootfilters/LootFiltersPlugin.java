@@ -1,7 +1,6 @@
 package com.lootfilters;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.google.inject.Provides;
 import com.lootfilters.migration.Migrate_133_140;
 import com.lootfilters.model.BufferedImageProvider;
@@ -11,7 +10,6 @@ import com.lootfilters.model.SoundProvider;
 import com.lootfilters.util.AudioPlayer;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
@@ -43,7 +41,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -68,8 +65,6 @@ import static net.runelite.client.util.ImageUtil.loadImageResource;
 @Getter
 public class LootFiltersPlugin extends Plugin {
 	public static final String CONFIG_GROUP = "loot-filters";
-	public static final String USER_FILTERS_KEY = "user-filters";
-	public static final String USER_FILTERS_INDEX_KEY = "user-filters-index";
 	public static final String SELECTED_FILTER_KEY = "selected-filter";
 
 	public static final File PLUGIN_DIRECTORY = new File(RUNELITE_DIR, "loot-filters");
@@ -148,50 +143,6 @@ public class LootFiltersPlugin extends Plugin {
 		return parsedUserFilters.stream().anyMatch(it -> it.getName().equals(name));
 	}
 
-	public List<String> getUserFilters() {
-		var cfg = configManager.getConfiguration(CONFIG_GROUP, USER_FILTERS_KEY);
-		if (cfg == null || cfg.isEmpty()) {
-			return new ArrayList<>();
-		}
-
-		var type = new TypeToken<List<String>>(){}.getType();
-        return gson.fromJson(configManager.getConfiguration(CONFIG_GROUP, USER_FILTERS_KEY), type);
-	}
-
-	@SneakyThrows // incoming user filters are vetted at this point, exceptions are a defect
-    public void setUserFilters(List<String> filters) {
-		parsedUserFilters = new ArrayList<>();
-		for (var filter : filters) {
-			parsedUserFilters.add(LootFilter.fromSource(filter));
-		}
-
-		var json = gson.toJson(filters);
-		configManager.setConfiguration(CONFIG_GROUP, USER_FILTERS_KEY, json);
-	}
-
-	public int getUserFilterIndex() {
-		var indexCfg = configManager.getConfiguration(CONFIG_GROUP, USER_FILTERS_INDEX_KEY);
-        var index = indexCfg == null || indexCfg.isEmpty()
-				? -1
-				: Integer.parseInt(indexCfg);
-		if (index > getUserFilters().size() -1) {
-			log.warn("User filter index {} is out of bounds, number of filters: {}", index, getUserFilters().size());
-			return -1;
-		}
-		return Math.max(index, -1);
-	}
-
-	public void setUserFilterIndex(int index) {
-		configManager.setConfiguration(CONFIG_GROUP, USER_FILTERS_INDEX_KEY, Integer.toString(index));
-	}
-
-	public String getUserActiveFilter() {
-		var filters = getUserFilters();
-		var index = getUserFilterIndex();
-		return filters.isEmpty() || index == -1 || index > filters.size()-1
-				? "" : filters.get(index);
-	}
-
 	public void addChatMessage(String msg) {
 		clientThread.invoke(() -> {
 			client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", msg, "loot-filters", false);
@@ -203,7 +154,7 @@ public class LootFiltersPlugin extends Plugin {
 	}
 
 	@Override
-	protected void startUp() throws Exception {
+	protected void startUp() {
 		initPluginDirectory();
 		overlayManager.add(overlay);
 
@@ -330,11 +281,6 @@ public class LootFiltersPlugin extends Plugin {
 			audioDispatcher.execute(() -> provider.play(this));
 		}
 		queuedAudio.clear();
-	}
-
-	private void loadFilter() throws Exception {
-		var userFilter = LootFilter.fromSource(getUserActiveFilter());
-		activeFilter = withConfigRules(userFilter, config);
 	}
 
 	private void scanAreaFilter() {
