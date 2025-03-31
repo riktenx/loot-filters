@@ -3,8 +3,8 @@ package com.lootfilters;
 import com.google.gson.Gson;
 import com.google.inject.Provides;
 import com.lootfilters.migration.Migrate_133_140;
-import com.lootfilters.model.BufferedImageProvider;
 import com.lootfilters.model.DisplayConfigIndex;
+import com.lootfilters.model.IconIndex;
 import com.lootfilters.model.PluginTileItem;
 import com.lootfilters.model.SoundProvider;
 import com.lootfilters.util.AudioPlayer;
@@ -39,12 +39,9 @@ import net.runelite.client.ui.overlay.OverlayManager;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -96,12 +93,13 @@ public class LootFiltersPlugin extends Plugin {
 	private final TileItemIndex tileItemIndex = new TileItemIndex();
 	private final LootbeamIndex lootbeamIndex = new LootbeamIndex(this);
 	private final DisplayConfigIndex displayIndex = new DisplayConfigIndex(this);
+	private final IconIndex iconIndex = new IconIndex(this);
+
 	private final MenuEntryComposer menuEntryComposer = new MenuEntryComposer(this);
 	private final LootFilterManager filterManager = new LootFilterManager(this);
 	private final AudioPlayer audioPlayer = new AudioPlayer(); // remove when https://github.com/runelite/runelite/pull/18745 is merged
 	private final ExecutorService audioDispatcher = Executors.newSingleThreadExecutor();
 	private final Set<SoundProvider> queuedAudio = new HashSet<>();
-	private final Map<BufferedImageProvider, BufferedImage> iconCache = new HashMap<>();
 
 	private LootFilter activeFilter;
 	private LootFilter currentAreaFilter;
@@ -238,15 +236,22 @@ public class LootFiltersPlugin extends Plugin {
 		if (match.getSound() != null && config.soundVolume() > 0) {
 			queuedAudio.add(match.getSound());
 		}
+		if (match.getIcon() != null) {
+			iconIndex.inc(match.getIcon(), item);
+		}
 	}
 
 	@Subscribe
 	public void onItemDespawned(ItemDespawned event) {
 		var tile = event.getTile();
 		var item = new PluginTileItem(this, tile, event.getItem());
+        var display = displayIndex.get(item);
 		tileItemIndex.remove(tile, item); // all of these are ultimately idempotent
 		lootbeamIndex.remove(tile, item);
 		displayIndex.remove(item);
+        if (display != null && display.getIcon() != null) {
+            iconIndex.dec(display.getIcon(), item);
+        }
 	}
 
 	@Subscribe
@@ -318,6 +323,7 @@ public class LootFiltersPlugin extends Plugin {
 		tileItemIndex.clear();
 		lootbeamIndex.clear();
 		displayIndex.clear();
+		iconIndex.clear();
 	}
 
 	public void reloadFilters() {
@@ -328,23 +334,13 @@ public class LootFiltersPlugin extends Plugin {
 
 	private void loadSelectedFilter() {
 		activeFilter = withConfigRules(getSelectedFilter(), config);
-		clientThread.invoke(this::seedImageCache);
-	}
-
-	private void seedImageCache() {
-		iconCache.clear();
-		for (var rule : activeFilter.getMatchers()) {
-			var provider = rule.getDisplay().getIcon();
-			if (provider != null && !iconCache.containsKey(provider)) {
-				iconCache.put(provider, provider.get(this));
-			}
-		}
 	}
 
 	private void resetDisplay() {
 		clientThread.invoke(() -> {
 			displayIndex.reset();
 			lootbeamIndex.reset();
+			iconIndex.reset();
 		});
 	}
 }
