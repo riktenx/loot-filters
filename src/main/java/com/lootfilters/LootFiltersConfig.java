@@ -16,7 +16,6 @@ import net.runelite.client.config.ConfigSection;
 import net.runelite.client.config.Keybind;
 import net.runelite.client.config.Range;
 import net.runelite.client.config.Units;
-import net.runelite.client.ui.overlay.OverlayLayer;
 
 import java.awt.Color;
 
@@ -240,17 +239,6 @@ public interface LootFiltersConfig extends Config {
             position = 92
     )
     default Color hiddenColor() { return Color.GRAY; }
-
-    String CONFIG_KEY_OVERLAY_LAYER = "overlayLayer";
-    @ConfigItem(
-            keyName = CONFIG_KEY_OVERLAY_LAYER,
-            name = "Overlay layer",
-            description = "Changes the draw order of the overlay." +
-                    "<br>Setting this to Manual will not render the overlay.",
-            section = displayOverrides,
-            position = 93
-    )
-    default OverlayLayer overlayLayer() { return OverlayLayer.UNDER_WIDGETS; }
 
     String CONFIG_KEY_OVERLAY_PRIORITY = "overlayPriority";
     @ConfigItem(
