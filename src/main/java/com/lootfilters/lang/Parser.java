@@ -384,6 +384,11 @@ public class Parser {
             }
             var filename = args.get(0).take().expectString();
             builder.icon(new BufferedImageProvider.File(filename));
+        } else if (type.getValue().equals("CurrentItem")) {
+            if (!args.isEmpty()) {
+                throw new ParseException("incorrect arg length in icon CurrentItem() expr", type);
+            }
+            builder.icon(new BufferedImageProvider.CurrentItem());
         } else {
             throw new ParseException("unrecognized icon type", type);
         }

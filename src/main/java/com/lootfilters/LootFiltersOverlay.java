@@ -163,7 +163,8 @@ public class LootFiltersOverlay extends Overlay {
                 text.render(g);
 
                 if (match.getIcon() != null) {
-                    var d = renderIcon(g, match.getIcon(), textPoint, currentOffset);
+                    var cacheKey = match.getIcon().getCacheKey(item);
+                    var d = renderIcon(g, cacheKey, textPoint, currentOffset);
                     leftOffset += d.width;
                 }
                 if (match.isShowDespawn() || plugin.isHotkeyActive()) {
@@ -277,7 +278,7 @@ public class LootFiltersOverlay extends Overlay {
         g.drawString("items: " + itemCount + "," + plugin.getTileItemIndex().pointIndexSize(), 0, 32);
         g.drawString("lootbeams: " + plugin.getLootbeamIndex().size(), 0, 48);
         g.drawString("displays: " + plugin.getDisplayIndex().size(), 0, 64);
-        g.drawString("audio: " + plugin.getQueuedAudio().size() + ", icon: " + plugin.getIconCache().size(), 0, 80);
+        g.drawString("audio: " + plugin.getQueuedAudio().size() + ", icon: " + plugin.getIconIndex().size(), 0, 80);
     }
 
     private void renderDespawnTimer(Graphics2D g, DespawnTimerType type, PluginTileItem item, net.runelite.api.Point textPoint, int textWidth, int textHeight, int yOffset, int leftOffset) {
@@ -371,8 +372,8 @@ public class LootFiltersOverlay extends Overlay {
         g.setStroke(origStroke);
     }
 
-    private Dimension renderIcon(Graphics2D g, BufferedImageProvider provider, net.runelite.api.Point textPoint, int yOffset) {
-        var image = plugin.getIconCache().get(provider);
+    private Dimension renderIcon(Graphics2D g, BufferedImageProvider.CacheKey cacheKey, net.runelite.api.Point textPoint, int yOffset) {
+        var image = plugin.getIconIndex().get(cacheKey);
         if (image == null) {
             return new Dimension(0, 0);
         }
