@@ -244,13 +244,13 @@ public class LootFiltersPlugin extends Plugin {
 	public void onItemDespawned(ItemDespawned event) {
 		var tile = event.getTile();
 		var item = new PluginTileItem(this, tile, event.getItem());
-        var display = displayIndex.get(item);
+		var display = displayIndex.get(item);
 		tileItemIndex.remove(tile, item); // all of these are ultimately idempotent
 		lootbeamIndex.remove(tile, item);
 		displayIndex.remove(item);
-        if (display != null && display.getIcon() != null) {
-            iconIndex.dec(display.getIcon(), item);
-        }
+		if (display != null && display.getIcon() != null) {
+			iconIndex.dec(display.getIcon(), item);
+		}
 	}
 
 	@Subscribe
