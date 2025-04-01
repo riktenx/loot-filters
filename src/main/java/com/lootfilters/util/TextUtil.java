@@ -1,5 +1,7 @@
 package com.lootfilters.util;
 
+import com.lootfilters.model.NamedQuantity;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.stream.Collectors;
@@ -106,5 +108,15 @@ public class TextUtil {
             }
         }
         return index != -1 && index < str.length() - 1;
+    }
+
+    public static boolean containsNamedQuantity(String csv, String item)  {
+        for (var part : csv.split(",")) {
+            var nq = NamedQuantity.fromString(part);
+            if (nq != null && item.trim().equalsIgnoreCase(nq.getName())) {
+                return true;
+            }
+        }
+        return false;
     }
 }
