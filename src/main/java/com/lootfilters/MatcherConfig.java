@@ -1,9 +1,11 @@
 package com.lootfilters;
 
+import com.lootfilters.model.NamedQuantity;
 import com.lootfilters.model.PluginTileItem;
 import com.lootfilters.rule.AndRule;
 import com.lootfilters.rule.Comparator;
 import com.lootfilters.rule.ItemNameRule;
+import com.lootfilters.rule.ItemQuantityRule;
 import com.lootfilters.rule.ItemTradeableRule;
 import com.lootfilters.rule.ItemValueRule;
 import com.lootfilters.rule.OrRule;
@@ -113,7 +115,8 @@ public class MatcherConfig {
     public static MatcherConfig highlight(String rawNames, Color color, boolean showLootbeam, boolean notify) {
         var rule = new OrRule(
                 Arrays.stream(rawNames.split(","))
-                        .map(ItemNameRule::new)
+                        .map(NamedQuantity::fromString)
+                        .map(it -> new AndRule(new ItemNameRule(it.getName()), new ItemQuantityRule(it.getQuantity(), it.getComparator())))
                         .collect(Collectors.toList())
         );
         var display = DisplayConfig.builder()
@@ -127,7 +130,8 @@ public class MatcherConfig {
     public static MatcherConfig hide(String rawNames) {
         var rule = new OrRule(
                 Arrays.stream(rawNames.split(","))
-                        .map(ItemNameRule::new)
+                        .map(NamedQuantity::fromString)
+                        .map(it -> new AndRule(new ItemNameRule(it.getName()), new ItemQuantityRule(it.getQuantity(), it.getComparator())))
                         .collect(Collectors.toList())
         );
         var display = DisplayConfig.builder()

@@ -17,4 +17,16 @@ public enum Comparator {
                 throw new ParseException("unrecognized token", t);
         }
     }
+
+    public static Comparator fromString(String str) {
+        switch (str) {
+            case ">": return GT;
+            case "<": return LT;
+            case "==": return EQ;
+            case ">=": return GT_EQ;
+            case "<=": return LT_EQ;
+            default:
+                throw new IllegalArgumentException("unrecognized comparator string " + str);
+        }
+    }
 }
