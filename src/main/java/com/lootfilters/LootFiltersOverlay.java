@@ -343,7 +343,7 @@ public class LootFiltersOverlay extends Overlay {
     }
 
     private void highlightTiles(Graphics2D g, Tile tile, List<PluginTileItem> items) {
-        if (tile.getLocalLocation() == null) {
+        if (tile.getLocalLocation() == null || tile.getPlane() != client.getTopLevelWorldView().getPlane()) {
             return;
         }
 
