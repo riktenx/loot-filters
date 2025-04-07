@@ -1,7 +1,13 @@
 package com.lootfilters;
 
-import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Request;
+import okhttp3.Response;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -14,9 +20,15 @@ import java.util.Map;
 import static com.lootfilters.util.TextUtil.quote;
 
 @Slf4j
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class LootFilterManager {
+    public static final String DEFAULT_FILTER_NAME = "[default]";
+
     private final LootFiltersPlugin plugin;
+
+    @Getter
+    @Setter
+    private LootFilter defaultFilter = null;
 
     public List<LootFilter> loadFilters() {
         var filters = new ArrayList<LootFilter>();
@@ -49,7 +61,7 @@ public class LootFilterManager {
 
             filters.add(filter);
         }
-        plugin.addChatMessage(String.format("Reloaded <col=%s>%d/%d</col> loot filters.",
+        plugin.addChatMessage(String.format("Loaded <col=%s>%d/%d</col> loot filters.",
                 filters.size() == files.length ? "00FF00" : "FF0000", filters.size(), files.length));
         return filters;
     }
@@ -75,6 +87,34 @@ public class LootFilterManager {
         try (var writer = new FileWriter(file)) {
             writer.write(src);
         }
+    }
+
+    public void fetchDefaultFilter(Runnable onComplete) {
+        var req = new Request.Builder()
+                .get()
+                .url("https://raw.githubusercontent.com/riktenx/filterscape/refs/heads/main/filterscape.rs2f")
+                .addHeader("User-Agent", "github.com/riktenx/loot-filters")
+                .build();
+        plugin.getOkHttpClient().newCall(req).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                log.warn("Failed to fetch default filter", e);
+                plugin.addChatMessage("Failed to fetch default filter: " + e.getMessage());
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) {
+                try {
+                    defaultFilter = LootFilter.fromSource(response.body().string()); // string() DOES close the response body
+                } catch (Exception e) {
+                    log.warn("Failed to load default filter", e);
+                    plugin.addChatMessage("Failed to load default filter: " + e.getMessage());
+                    return;
+                }
+
+                onComplete.run();
+            }
+        });
     }
 
     private static String toFilename(String filterName) {

@@ -36,10 +36,12 @@ import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.ui.overlay.OverlayManager;
+import okhttp3.OkHttpClient;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -86,6 +88,7 @@ public class LootFiltersPlugin extends Plugin {
 	@Inject private ItemManager itemManager;
 	@Inject private Notifier notifier;
 	@Inject private SpriteManager spriteManager;
+	@Inject private OkHttpClient okHttpClient;
 
 	private LootFiltersPanel pluginPanel;
 	private NavigationButton pluginPanelNav;
@@ -100,6 +103,7 @@ public class LootFiltersPlugin extends Plugin {
 	private final AudioPlayer audioPlayer = new AudioPlayer(); // remove when https://github.com/runelite/runelite/pull/18745 is merged
 	private final ExecutorService audioDispatcher = Executors.newSingleThreadExecutor();
 	private final Set<SoundProvider> queuedAudio = new HashSet<>();
+	private final List<String> queuedChatMessages = new ArrayList<>();
 
 	private LootFilter activeFilter;
 	private LootFilter currentAreaFilter;
@@ -131,20 +135,27 @@ public class LootFiltersPlugin extends Plugin {
 		}
 	}
 
+	public List<LootFilter> getLoadedFilters() {
+		var filters = new ArrayList<LootFilter>();
+		if (filterManager.getDefaultFilter() != null) {
+			filters.add(filterManager.getDefaultFilter());
+		}
+		filters.addAll(parsedUserFilters);
+		return filters;
+	}
+
 	public LootFilter getSelectedFilter() {
-		return parsedUserFilters.stream()
+		return getLoadedFilters().stream()
 				.filter(it -> it.getName().equals(getSelectedFilterName()))
 				.findFirst().orElse(LootFilter.Nop);
 	}
 
 	public boolean hasFilter(String name) {
-		return parsedUserFilters.stream().anyMatch(it -> it.getName().equals(name));
+		return getLoadedFilters().stream().anyMatch(it -> it.getName().equals(name));
 	}
 
 	public void addChatMessage(String msg) {
-		clientThread.invoke(() -> {
-			client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", msg, "loot-filters", false);
-		});
+		queuedChatMessages.add(msg);
 	}
 
 	public String getItemName(int id) {
@@ -168,6 +179,10 @@ public class LootFiltersPlugin extends Plugin {
 		clientToolbar.addNavigation(pluginPanelNav);
 		keyManager.registerKeyListener(hotkeyListener);
 		mouseManager.registerMouseListener(mouseAdapter);
+
+		if (config.fetchDefaultFilter()) {
+			filterManager.fetchDefaultFilter(this::onFetchDefaultFilter);
+		}
 
 		Migrate_133_140.run(this);
 	}
@@ -204,6 +219,27 @@ public class LootFiltersPlugin extends Plugin {
 		if (event.getKey().equals(LootFiltersConfig.CONFIG_KEY_OVERLAY_PRIORITY)) {
 			overlay.setPriority(config.overlayPriority().getValue());
 			overlayManager.resetOverlay(overlay);
+		}
+
+		if (event.getKey().equals(LootFiltersConfig.CONFIG_KEY_FETCH_DEFAULT_FILTER)) {
+			if (config.fetchDefaultFilter()) {
+				filterManager.fetchDefaultFilter(this::onFetchDefaultFilter);
+			} else {
+				var selected = getSelectedFilterName();
+				filterManager.setDefaultFilter(null);
+				if (selected != null && selected.equals(LootFilterManager.DEFAULT_FILTER_NAME)) {
+					selected = null;
+					setSelectedFilterName(null);
+				}
+				pluginPanel.reflowFilterSelect(getLoadedFilters(), selected);
+			}
+		}
+
+		if (event.getKey().equals(SELECTED_FILTER_KEY)) {
+			var selected = getSelectedFilterName();
+			if (selected != null && selected.equals(LootFilterManager.DEFAULT_FILTER_NAME)) {
+				addChatMessage("Loaded the default filter. Visit filterscape.xyz to configure it.");
+			}
 		}
 
 		loadSelectedFilter();
@@ -277,6 +313,9 @@ public class LootFiltersPlugin extends Plugin {
 		if (!queuedAudio.isEmpty()) {
 			flushAudio();
 		}
+		if (!queuedChatMessages.isEmpty()) {
+			flushChatMessages();
+		}
 	}
 
 	@Subscribe
@@ -293,6 +332,14 @@ public class LootFiltersPlugin extends Plugin {
 		queuedAudio.clear();
 	}
 
+	private void flushChatMessages() {
+		for (var msg : queuedChatMessages) {
+			var chatMsg = String.format("<col=00ffff>[Loot Filters]</col>: %s", msg);
+			client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", chatMsg, "loot-filters", false);
+		}
+		queuedChatMessages.clear();
+	}
+
 	private void scanAreaFilter() {
 		if (!config.autoToggleFilters()) {
 			return;
@@ -304,7 +351,7 @@ public class LootFiltersPlugin extends Plugin {
 		}
 
 		var p = WorldPoint.fromLocalInstance(client, player.getLocalLocation());
-		var match = parsedUserFilters.stream()
+		var match = getLoadedFilters().stream()
 				.filter(it -> it.isInActivationArea(p))
 				.findFirst().orElse(null);
 		if (match != null && (currentAreaFilter == null || !Objects.equals(match.getName(), currentAreaFilter.getName()))) {
@@ -341,5 +388,12 @@ public class LootFiltersPlugin extends Plugin {
 			lootbeamIndex.reset();
 			iconIndex.reset();
 		});
+	}
+
+	private void onFetchDefaultFilter() {
+		if (getSelectedFilterName() == null) {
+			setSelectedFilterName(LootFilterManager.DEFAULT_FILTER_NAME);
+		}
+		pluginPanel.reflowFilterSelect(getLoadedFilters(), getSelectedFilterName());
 	}
 }
