@@ -165,7 +165,9 @@ public class LootFiltersPlugin extends Plugin {
 				.icon(loadImageResource(this.getClass(), "/com/lootfilters/icons/panel.png"))
 				.panel(pluginPanel)
 				.build();
-		clientToolbar.addNavigation(pluginPanelNav);
+		if (config.showPluginPanel()) {
+			clientToolbar.addNavigation(pluginPanelNav);
+		}
 		keyManager.registerKeyListener(hotkeyListener);
 		mouseManager.registerMouseListener(mouseAdapter);
 
@@ -199,6 +201,14 @@ public class LootFiltersPlugin extends Plugin {
 	public void onConfigChanged(ConfigChanged event) throws Exception {
 		if (!event.getGroup().equals(CONFIG_GROUP)) {
 			return;
+		}
+
+		if (event.getKey().equals(LootFiltersConfig.SHOW_PLUGIN_PANEL)) {
+			if (config.showPluginPanel()) {
+				clientToolbar.addNavigation(pluginPanelNav);
+			} else {
+				clientToolbar.removeNavigation(pluginPanelNav);
+			}
 		}
 
 		if (event.getKey().equals(LootFiltersConfig.CONFIG_KEY_OVERLAY_PRIORITY)) {
