@@ -43,6 +43,7 @@ public class LootFiltersOverlay extends Overlay {
     private static final int Z_STACK_OFFSET = 16;
     private static final int BOX_PAD = 2;
     private static final int CLICKBOX_SIZE = 8;
+    private static final int TIMER_RADIUS = 5;
 
     private final Client client;
     private final LootFiltersPlugin plugin;
@@ -302,11 +303,10 @@ public class LootFiltersOverlay extends Overlay {
             var timer = new ProgressPieComponent();
             var total = item.getDespawnTime() - item.getSpawnTime();
             var remaining = item.getDespawnTime() - plugin.getClient().getTickCount();
-            var radius = textHeight / 2;
-            timer.setPosition(new net.runelite.api.Point(textPoint.getX() - radius - BOX_PAD - 2 - leftOffset,
-                    textPoint.getY() - yOffset - radius));
+            timer.setPosition(new net.runelite.api.Point(textPoint.getX() - TIMER_RADIUS - BOX_PAD - 2 - leftOffset,
+                    textPoint.getY() - yOffset - TIMER_RADIUS));
             timer.setProgress(remaining / (double) total);
-            timer.setDiameter(textHeight);
+            timer.setDiameter(TIMER_RADIUS * 2);
             timer.setFill(getDespawnTextColor(item));
             timer.setBorderColor(getDespawnTextColor(item));
             timer.render(g);
