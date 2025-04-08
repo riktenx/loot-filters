@@ -22,6 +22,22 @@ import java.awt.Color;
 @ConfigGroup("loot-filters")
 public interface LootFiltersConfig extends Config {
     @ConfigSection(
+            name = "Plugin panel",
+            description = "",
+            position = -2
+    )
+    String pluginPanel = "pluginPanel";
+    String SHOW_PLUGIN_PANEL = "showPluginPanel";
+    @ConfigItem(
+            keyName = SHOW_PLUGIN_PANEL,
+            name = "Enabled",
+            description = "Show the plugin panel in the side nav. The entire plugin, including the active loot filter, will still operate if the panel is hidden.",
+            section = pluginPanel,
+            position = -2
+    )
+    default boolean showPluginPanel() { return true; }
+
+    @ConfigSection(
             name = "General",
             description = "Configure general options.",
             position = 0
