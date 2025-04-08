@@ -30,8 +30,8 @@ public interface LootFiltersConfig extends Config {
     String CONFIG_KEY_FETCH_DEFAULT_FILTER = "fetchDefaultFilter";
     @ConfigItem(
             keyName = CONFIG_KEY_FETCH_DEFAULT_FILTER,
-            name = "Default filter",
-            description = "Fetch the default filter on plugin startup. This filter is retrieved from GitHub and is updated independently of the plugin itself.",
+            name = "Fetch default filter",
+            description = "Fetch the default filter and include it as an option in the plugin panel. This filter is retrieved from GitHub and is updated independently of the plugin itself.",
             section = general,
             position = -2
     )
