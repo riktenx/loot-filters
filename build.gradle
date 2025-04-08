@@ -27,7 +27,7 @@ dependencies {
 }
 
 group = 'com.lootfilters'
-version = '1.7.4'
+version = '1.7.5'
 
 tasks.withType(JavaCompile).configureEach {
 	options.encoding = 'UTF-8'
