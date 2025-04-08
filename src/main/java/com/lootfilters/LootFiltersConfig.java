@@ -38,6 +38,15 @@ public interface LootFiltersConfig extends Config {
             position = 0
     )
     String general = "general";
+    String CONFIG_KEY_FETCH_DEFAULT_FILTER = "fetchDefaultFilter";
+    @ConfigItem(
+            keyName = CONFIG_KEY_FETCH_DEFAULT_FILTER,
+            name = "Fetch default filter",
+            description = "Fetch the default filter and include it as an option in the plugin panel. This filter is retrieved from GitHub and is updated independently of the plugin itself.",
+            section = general,
+            position = -2
+    )
+    default boolean fetchDefaultFilter() { return true; }
     @ConfigItem(
             keyName = "autoToggleFilter",
             name = "Auto-toggle active filter",
@@ -327,7 +336,7 @@ public interface LootFiltersConfig extends Config {
             section = itemValueRules,
             position = 0
     )
-    default ItemValueRulesMode itemValueRulesMode() { return ItemValueRulesMode.BEFORE_FILTER; }
+    default ItemValueRulesMode itemValueRulesMode() { return ItemValueRulesMode.AFTER_FILTER; }
     @ConfigItem(
             keyName = "valueType",
             name = "Value mode",

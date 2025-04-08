@@ -109,7 +109,7 @@ public class LootFiltersPanel extends PluginPanel {
 
         add(root);
 
-        reflowFilterSelect(plugin.getFilterManager().loadFilters(), plugin.getSelectedFilterName());
+        reflowFilterSelect(plugin.getLoadedFilters(), plugin.getSelectedFilterName());
     }
 
     private void onCreateEmptyFilter() {
@@ -172,7 +172,7 @@ public class LootFiltersPanel extends PluginPanel {
             return;
         }
 
-        var existing = plugin.getParsedUserFilters();
+        var existing = plugin.getLoadedFilters();
         for (var filter : existing) {
             if (!filter.getName().equals(newFilter.getName())) {
                 continue;
@@ -262,7 +262,7 @@ public class LootFiltersPanel extends PluginPanel {
 
     private void onReloadFilters() {
         plugin.reloadFilters();
-        reflowFilterSelect(plugin.getParsedUserFilters(), plugin.getSelectedFilterName());
+        reflowFilterSelect(plugin.getLoadedFilters(), plugin.getSelectedFilterName());
     }
 
     private void onBrowseFolder() {

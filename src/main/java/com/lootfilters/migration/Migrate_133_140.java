@@ -42,7 +42,7 @@ public class Migrate_133_140 {
             plugin.getFilterManager().saveNewFilter("migrated_filter_" + i, toMigrate.get(i));
         }
         plugin.reloadFilters();
-        plugin.getPluginPanel().reflowFilterSelect(plugin.getParsedUserFilters(), plugin.getSelectedFilterName());
+        plugin.getPluginPanel().reflowFilterSelect(plugin.getLoadedFilters(), plugin.getSelectedFilterName());
     }
 
     private List<String> getConfigUserFilters() {
