@@ -7,7 +7,6 @@ import com.lootfilters.model.DisplayConfigIndex;
 import com.lootfilters.model.IconIndex;
 import com.lootfilters.model.PluginTileItem;
 import com.lootfilters.model.SoundProvider;
-import com.lootfilters.util.AudioPlayer;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +22,7 @@ import net.runelite.api.events.ItemDespawned;
 import net.runelite.api.events.ItemSpawned;
 import net.runelite.api.events.MenuEntryAdded;
 import net.runelite.client.Notifier;
+import net.runelite.client.audio.AudioPlayer;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
@@ -89,6 +89,7 @@ public class LootFiltersPlugin extends Plugin {
 	@Inject private Notifier notifier;
 	@Inject private SpriteManager spriteManager;
 	@Inject private OkHttpClient okHttpClient;
+	@Inject private AudioPlayer audioPlayer;
 
 	private LootFiltersPanel pluginPanel;
 	private NavigationButton pluginPanelNav;
@@ -100,7 +101,6 @@ public class LootFiltersPlugin extends Plugin {
 
 	private final MenuEntryComposer menuEntryComposer = new MenuEntryComposer(this);
 	private final LootFilterManager filterManager = new LootFilterManager(this);
-	private final AudioPlayer audioPlayer = new AudioPlayer(); // remove when https://github.com/runelite/runelite/pull/18745 is merged
 	private final ExecutorService audioDispatcher = Executors.newSingleThreadExecutor();
 	private final Set<SoundProvider> queuedAudio = new HashSet<>();
 	private final List<String> queuedChatMessages = new ArrayList<>();
