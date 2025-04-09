@@ -60,7 +60,6 @@ text, although the parser doesn't know the difference.
 meta {
     name = "riktenx/demo";
     description = "demo filter";
-    area = [1,2,3,4,5,6];
 }
 ```
 
@@ -76,22 +75,6 @@ The user-friendly name of the filter.
 #### `description`
 
 User-friendly description of this filter.
-
-#### `area`
-
-The in-game area, expressed in coordinates, in which the plugin should automatically load this filter. This mainly
-allows you to write bespoke filters for specific bosses.
-
-Area is expressed as a list of _exactly_ six (6) integers that represent the boundary coordinates of the desired
-activation area:
-
-```
-[x0, y0, z0, x1, y1, z1]
-```
-
-There are several excellent web-based tools for finding map coordinates, such as https://mejrs.github.io/osrs.
-
-For example, the coordinate pair `[2240, 4032, 0, 2303, 4095, 0]` describes the area for Vorkath.
 
 ## Rules
 
@@ -157,6 +140,22 @@ You can use logical operators to express compound conditions, such as
 ```
 
 Rules support the following conditions:
+
+#### area `area:[x0,y0,z0,x1,y1,z1]`
+
+Match against the in-world location of an item, expressed in coordinates. This allows you to write filter behavior
+constrained to a specific monster, etc.
+
+Area is expressed as a list of _exactly_ six (6) integers that represent the boundary coordinates of the desired
+activation area:
+
+```
+[x0, y0, z0, x1, y1, z1]
+```
+
+There are several excellent web-based tools for finding map coordinates, such as https://mejrs.github.io/osrs.
+
+For example, the coordinate pair `[2240, 4032, 0, 2303, 4095, 0]` describes the area for Vorkath.
 
 #### name `name:"..."` or `name:["...", "...", <...>]`
 
