@@ -100,6 +100,10 @@ public class Lexer {
     }
 
     private boolean tokenizeComment() {
+        return tokenizeLineComment() || tokenizeBlockComment();
+    }
+
+    private boolean tokenizeLineComment() {
         if (!input.startsWith("//", offset)) {
             return false;
         }
@@ -112,6 +116,29 @@ public class Lexer {
         currentLineOffset += text.length();
         offset += text.length();
         return true;
+    }
+
+    private boolean tokenizeBlockComment() {
+        if (!input.startsWith("/*", offset)) {
+            return false;
+        }
+
+        for (var i = offset + 2; i < input.length(); ++i) {
+            if (input.startsWith("*/", i)) {
+                currentLineOffset += 2;
+                var text = input.substring(offset, i + 2);
+                tokens.add(new Token(Token.Type.COMMENT, text, currentLocation()));
+                offset += text.length();
+                return true;
+            } else if (input.charAt(i) == '\n') {
+                ++currentLineNumber;
+                currentLineOffset = 0;
+            } else {
+                ++currentLineOffset;
+            }
+        }
+
+        throw new TokenizeException(String.format("unterminated block comment at line %d, char %d", currentLineNumber, currentLineOffset));
     }
 
     private void tokenizeWhitespace() {
