@@ -123,6 +123,8 @@ public class Lexer {
             return false;
         }
 
+        var startLine = currentLineNumber;
+        var startOffset = currentLineOffset;
         for (var i = offset + 2; i < input.length(); ++i) {
             if (input.startsWith("*/", i)) {
                 currentLineOffset += 2;
@@ -132,13 +134,13 @@ public class Lexer {
                 return true;
             } else if (input.charAt(i) == '\n') {
                 ++currentLineNumber;
-                currentLineOffset = 0;
+                currentLineOffset = 1;
             } else {
                 ++currentLineOffset;
             }
         }
 
-        throw new TokenizeException(String.format("unterminated block comment at line %d, char %d", currentLineNumber, currentLineOffset));
+        throw new TokenizeException(String.format("unterminated block comment at line %d, char %d", startLine, startOffset));
     }
 
     private void tokenizeWhitespace() {
