@@ -137,9 +137,7 @@ public class LootFiltersPlugin extends Plugin {
 
 	public List<LootFilter> getLoadedFilters() {
 		var filters = new ArrayList<LootFilter>();
-		if (filterManager.getDefaultFilter() != null) {
-			filters.add(filterManager.getDefaultFilter());
-		}
+		filters.addAll(filterManager.getDefaultFilters());
 		filters.addAll(parsedUserFilters);
 		return filters;
 	}
@@ -182,8 +180,8 @@ public class LootFiltersPlugin extends Plugin {
 		keyManager.registerKeyListener(hotkeyListener);
 		mouseManager.registerMouseListener(mouseAdapter);
 
-		if (config.fetchDefaultFilter()) {
-			filterManager.fetchDefaultFilter(this::onFetchDefaultFilter);
+		if (config.fetchDefaultFilters()) {
+			filterManager.fetchDefaultFilters(this::onFetchDefaultFilters);
 		}
 
 		Migrate_133_140.run(this);
@@ -231,13 +229,13 @@ public class LootFiltersPlugin extends Plugin {
 			overlayManager.resetOverlay(overlay);
 		}
 
-		if (event.getKey().equals(LootFiltersConfig.CONFIG_KEY_FETCH_DEFAULT_FILTER)) {
-			if (config.fetchDefaultFilter()) {
-				filterManager.fetchDefaultFilter(this::onFetchDefaultFilter);
+		if (event.getKey().equals(LootFiltersConfig.CONFIG_KEY_FETCH_DEFAULT_FILTERS)) {
+			if (config.fetchDefaultFilters()) {
+				filterManager.fetchDefaultFilters(this::onFetchDefaultFilters);
 			} else {
 				var selected = getSelectedFilterName();
-				filterManager.setDefaultFilter(null);
-				if (selected != null && selected.equals(LootFilterManager.DEFAULT_FILTER_NAME)) {
+				filterManager.getDefaultFilters().clear();
+				if (selected != null && selected.equals(DefaultFilter.FILTERSCAPE.getName())) {
 					selected = null;
 					setSelectedFilterName(null);
 				}
@@ -247,8 +245,8 @@ public class LootFiltersPlugin extends Plugin {
 
 		if (event.getKey().equals(SELECTED_FILTER_KEY)) {
 			var selected = getSelectedFilterName();
-			if (selected != null && selected.equals(LootFilterManager.DEFAULT_FILTER_NAME)) {
-				addChatMessage("Loaded the default filter. Visit filterscape.xyz to configure it.");
+			if (DefaultFilter.all().stream().anyMatch(it -> it.getName().equals(selected))) {
+				addChatMessage("Loaded " + selected + ". Visit filterscape.xyz to configure it.");
 			}
 		}
 
@@ -400,9 +398,9 @@ public class LootFiltersPlugin extends Plugin {
 		});
 	}
 
-	private void onFetchDefaultFilter() {
+	private void onFetchDefaultFilters() {
 		if (getSelectedFilterName() == null) {
-			setSelectedFilterName(LootFilterManager.DEFAULT_FILTER_NAME);
+			setSelectedFilterName(DefaultFilter.FILTERSCAPE.getName());
 		}
 		pluginPanel.reflowFilterSelect(getLoadedFilters(), getSelectedFilterName());
 	}

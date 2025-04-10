@@ -38,15 +38,15 @@ public interface LootFiltersConfig extends Config {
             position = 0
     )
     String general = "general";
-    String CONFIG_KEY_FETCH_DEFAULT_FILTER = "fetchDefaultFilter";
+    String CONFIG_KEY_FETCH_DEFAULT_FILTERS = "fetchDefaultFilters";
     @ConfigItem(
-            keyName = CONFIG_KEY_FETCH_DEFAULT_FILTER,
-            name = "Fetch default filter",
-            description = "Fetch the default filter and include it as an option in the plugin panel. This filter is retrieved from GitHub and is updated independently of the plugin itself.",
+            keyName = CONFIG_KEY_FETCH_DEFAULT_FILTERS,
+            name = "Fetch default filters",
+            description = "Fetch the default filters and include them as options in the plugin panel.",
             section = general,
             position = -2
     )
-    default boolean fetchDefaultFilter() { return true; }
+    default boolean fetchDefaultFilters() { return true; }
     @ConfigItem(
             keyName = "autoToggleFilter",
             name = "Auto-toggle active filter",
