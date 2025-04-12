@@ -19,12 +19,12 @@ apply (value:>10_000) {
   borderColor = "#ff80ff";
 }
 
-// we really care about anglerfish
-if (name:"anglerfish") {
+// the filter keeps going until it hits a "rule" with matching conditions
+rule (name:"anglerfish") {
   color = MAGENTA;
 }
 
-if (name:"coins") {
+rule (name:"coins") {
   color = YELLOW; // and also, coins
   showLootbeam = true;
 }
@@ -37,18 +37,19 @@ Scriptable filters allow us to exercise both a deep and far-reaching level of co
 Single-line comments are supported, delimited by `//`, and can appear anywhere on a line, as demonstrated above. The
 parser will ignore all text from the comment marker until the end of the line.
 
-Block-style comments, e.g. `/* block */` are not supported at this time.
+Block-style comments, e.g. `/* block */` are also supported. Block comments can be multiple lines long. A block comment starts
+with `/*` and ends with `*/`. All text in between those two markers is ignored.
 
 The script parser will ignore whitespace in the way you'd expect it to for any other language. For example, these two
 matcher expressions are semantically equivalent:
 
 ```
 // relaxed
-if (value:>100) {
+rule ( value : > 100 ) {
   color = BLUE;
 }
 
-if (value:>100) {color = BLUE;} // compact
+rule(value:>100){color=BLUE;} // compact
 ```
 
 ## The `meta` block
@@ -81,7 +82,7 @@ User-friendly description of this filter.
 A loot filter is written as a list of rules, like so:
 
 ```
-(if|apply) (<conditions...>) {
+(rule|apply) (<conditions...>) {
     <display_property1> = <value>;
     <display_property2> = <value>;
     ...
@@ -89,15 +90,14 @@ A loot filter is written as a list of rules, like so:
 ... more rules
 ```
 
-There are **two (2)** top-level types of rules:
-* TERMINAL rules, expressed via the `if` keyword. The filter stops evaluating
-  for an item when it matches a terminal rule.
+There are **two (2)** top-level types of blocks
+* TERMINAL rules, expressed via `rule` keyword. The filter stops evaluating
+  for an item when it matches one of these.
 * NON-TERMINAL rules, expressed via the `apply` keyword. Applies any display
   settings to the item when it matches, but keeps evaluating the script.
 
-Rules evaluate top-down for a given ground item. The plugin terminates
-evaluation when the first terminal rule with a matching condition is
-encountered.
+Rules evaluate top-down for a given ground item, terminating on the first matched
+`rule`.
 
 ### Example: terminal vs non-terminal
 
@@ -109,11 +109,11 @@ apply (value:>100_000) {
   showLootbeam = true;
 }
 
-if (name:"*godsword") {
+rule (name:"*godsword") {
   textColor = "#00ffff";
 }
 
-if (name:"bandos*") {
+rule (name:"bandos*") {
   textColor = "#ffa500";
   showLootbeam = false;
 }
@@ -227,7 +227,7 @@ Display settings control the following:
 For example:
 
 ```
-if (name:"coins" && quantity:>100_000) {
+rule (name:"coins" && quantity:>100_000) {
   textColor = YELLOW;
   borderColor = YELLOW;
   showLootbeam = true;
@@ -340,7 +340,7 @@ Macros can also have parameters. For example:
 
 ```
 // define
-#define IMPORTANT(_name, _color) if (name:_name) {\
+#define IMPORTANT(_name, _color) rule (name:_name) {\
   color = _color; \
   notify = true; \
 }
