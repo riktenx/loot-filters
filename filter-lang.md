@@ -1,5 +1,12 @@
 # Loot Filters
 
+## ⚠️ You do not need to understand any of this to use the plugin
+
+This page is a _scripting reference guide_ for writing loot filters. It describes how filter syntax works and how to actually write a filter.
+In practice, as a player, this is probably not something you need to do or think about, especially if you're not familiar with programming concepts.
+
+If you just want to get started using the plugin and customizing filters, check out [filterscape.xyz](https://filterscape.xyz).
+
 ## Overview
 
 A loot filter is a basic script that contains the following
