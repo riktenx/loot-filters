@@ -189,7 +189,7 @@ Match based on an item's highest value (GE vs. HA). Supports the same comparison
 
 Match based on an item's GE value.
 
-#### havalue `gevalue:>40_000`
+#### havalue `havalue:>40_000`
 
 Match based on an item's high alchemy (HA) value.
 
