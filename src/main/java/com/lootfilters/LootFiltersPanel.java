@@ -37,7 +37,7 @@ public class LootFiltersPanel extends PluginPanel {
     private static final String TUTORIAL_TEXT = "// Welcome to the loot filter\n" +
             "// For more information on \n" +
             "// usage, please check\n" +
-            "// https://github.com/riktenx/loot-filters/blob/main/guides/loot-filters.md";
+            "// https://github.com/riktenx/loot-filters/blob/userguide/filter-lang.md";
     private static final String EXAMPLE_TEXT = "// Here's an example:\nif (name:\"Herring\") {\n  color = RED;\n}";
 
     private final LootFiltersPlugin plugin;

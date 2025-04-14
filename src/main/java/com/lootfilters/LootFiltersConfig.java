@@ -336,7 +336,7 @@ public interface LootFiltersConfig extends Config {
             section = itemValueRules,
             position = 0
     )
-    default ItemValueRulesMode itemValueRulesMode() { return ItemValueRulesMode.AFTER_FILTER; }
+    default ItemValueRulesMode itemValueRulesMode() { return ItemValueRulesMode.OFF; }
     @ConfigItem(
             keyName = "valueType",
             name = "Value mode",
@@ -368,7 +368,7 @@ public interface LootFiltersConfig extends Config {
             section = itemValueRules,
             position = 11
     )
-    default boolean enableInsaneItemValueTier() { return true; }
+    default boolean enableInsaneItemValueTier() { return false; }
     @ConfigItem(
             keyName = "insaneValue",
             name = "Insane value",
@@ -392,7 +392,7 @@ public interface LootFiltersConfig extends Config {
             section = itemValueRules,
             position = 14
     )
-    default boolean enableHighItemValueTier() { return true; }
+    default boolean enableHighItemValueTier() { return false; }
     @ConfigItem(
             keyName = "highValue",
             name = "High value",
@@ -416,7 +416,7 @@ public interface LootFiltersConfig extends Config {
             section = itemValueRules,
             position = 17
     )
-    default boolean enableMediumItemValueTier() { return true; }
+    default boolean enableMediumItemValueTier() { return false; }
     @ConfigItem(
             keyName = "mediumValue",
             name = "Medium value",
@@ -440,7 +440,7 @@ public interface LootFiltersConfig extends Config {
             section = itemValueRules,
             position = 20
     )
-    default boolean enableLowItemValueTier() { return true; }
+    default boolean enableLowItemValueTier() { return false; }
     @ConfigItem(
             keyName = "lowValue",
             name = "Low value",
