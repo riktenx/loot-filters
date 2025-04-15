@@ -5,7 +5,7 @@
 This page is a _scripting reference guide_ for writing loot filters. It describes how filter syntax works and how to actually write a filter.
 In practice, as a player, this is probably not something you need to do or think about, especially if you're not familiar with programming concepts.
 
-Instead you should use one of the filters that others have written. If you just want to get started thay way, check out [filterscape.xyz](https://filterscape.xyz).
+Instead you should use one of the filters that others have written. If you just want to get started that way, check out [filterscape.xyz](https://filterscape.xyz).
 
 ## Overview
 
