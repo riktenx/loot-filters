@@ -1,5 +1,7 @@
 # Loot Filters
 
+This guide describes how to write loot filters, casually referred to as "rs2f".
+
 ## ⚠️ You do not need to understand any of this to use the plugin
 
 This page is a _scripting reference guide_ for writing loot filters. It describes how filter syntax works and how to actually write a filter.
