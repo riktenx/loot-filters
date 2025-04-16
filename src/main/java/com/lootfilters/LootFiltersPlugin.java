@@ -191,6 +191,7 @@ public class LootFiltersPlugin extends Plugin {
 	protected void shutDown() {
 		overlayManager.remove(overlay);
 
+		filterManager.getDefaultFilters().clear();
 		clearIndices();
 
 		clientToolbar.removeNavigation(pluginPanelNav);
