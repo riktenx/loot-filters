@@ -34,15 +34,7 @@ public class FilterUtil {
                 config.highlightedItems(), config.highlightColor(), config.highlightLootbeam(), config.highlightNotify()));
         withConfig.add(MatcherConfig.hide(config.hiddenItems()));
 
-        if (config.itemValueRulesMode() == ItemValueRulesMode.BEFORE_FILTER) {
-            withConfig.addAll(configValueTiers(config));
-        }
-
         withConfig.addAll(filter.getMatchers());
-
-        if (config.itemValueRulesMode() == ItemValueRulesMode.AFTER_FILTER) {
-            withConfig.addAll(configValueTiers(config));
-        }
 
         withConfig = withConfig.stream()
                 .map(it -> it.withDisplay(builder -> {
@@ -90,33 +82,5 @@ public class FilterUtil {
                 tutorialText,
                 highlights,
                 hides);
-    }
-
-    private static List<MatcherConfig> configValueTiers(LootFiltersConfig config) {
-        var valueType = config.valueType();
-        return List.of(
-                MatcherConfig.valueTier(
-                        config.enableInsaneItemValueTier(), config.insaneValue(), config.insaneValueColor(),
-                        config.lootbeamTier().ordinal() >= ValueTier.INSANE.ordinal(),
-                        config.notifyTier().ordinal() >= ValueTier.INSANE.ordinal(),
-                        valueType),
-                MatcherConfig.valueTier(
-                        config.enableHighItemValueTier(), config.highValue(), config.highValueColor(),
-                        config.lootbeamTier().ordinal() >= ValueTier.HIGH.ordinal(),
-                        config.notifyTier().ordinal() >= ValueTier.HIGH.ordinal(),
-                        valueType),
-                MatcherConfig.valueTier(
-                        config.enableMediumItemValueTier(), config.mediumValue(), config.mediumValueColor(),
-                        config.lootbeamTier().ordinal() >= ValueTier.MEDIUM.ordinal(),
-                        config.notifyTier().ordinal() >= ValueTier.MEDIUM.ordinal(),
-                        valueType),
-                MatcherConfig.valueTier(
-                        config.enableLowItemValueTier(), config.lowValue(), config.lowValueColor(),
-                        config.lootbeamTier().ordinal() >= ValueTier.LOW.ordinal(),
-                        config.notifyTier().ordinal() >= ValueTier.LOW.ordinal(),
-                        valueType),
-                MatcherConfig.hiddenTier(config.hideTierEnabled(), config.hideTierValue(),
-                        config.hideTierShowUntradeable(), valueType)
-        );
     }
 }

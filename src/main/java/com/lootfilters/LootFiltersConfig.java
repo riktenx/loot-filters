@@ -325,160 +325,16 @@ public interface LootFiltersConfig extends Config {
 
     @ConfigSection(
             name = "Item value rules",
-            description = "Configure default rules for showing based on item value.<br>These rules take precedence over the active filter. If you are using a filter that implements its own rules for item value, you will probably want to disable these.",
+            description = "These have been removed. See the readme hover below.",
             position = 9
     )
     String itemValueRules = "itemValueRules";
     @ConfigItem(
-            keyName = "itemValueRulesMode",
-            name = "Enabled",
-            description = "How item value tiers are checked.<br><br>[before filter]: Value tiers override the active filter. Use this if you want to control the display of valuable items exclusively through config.<br><br>[after filter]: Value tiers are checked after the active filter. If a filter matches an item that your value tier settings would otherwise match,<br>the latter will be ignored, as the filter takes precedence. Use this if you want the filter to take precedence, but have these as a failsafe.<br><br>[off]: Globally disable item value tiers. If you're using a filter that supports its own value tiers, you probably want this mode.<br>",
+            keyName = "itemValueRulesReadme",
+            name = "readme (hover over this)",
+            description = "Unlike the ground items plugin, item value rules are managed by your active loot filter.<br>Both of the default filters shipped with the plugin - FilterScape and Joe's filter - include item value tiers with thresholds similar to that of the ground items plugin.<br>You can configure both the value thresholds and display settings for these on https://filterscape.xyz/.<br><br>(this toggle has no effect)",
             section = itemValueRules,
             position = 0
     )
-    default ItemValueRulesMode itemValueRulesMode() { return ItemValueRulesMode.OFF; }
-    @ConfigItem(
-            keyName = "valueType",
-            name = "Value mode",
-            description = "The type of item value to use for these value tiers. This does not control item value rules in the active filter.",
-            section = itemValueRules,
-            position = 1
-    )
-    default ValueType valueType() { return ValueType.HIGHEST; }
-    @ConfigItem(
-            keyName = "lootbeamTier",
-            name = "Lootbeam tier",
-            description = "Minimum tier at which to show a lootbeam.",
-            section = itemValueRules,
-            position = 2
-    )
-    default ValueTier lootbeamTier() { return ValueTier.HIGH; }
-    @ConfigItem(
-            keyName = "notifyTier",
-            name = "Notification tier",
-            description = "Minimum tier at which to fire a system notification.",
-            section = itemValueRules,
-            position = 3
-    )
-    default ValueTier notifyTier() { return ValueTier.NONE; }
-    @ConfigItem(
-            keyName = "enableInsaneItemValueTier",
-            name = "Insane tier",
-            description = "Enable INSANE item value tier.",
-            section = itemValueRules,
-            position = 11
-    )
-    default boolean enableInsaneItemValueTier() { return false; }
-    @ConfigItem(
-            keyName = "insaneValue",
-            name = "Insane value",
-            description = "Configures the value for INSANE tier.",
-            section = itemValueRules,
-            position = 12
-    )
-    default int insaneValue() { return 10_000_000; }
-    @ConfigItem(
-            keyName = "insaneValueColor",
-            name = "Insane color",
-            description = "Configures the color for INSANE item values.",
-            section = itemValueRules,
-            position = 13
-    )
-    default Color insaneValueColor() { return Color.decode("#ff66b2"); }
-    @ConfigItem(
-            keyName = "enableHighItemValueTier",
-            name = "High tier",
-            description = "Enable high item value tier.",
-            section = itemValueRules,
-            position = 14
-    )
-    default boolean enableHighItemValueTier() { return false; }
-    @ConfigItem(
-            keyName = "highValue",
-            name = "High value",
-            description = "Configures the value for high tier.",
-            section = itemValueRules,
-            position = 15
-    )
-    default int highValue() { return 1_000_000; }
-    @ConfigItem(
-            keyName = "highValueColor",
-            name = "High color",
-            description = "Configures the color for high item values.",
-            section = itemValueRules,
-            position = 16
-    )
-    default Color highValueColor() { return Color.decode("#ff9600"); }
-    @ConfigItem(
-            keyName = "enableMediumItemValueTier",
-            name = "Medium tier",
-            description = "Enable medium item value tier.",
-            section = itemValueRules,
-            position = 17
-    )
-    default boolean enableMediumItemValueTier() { return false; }
-    @ConfigItem(
-            keyName = "mediumValue",
-            name = "Medium value",
-            description = "Configures the value for medium tier.",
-            section = itemValueRules,
-            position = 18
-    )
-    default int mediumValue() { return 100_000; }
-    @ConfigItem(
-            keyName = "mediumValueColor",
-            name = "Medium color",
-            description = "Configures the color for medium item values.",
-            section = itemValueRules,
-            position = 19
-    )
-    default Color mediumValueColor() { return Color.decode("#99ff99"); }
-    @ConfigItem(
-            keyName = "enableLowItemValueTier",
-            name = "Low tier",
-            description = "Enable low item value tier.",
-            section = itemValueRules,
-            position = 20
-    )
-    default boolean enableLowItemValueTier() { return false; }
-    @ConfigItem(
-            keyName = "lowValue",
-            name = "Low value",
-            description = "Configures the value for low tier.",
-            section = itemValueRules,
-            position = 21
-    )
-    default int lowValue() { return 10_000; }
-    @ConfigItem(
-            keyName = "lowValueColor",
-            name = "Low color",
-            description = "Configures the color for low item values.",
-            section = itemValueRules,
-            position = 22
-    )
-    default Color lowValueColor() { return Color.decode("#66b2ff"); }
-    @ConfigItem(
-            keyName = "hiddenTierEnabled",
-            name = "Hide below value tier",
-            description = "Hide items below a certain value.",
-            section = itemValueRules,
-            position = 23
-    )
-    default boolean hideTierEnabled() { return false; }
-    @ConfigItem(
-            keyName = "hiddenValue",
-            name = "Hide below value",
-            description = "Hide items below this value, if enabled.",
-            section = itemValueRules,
-            position = 24
-    )
-    default int hideTierValue() { return 0; }
-    @ConfigItem(
-            keyName = "hiddenNoHideUntradeables",
-            name = "Don't hide untradeables",
-            description = "Ignore untradeables for the hide-below-value tier.",
-            section = itemValueRules,
-            position = 25
-    )
-    default boolean hideTierShowUntradeable() { return true; }
+    default boolean itemValueRulesReadme() { return false; }
 }
