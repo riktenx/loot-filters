@@ -81,37 +81,6 @@ public class MatcherConfig {
         return new MatcherConfig(rule, display, false);
     }
 
-    public static MatcherConfig valueTier(boolean enabled, int value, Color color, boolean showLootbeam, boolean notify, ValueType valueType) {
-        var inner = new ItemValueRule(value, Comparator.GT_EQ, valueType);
-        var rule = new Rule("") {
-            @Override public boolean test(LootFiltersPlugin plugin, PluginTileItem item) {
-                return enabled && inner.test(plugin, item);
-            }
-        };
-        var display = DisplayConfig.builder()
-                .textColor(color)
-                .showLootbeam(showLootbeam)
-                .notify(notify)
-                .build();
-        return new MatcherConfig(rule, display);
-    }
-
-    public static MatcherConfig hiddenTier(boolean enabled, int value, boolean showUntradeable, ValueType valueType) {
-        var valueRule = new ItemValueRule(value, Comparator.LT, valueType);
-        var inner = showUntradeable
-                ? new AndRule(valueRule, new ItemTradeableRule(true))
-                : valueRule;
-        var rule = new Rule("") {
-            @Override public boolean test(LootFiltersPlugin plugin, PluginTileItem item) {
-                return enabled && inner.test(plugin, item);
-            }
-        };
-        var display = DisplayConfig.builder()
-                .hidden(true)
-                .build();
-        return new MatcherConfig(rule, display);
-    }
-
     public static MatcherConfig highlight(String rawNames, Color color, boolean showLootbeam, boolean notify) {
         var rule = new OrRule(
                 Arrays.stream(rawNames.split(","))
