@@ -5,6 +5,7 @@ import com.lootfilters.LootFilter;
 import com.lootfilters.MatcherConfig;
 import com.lootfilters.model.SoundProvider;
 import com.lootfilters.model.BufferedImageProvider;
+import com.lootfilters.rule.AccountTypeRule;
 import com.lootfilters.rule.AndRule;
 import com.lootfilters.rule.AreaRule;
 import com.lootfilters.rule.Comparator;
@@ -256,6 +257,8 @@ public class Parser {
                 return parseItemNotedRule();
             case "area":
                 return parseAreaRule();
+            case "accountType":
+                return parseAccountTypeRule();
             default:
                 throw new ParseException("unknown rule identifier", first);
         }
@@ -324,6 +327,11 @@ public class Parser {
                 new WorldPoint(coords.get(3), coords.get(4), coords.get(5)));
     }
 
+    private AccountTypeRule parseAccountTypeRule() {
+        var type = tokens.takeExpect(LITERAL_INT).expectInt();
+        return new AccountTypeRule(type);
+    }
+
     private Rule buildRule(List<Rule> postfix) {
         var operands = new Stack<Rule>();
         for (var rule : postfix) {
@@ -336,7 +344,9 @@ public class Parser {
                     || rule instanceof ItemTradeableRule
                     || rule instanceof ItemStackableRule
                     || rule instanceof ItemNotedRule
-                    || rule instanceof AreaRule) {
+                    || rule instanceof AreaRule
+                    || rule instanceof AccountTypeRule
+            ) {
                 operands.push(rule);
             } else if (rule instanceof AndRule) {
                 operands.push(new AndRule(operands.pop(), operands.pop()));
