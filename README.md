@@ -6,9 +6,13 @@ Loot Filters is an extended version of the builtin Ground Items plugin. It repli
 the builtin, and adds support for scriptable "loot filters".
 
 ## Quick links
-* Get filters: https://filterscape.xyz/
+* Configure filters: https://filterscape.xyz/
 * Discord: https://discord.gg/ESbA28wPnt
 * In-depth user guide: [click here](https://github.com/riktenx/loot-filters/blob/userguide/README.md)
+
+## Get started
+By default the plugin downloads and selects the "FilterScape" filter, which is meant to be useful by default
+and supports intelligent filtering for a variety of PvM scenarios. You can visit https://filterscape.xyz/ to customize it.
 
 ## Loot filters
 
