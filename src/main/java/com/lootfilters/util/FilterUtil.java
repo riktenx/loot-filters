@@ -3,12 +3,9 @@ package com.lootfilters.util;
 import com.lootfilters.LootFilter;
 import com.lootfilters.LootFiltersConfig;
 import com.lootfilters.MatcherConfig;
-import com.lootfilters.model.ItemValueRulesMode;
 import com.lootfilters.rule.TextAccent;
-import com.lootfilters.rule.ValueTier;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.lootfilters.util.TextUtil.quote;
@@ -30,8 +27,7 @@ public class FilterUtil {
         withConfig.add(MatcherConfig.ownershipFilter(config.ownershipFilter()));
         withConfig.add(MatcherConfig.itemSpawnFilter(config.itemSpawnFilter()));
 
-        withConfig.add(MatcherConfig.highlight(
-                config.highlightedItems(), config.highlightColor(), config.highlightLootbeam(), config.highlightNotify()));
+        withConfig.add(MatcherConfig.highlight(config));
         withConfig.add(MatcherConfig.hide(config.hiddenItems()));
 
         withConfig.addAll(filter.getMatchers());

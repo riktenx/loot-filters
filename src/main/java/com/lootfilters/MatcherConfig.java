@@ -2,6 +2,7 @@ package com.lootfilters;
 
 import com.lootfilters.model.NamedQuantity;
 import com.lootfilters.model.PluginTileItem;
+import com.lootfilters.model.SoundProvider;
 import com.lootfilters.rule.AndRule;
 import com.lootfilters.rule.Comparator;
 import com.lootfilters.rule.ItemNameRule;
@@ -76,22 +77,40 @@ public class MatcherConfig {
             }
         };
         var display = DisplayConfig.builder()
-                .textColor(Color.WHITE)
+                .textColor(java.awt.Color.WHITE)
                 .build();
         return new MatcherConfig(rule, display, false);
     }
 
-    public static MatcherConfig highlight(String rawNames, Color color, boolean showLootbeam, boolean notify) {
+    public static MatcherConfig highlight(LootFiltersConfig config) {
+        var rawNames = config.highlightedItems();
         var rule = new OrRule(
                 Arrays.stream(rawNames.split(","))
                         .map(NamedQuantity::fromString)
                         .map(it -> new AndRule(new ItemNameRule(it.getName()), new ItemQuantityRule(it.getQuantity(), it.getComparator())))
                         .collect(Collectors.toList())
         );
+
+        SoundProvider sound = null;
+        var configSound = config.highlightSound();
+        try {
+            var soundId = Integer.parseInt(configSound);
+            sound = new SoundProvider.SoundEffect(soundId);
+        } catch (NumberFormatException e) {
+            if (!configSound.isBlank()) {
+                sound = new SoundProvider.File(configSound);
+            }
+        }
         var display = DisplayConfig.builder()
-                .textColor(color)
-                .showLootbeam(showLootbeam)
-                .notify(notify)
+                .textColor(config.highlightColor())
+                .showLootbeam(config.highlightLootbeam())
+                .notify(config.highlightNotify())
+                .backgroundColor(config.higlightBackgroundColor())
+                .borderColor(config.highlightBorderColor())
+                .lootbeamColor(config.highlightLootbeamColor())
+                .menuTextColor(config.highlightMenuTextColor())
+                .menuSort(config.highlightMenuSort())
+                .sound(sound)
                 .build();
         return new MatcherConfig(rule, display);
     }
