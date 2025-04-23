@@ -8,6 +8,7 @@ import net.runelite.api.coords.WorldPoint;
 
 import java.awt.Color;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -79,12 +80,22 @@ public class MenuEntryComposer {
         var itemCounts = Stream.of(entries)
                 .filter(MenuEntryComposer::isGroundItem)
                 .collect(Collectors.groupingBy(MenuEntryComposer::entrySlug, Collectors.counting()));
-        return Arrays.stream(entries)
+
+        // the displayed list is built IN REVERSE of the actual array contents - so you have to collapse in reverse as
+        // well, otherwise you will break the original order
+        // this is accomplished trivially by reverse -> collapse -> reverse
+        var reversed = Arrays.asList(entries);
+        Collections.reverse(reversed);
+
+        var collapsed = reversed.stream()
                 .map(it -> isGroundItem(it)
                         ? withCount(it, itemCounts.getOrDefault(entrySlug(it), 1L))
                         : it)
                 .distinct()
-                .toArray(MenuEntry[]::new);
+                .collect(Collectors.toList());
+        Collections.reverse(collapsed);
+
+        return collapsed.toArray(MenuEntry[]::new);
     }
 
     private MenuEntry withCount(MenuEntry entry, long count) {
