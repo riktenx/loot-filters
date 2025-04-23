@@ -13,11 +13,9 @@ import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
-import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.ClientTick;
 import net.runelite.api.events.CommandExecuted;
 import net.runelite.api.events.GameStateChanged;
-import net.runelite.api.events.GameTick;
 import net.runelite.api.events.ItemDespawned;
 import net.runelite.api.events.ItemSpawned;
 import net.runelite.api.events.MenuEntryAdded;
@@ -44,13 +42,11 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static com.lootfilters.util.FilterUtil.withConfigRules;
-import static com.lootfilters.util.TextUtil.quote;
 import static net.runelite.client.RuneLite.RUNELITE_DIR;
 import static net.runelite.client.util.ImageUtil.loadImageResource;
 
@@ -255,9 +251,6 @@ public class LootFiltersPlugin extends Plugin {
 		}
 
 		loadSelectedFilter();
-		if (!config.autoToggleFilters()) {
-			currentAreaFilter = null;
-		} // if we're transitioning TO enabled, do nothing - onGameTick() will handle it
 		resetDisplay();
 	}
 
@@ -309,11 +302,6 @@ public class LootFiltersPlugin extends Plugin {
 	}
 
 	@Subscribe
-	public void onGameTick(GameTick event) {
-		scanAreaFilter();
-	}
-
-	@Subscribe
 	private void onMenuEntryAdded(MenuEntryAdded event) {
 		menuEntryComposer.onMenuEntryAdded(event.getMenuEntry());
 	}
@@ -350,31 +338,6 @@ public class LootFiltersPlugin extends Plugin {
 			client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", chatMsg, "loot-filters", false);
 		}
 		queuedChatMessages.clear();
-	}
-
-	private void scanAreaFilter() {
-		if (!config.autoToggleFilters()) {
-			return;
-		}
-
-		var player = client.getLocalPlayer();
-		if (player == null) {
-			return;
-		}
-
-		var p = WorldPoint.fromLocalInstance(client, player.getLocalLocation());
-		var match = getLoadedFilters().stream()
-				.filter(it -> it.isInActivationArea(p))
-				.findFirst().orElse(null);
-		if (match != null && (currentAreaFilter == null || !Objects.equals(match.getName(), currentAreaFilter.getName()))) {
-			addChatMessage("Entering area for filter " + quote(match.getName()));
-			currentAreaFilter = withConfigRules(match, config);
-			resetDisplay();
-		} else if (match == null && currentAreaFilter != null) {
-			addChatMessage("Leaving area for filter " + quote(currentAreaFilter.getName()));
-			currentAreaFilter = null;
-			resetDisplay();
-		}
 	}
 
 	private void clearIndices() {
