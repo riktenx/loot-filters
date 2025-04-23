@@ -268,6 +268,17 @@ public interface LootFiltersConfig extends Config {
             position = 94
     )
     default OverlayPriority overlayPriority() { return OverlayPriority.DEFAULT; }
+    @ConfigItem(
+            keyName = "overlayZOffset",
+            name = "Overlay z-offset",
+            description = "Adjusts the initial vertical offset of the text overlay.<br><br>" +
+                    "This is the initial z-axis offset in 3D space. Each individual unit does not necessary correspond<br>" +
+                    "to a full pixel, it will vary by camera perspective.",
+            section = displayOverrides,
+            position = 95
+    )
+    @Range(max = 32)
+    default int overlayZOffset() { return 16; }
 
     @ConfigSection(
             name = "Item lists",

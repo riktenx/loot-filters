@@ -40,7 +40,6 @@ import static net.runelite.api.Perspective.getCanvasTextLocation;
 import static net.runelite.api.Perspective.getCanvasTilePoly;
 
 public class LootFiltersOverlay extends Overlay {
-    private static final int Z_STACK_OFFSET = 16;
     private static final int BOX_PAD = 2;
     private static final int CLICKBOX_SIZE = 8;
     private static final int TIMER_RADIUS = 5;
@@ -118,7 +117,7 @@ public class LootFiltersOverlay extends Overlay {
                 } // otherwise we don't have to do anything, the font is already set
 
                 var displayText = buildDisplayText(item, count, match);
-                var textPoint = getCanvasTextLocation(client, g, loc, displayText, tile.getItemLayer().getHeight() + Z_STACK_OFFSET);
+                var textPoint = getCanvasTextLocation(client, g, loc, displayText, tile.getItemLayer().getHeight() + config.overlayZOffset());
                 if (textPoint == null) {
                     continue;
                 }
