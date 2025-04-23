@@ -51,16 +51,6 @@ public interface LootFiltersConfig extends Config {
     )
     default boolean fetchDefaultFilters() { return true; }
     @ConfigItem(
-            keyName = "autoToggleFilter",
-            name = "Auto-toggle active filter",
-            description = "Filters can be annotated with area boundaries in which they are relevant. If enabled, filters will automatically become active when the player enters their corresponding area.",
-            section = general,
-            position = 0
-    )
-    default boolean autoToggleFilters() {
-        return true;
-    }
-    @ConfigItem(
             keyName = "showUnmatchedItems",
             name = "Show unmatched items",
             description = "Give a default text overlay to items that don't match the active filter.",
