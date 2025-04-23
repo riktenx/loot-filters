@@ -130,6 +130,9 @@ public class LootFiltersPlugin extends Plugin {
 	public void setSelectedFilterName(String name) {
 		if (name != null) {
 			configManager.setConfiguration(CONFIG_GROUP, SELECTED_FILTER_KEY, name);
+			if (name.equals(DefaultFilter.FILTERSCAPE.getName()) || name.equals(DefaultFilter.JOESFILTER.getName())) {
+				config.setPreferredDefault(name);
+			}
 		} else {
 			configManager.unsetConfiguration(CONFIG_GROUP, SELECTED_FILTER_KEY);
 		}
@@ -401,7 +404,7 @@ public class LootFiltersPlugin extends Plugin {
 
 	private void onFetchDefaultFilters() {
 		if (getSelectedFilterName() == null) {
-			setSelectedFilterName(DefaultFilter.FILTERSCAPE.getName());
+			setSelectedFilterName(config.getPreferredDefault());
 		}
 		pluginPanel.reflowFilterSelect(getLoadedFilters(), getSelectedFilterName());
 	}

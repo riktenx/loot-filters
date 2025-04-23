@@ -19,6 +19,11 @@ import java.awt.Color;
 
 @ConfigGroup("loot-filters")
 public interface LootFiltersConfig extends Config {
+    @ConfigItem(keyName = "preferredDefaultFilter", hidden = true, name = "", description = "")
+    default String getPreferredDefault() { return DefaultFilter.FILTERSCAPE.getName(); }
+    @ConfigItem(keyName = "preferredDefaultFilter", hidden = true, name = "", description = "")
+    void setPreferredDefault(String name);
+
     @ConfigSection(name = "Plugin panel", description = "", position = -2)
     String pluginPanel = "pluginPanel";
     String SHOW_PLUGIN_PANEL = "showPluginPanel";
