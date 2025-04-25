@@ -11,8 +11,11 @@ the builtin, and adds support for scriptable "loot filters".
 * In-depth user guide: [click here](https://github.com/riktenx/loot-filters/blob/userguide/README.md)
 
 ## Get started
-By default the plugin downloads and selects the "FilterScape" filter, which is meant to be useful by default
-and supports intelligent filtering for a variety of PvM scenarios. You can visit https://filterscape.xyz/ to customize it.
+
+By default the plugin downloads and selects the "FilterScape" filter, which is meant to be useful by default and
+supports intelligent filtering for a variety of PvM scenarios. It also applies special styling to various items /
+categories, the image above shows some examples. You can visit https://filterscape.xyz/ to customize both the behavior
+and styling of FilterScape, select a different filter, or even create your own.
 
 ## Loot filters
 
@@ -30,6 +33,3 @@ Loot filters allow you to do things like the following:
 * extended display configuration - background / border, custom menu / lootbeam text colors, and more
 * play a sound on item drop
 * sort menu entries for ground items
-
-The above teaser image provides an example of what is possible with this plugin.
-
