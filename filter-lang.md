@@ -148,7 +148,35 @@ You can use logical operators to express compound conditions, such as
 (name:"blue dragonhide" && !quantity:==1)
 ```
 
-Rules support the following conditions:
+Logical operators should work as you'd expect from any other language:
+* `!`, `&&`, and `||` work
+* `&&` has higher operation order than `||`
+* you can use parentheses to control operation order e.g. `(v1 || v2) && v3 && !(v4 || v5)`
+* parenthesis can be nested to an arbitrary depth e.g. `(!(v1 || v2) && (v3 || v4) && v5`
+
+The following conditions are supported.
+
+For rules that take operators (denoted by `<op>`), you can use the following comparators:
+* `==` (there's no `!=` but just use `!` on the rule itself)
+* `>`
+* `<`
+* `>=`
+* `<=`
+
+| name        | syntax                               | example                         | description |
+|-------------|--------------------------------------|---------------------------------|-------------|
+| id          | `id:<n>`, `id:[<n0>, <n1>, ...]`     | `id:995`, `id:[995, 996]`       |             |
+| ownership   | `ownership:<n>`                      | `ownership:1`                   |             |
+| name        | `name:<s>`, `name:[<s0>, <s1>, ...]` | `name:["Coins"]`                |             |
+| quantity    | `quantity:<op><n>`                   | `quantity:>1`, `quantity:==10`  |             |
+| value       | `value:<op><n>`                      | `value:>500`, `value:<=500`     |             |
+| gevalue     | `gevalue:<op><n>`                    | `gevalue:>500`, `gevalue:<=500` |             |
+| havalue     | `havalue:<op><n>`                    | `havalue:>500`, `havalue:<=500` |             |
+| tradeable   | `tradeable:<b>`                      | `tradeable:true`                |             |
+| stackable   | `stackable:<b>`                      | `stackable:true`                |             |
+| noted       | `noted:<b>`                          | `noted:true`                    |             |
+| area        | `area:[x0,y0,z0,x1,y1,z1`            |                                 |             |
+| accountType | `accountType:<n>`                    | `accountType:1`                 |             |
 
 #### area `area:[x0,y0,z0,x1,y1,z1]`
 
