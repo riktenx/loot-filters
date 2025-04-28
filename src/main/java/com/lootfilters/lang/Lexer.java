@@ -20,6 +20,7 @@ public class Lexer {
         put("true", Token.Type.TRUE);
         put("meta", Token.Type.META);
         put("rule", Token.Type.RULE);
+        put("nil", Token.Type.NIL);
         put("if", Token.Type.IF);
         put("&&", Token.Type.OP_AND);
         put("||", Token.Type.OP_OR);

@@ -14,6 +14,7 @@ public class Token {
         IF, APPLY, RULE,
         META,
         COLON, COMMA,
+        NIL,
         TRUE, FALSE,
         IDENTIFIER,
         LITERAL_INT, LITERAL_STRING,
@@ -54,6 +55,10 @@ public class Token {
     }
 
     public Color expectColor() {
+        if (type == Type.NIL) {
+            return null;
+        }
+
         if (type != Type.LITERAL_STRING) {
             throw new ParseException("unexpected non-string token", this);
         }

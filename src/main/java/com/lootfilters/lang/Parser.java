@@ -47,6 +47,7 @@ import static com.lootfilters.lang.Token.Type.LIST_START;
 import static com.lootfilters.lang.Token.Type.LITERAL_INT;
 import static com.lootfilters.lang.Token.Type.LITERAL_STRING;
 import static com.lootfilters.lang.Token.Type.META;
+import static com.lootfilters.lang.Token.Type.NIL;
 import static com.lootfilters.lang.Token.Type.OP_AND;
 import static com.lootfilters.lang.Token.Type.OP_NOT;
 import static com.lootfilters.lang.Token.Type.OP_OR;
@@ -375,6 +376,12 @@ public class Parser {
         tokens.takeExpect(IDENTIFIER);
         tokens.takeExpect(ASSIGN);
         var type = tokens.takeExpect(IDENTIFIER);
+        if (type.getType() == NIL) {
+            tokens.takeExpect(STMT_END);
+            builder.icon(null);
+            return;
+        }
+
         var args = tokens.takeArgList();
         if (type.getValue().equals("Sprite")) {
             if (args.size() != 2) {

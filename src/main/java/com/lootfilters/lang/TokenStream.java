@@ -84,7 +84,8 @@ public class TokenStream {
         if (!first.is(Token.Type.LITERAL_INT)
                 && !first.is(Token.Type.LITERAL_STRING)
                 && !first.is(Token.Type.TRUE)
-                && !first.is(Token.Type.FALSE)) {
+                && !first.is(Token.Type.FALSE)
+                && !first.is(Token.Type.NIL)) {
             throw new ParseException("unexpected non-literal token", first);
         }
         return first;
