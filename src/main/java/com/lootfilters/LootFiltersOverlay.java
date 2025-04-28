@@ -229,7 +229,6 @@ public class LootFiltersOverlay extends Overlay {
                               int currentOffset, net.runelite.api.Point mouse,  Consumer<Integer> onHoverHide,
                               Consumer<Integer> onHoverHighlight, Consumer<Integer> onHoveredItem, int rowOffset,
                               int rowSize){
-        // item square size- 1 px padding outside the bouding box, 1 px inside, item width, 1 px, 1 px.
         var overrideHidden = plugin.isHotkeyActive() && config.hotkeyShowHiddenItems();
         if (match.isHideOverlay() && !overrideHidden) {
             return -1;
@@ -251,12 +250,13 @@ public class LootFiltersOverlay extends Overlay {
         var boxHeight = config.compactRenderSize();
         var boxWidth = Math.round(36 * boxHeight/(DEFAULT_IMAGE_HEIGHT*1.0f));
 
-        var originalImage = plugin.getItemManager().getImage(item.getId());
-        //var image = ImageUtil.resizeImage(originalImage, boxWidth, boxHeight,true);
         var image = plugin.getIconIndex().get(match.getIcon().getCacheKey(item,config.compactRenderSize()));
         if(image == null){
             plugin.getIconIndex().inc(match.getIcon(), item,config.compactRenderSize());
             image = plugin.getIconIndex().get(match.getIcon().getCacheKey(item,config.compactRenderSize()));
+            if(image == null){
+                return -1;
+            }
         }
         boxHeight = image.getHeight();
         boxWidth = image.getWidth();
@@ -265,6 +265,7 @@ public class LootFiltersOverlay extends Overlay {
         if(imagePoint == null){
             return -1;
         }
+        // item square size- 1 px padding outside the bounding box, 1 px inside, item width, 1 px, 1 px.
         var boundingBox = new Rectangle(
                 imagePoint.getX() + (fullBoxWidth)*rowOffset - Math.round(fullBoxWidth*((rowSize-1)/2f)), imagePoint.getY() - currentOffset - boxHeight ,
                 boxWidth + 2, boxHeight + 2

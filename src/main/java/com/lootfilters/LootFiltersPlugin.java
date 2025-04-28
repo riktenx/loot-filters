@@ -295,7 +295,6 @@ public class LootFiltersPlugin extends Plugin {
 		tileItemIndex.remove(tile, item); // all of these are ultimately idempotent
 		lootbeamIndex.remove(tile, item);
 		displayIndex.remove(item);
-
 		if (display != null && display.getIcon() != null) {
 			iconIndex.dec(display.getIcon(), item, display.isCompact()? config.compactRenderSize() : 16);
 		}

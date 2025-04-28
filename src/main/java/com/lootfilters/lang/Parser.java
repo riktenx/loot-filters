@@ -166,11 +166,12 @@ public class Parser {
         // rule expression MUST be followed by block w/ display config assignments
         tokens.takeExpect(BLOCK_START);
         var builder = DisplayConfig.builder();
-        //var compactOverride = false;
+        var hasIcon = false;
         while (!tokens.peek().is(BLOCK_END)) { // TokenStream.traverseBlock?
             var property = tokens.peek();
             if (property.getValue().equals("icon")) {
                 parseIcon(builder);
+                hasIcon = true;
                 continue;
             }
 
@@ -192,8 +193,8 @@ public class Parser {
                     builder.showValue(assign[1].expectBoolean()); break;
                 case "compact":
                 {
-                    builder.icon(new BufferedImageProvider.CurrentItem());
-                    //compactOverride = true;
+                    if(!hasIcon)
+                        builder.icon(new BufferedImageProvider.CurrentItem());
                     builder.compact(assign[1].expectBoolean()); break;
                 }
                 case "showDespawn":
