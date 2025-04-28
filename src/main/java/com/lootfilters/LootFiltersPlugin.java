@@ -276,8 +276,11 @@ public class LootFiltersPlugin extends Plugin {
 		if (match.getSound() != null && config.soundVolume() > 0) {
 			queuedAudio.add(match.getSound());
 		}
-		if (match.getIcon() != null) {
+		if (match.getIcon() != null && !match.isCompact()) {
 			iconIndex.inc(match.getIcon(), item);
+		}
+		if(match.isCompact()){
+			iconIndex.inc(match.getIcon(), item,config.compactRenderSize());
 		}
 	}
 
@@ -290,7 +293,7 @@ public class LootFiltersPlugin extends Plugin {
 		lootbeamIndex.remove(tile, item);
 		displayIndex.remove(item);
 		if (display != null && display.getIcon() != null) {
-			iconIndex.dec(display.getIcon(), item);
+			iconIndex.dec(display.getIcon(), item, display.isCompact()? config.compactRenderSize() : 16);
 		}
 	}
 
