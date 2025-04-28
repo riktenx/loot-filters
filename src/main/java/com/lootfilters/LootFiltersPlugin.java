@@ -242,6 +242,9 @@ public class LootFiltersPlugin extends Plugin {
 				pluginPanel.reflowFilterSelect(getLoadedFilters(), selected);
 			}
 		}
+		if(event.getKey().equals(LootFiltersConfig.COMPACT_RENDER_SIZE)){
+			resetDisplay();
+		}
 
 		if (event.getKey().equals(SELECTED_FILTER_KEY)) {
 			var selected = getSelectedFilterName();
@@ -276,8 +279,11 @@ public class LootFiltersPlugin extends Plugin {
 		if (match.getSound() != null && config.soundVolume() > 0) {
 			queuedAudio.add(match.getSound());
 		}
-		if (match.getIcon() != null) {
+		if (match.getIcon() != null && !match.isCompact()) {
 			iconIndex.inc(match.getIcon(), item);
+		}
+		if(match.isCompact()){
+			iconIndex.inc(match.getIcon(), item,config.compactRenderSize());
 		}
 	}
 
@@ -289,8 +295,9 @@ public class LootFiltersPlugin extends Plugin {
 		tileItemIndex.remove(tile, item); // all of these are ultimately idempotent
 		lootbeamIndex.remove(tile, item);
 		displayIndex.remove(item);
+
 		if (display != null && display.getIcon() != null) {
-			iconIndex.dec(display.getIcon(), item);
+			iconIndex.dec(display.getIcon(), item, display.isCompact()? config.compactRenderSize() : 16);
 		}
 	}
 

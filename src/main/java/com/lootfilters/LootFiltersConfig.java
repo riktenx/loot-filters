@@ -212,12 +212,29 @@ public interface LootFiltersConfig extends Config {
             position = 23
     )
     default TextAccent textAccent() { return TextAccent.USE_FILTER; }
+    String COMPACT_RENDER_SIZE  = "compactRenderSize";
+    @ConfigItem(
+            keyName = COMPACT_RENDER_SIZE,
+            name = "Compact icon size",
+            description = "Icon size for compact item rendering. Specifically, height in pixels, although it will sometimes adjust it slightly to preserve aspect ratio. Full size is 32, a good medium is 26.",
+            section = displayOverrides,
+            position = 24
+    )
+    default int compactRenderSize() { return 26; }
+    @ConfigItem(
+            keyName = "compactRenderRowLength",
+            name = "Compact row size",
+            description = "How many items to render per row for compact items.",
+            section = displayOverrides,
+            position = 25
+    )
+    default int compactRenderRowLength() { return 6; }
     @ConfigItem(
             keyName = "highlightTiles",
             name = "Highlight tiles",
             description = "Always highlight tiles, regardless of filter config.",
             section = displayOverrides,
-            position = 24
+            position = 26
     )
     default boolean highlightTiles() { return false; }
     @ConfigItem(

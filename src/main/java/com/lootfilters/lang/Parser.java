@@ -166,6 +166,7 @@ public class Parser {
         // rule expression MUST be followed by block w/ display config assignments
         tokens.takeExpect(BLOCK_START);
         var builder = DisplayConfig.builder();
+        //var compactOverride = false;
         while (!tokens.peek().is(BLOCK_END)) { // TokenStream.traverseBlock?
             var property = tokens.peek();
             if (property.getValue().equals("icon")) {
@@ -189,6 +190,12 @@ public class Parser {
                     builder.showLootbeam(assign[1].expectBoolean()); break;
                 case "showValue":
                     builder.showValue(assign[1].expectBoolean()); break;
+                case "compact":
+                {
+                    builder.icon(new BufferedImageProvider.CurrentItem());
+                    //compactOverride = true;
+                    builder.compact(assign[1].expectBoolean()); break;
+                }
                 case "showDespawn":
                     builder.showDespawn(assign[1].expectBoolean()); break;
                 case "notify":

@@ -16,18 +16,16 @@ import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.components.ProgressPieComponent;
+import net.runelite.client.util.ImageUtil;
 
 import javax.inject.Inject;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.Rectangle;
+import java.awt.*;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
@@ -36,13 +34,13 @@ import static com.lootfilters.util.TextUtil.abbreviateValue;
 import static com.lootfilters.util.TextUtil.withParentheses;
 import static java.util.stream.Collectors.counting;
 import static java.util.stream.Collectors.groupingBy;
-import static net.runelite.api.Perspective.getCanvasTextLocation;
-import static net.runelite.api.Perspective.getCanvasTilePoly;
+import static net.runelite.api.Perspective.*;
 
 public class LootFiltersOverlay extends Overlay {
     private static final int BOX_PAD = 2;
     private static final int CLICKBOX_SIZE = 8;
     private static final int TIMER_RADIUS = 5;
+    private static final int DEFAULT_IMAGE_HEIGHT = 32;
 
     private final Client client;
     private final LootFiltersPlugin plugin;
@@ -69,7 +67,7 @@ public class LootFiltersOverlay extends Overlay {
         }
 
         var mouse = client.getMouseCanvasPosition();
-        var hoveredItem = -1;
+        var hoveredItem = new AtomicInteger(-1);
         var hoveredHide = new AtomicInteger(-1);
         var hoveredHighlight = new AtomicInteger(-1);
 
@@ -83,103 +81,233 @@ public class LootFiltersOverlay extends Overlay {
 
             var tile = entry.getKey();
             var currentOffset = 0;
+            var compactRowPosition = 0;
             var rendered = new ArrayList<Integer>();
+            var matchedItems = new ArrayList<Map.Entry<PluginTileItem, DisplayConfig>>();
+            var remainingCompactMatches = 0;
             for (var item : items) {
-                var leftOffset = 0;
+
 
                 if (rendered.contains(item.getId())) {
                     continue;
                 }
                 rendered.add(item.getId());
 
-                var count = itemCounts.get(item.getId());
-
                 var match = plugin.getDisplayIndex().get(item);
                 if (match == null) {
                     continue;
                 }
+                matchedItems.add(Map.entry(item,match));
+                if(match.isCompact())
+                    remainingCompactMatches++;
+            }
+            matchedItems.sort(Comparator.comparingInt(o -> (o.getValue().isCompact() ? 0 : 1)));
+            boolean renderingCompact = false;
+            for (var matchedItem: matchedItems){
+                var count = itemCounts.get(matchedItem.getKey().getId());
+                var textHeight = 0;
+                if(matchedItem.getValue().isCompact()){
+                    var effectiveRowLength = config.compactRenderRowLength() > remainingCompactMatches? remainingCompactMatches : config.compactRenderRowLength();
+                    textHeight = renderCompact(matchedItem.getValue(), g, matchedItem.getKey(), tile, count, currentOffset, mouse, hoveredHide::set,
+                            hoveredHighlight::set, hoveredItem::set, compactRowPosition, effectiveRowLength);
+                    if(textHeight > 0){
+                        renderingCompact = true;
+                        if(compactRowPosition >= config.compactRenderRowLength()-1){
+                            compactRowPosition = 0;
+                            currentOffset += textHeight + BOX_PAD + 3;
+                            remainingCompactMatches -= config.compactRenderRowLength();
+                        } else {
+                            compactRowPosition++;
+                        }
+                    }
+                } else {
+                    if(renderingCompact){
+                        renderingCompact = false;
+                        currentOffset += config.compactRenderSize()/2;
+                        if(compactRowPosition > 0){
+                            compactRowPosition = 0;
+                            currentOffset += config.compactRenderSize() + BOX_PAD + 2;
+                        }
+                    }
+                    textHeight = renderClassic(matchedItem.getValue(), g, matchedItem.getKey(), tile, count, currentOffset, mouse, hoveredHide::set,
+                            hoveredHighlight::set, hoveredItem::set);
+                    if(textHeight > 0){
 
-                var overrideHidden = plugin.isHotkeyActive() && config.hotkeyShowHiddenItems();
-                if (match.isHideOverlay() && !overrideHidden) {
-                    continue;
+                        currentOffset += textHeight + BOX_PAD + 3;
+                    }
                 }
-
-                var loc = LocalPoint.fromWorld(client.getTopLevelWorldView(), tile.getWorldLocation());
-                if (loc == null) {
-                    continue;
-                }
-                if (tile.getItemLayer() == null) {
-                    continue;
-                }
-
-                if (config.fontMode() == FontMode.PLUGIN) {
-                    g.setFont(match.getFont());
-                } // otherwise we don't have to do anything, the font is already set
-
-                var displayText = buildDisplayText(item, count, match);
-                var textPoint = getCanvasTextLocation(client, g, loc, displayText, tile.getItemLayer().getHeight() + config.overlayZOffset());
-                if (textPoint == null) {
-                    continue;
-                }
-
-                var fm = g.getFontMetrics(g.getFont());
-                var textWidth = fm.stringWidth(displayText);
-                var textHeight = fm.getHeight();
-
-                var text = new TextComponent();
-                text.setText(displayText);
-                text.setColor(match.isHidden() ? config.hiddenColor() : match.getTextColor());
-                text.setPosition(new Point(textPoint.getX(), textPoint.getY() - currentOffset));
-                if (match.getTextAccentColor() != null) {
-                    text.setAccentColor(match.getTextAccentColor());
-                }
-                if (match.getTextAccent() != null) {
-                    text.setTextAccent(match.getTextAccent());
-                }
-
-                var boundingBox = new Rectangle(
-                        textPoint.getX() - BOX_PAD, textPoint.getY() - currentOffset - textHeight - BOX_PAD,
-                        textWidth + 2 * BOX_PAD, textHeight + 2 * BOX_PAD
-                );
-
-                if (match.getBackgroundColor() != null) {
-                    g.setColor(match.getBackgroundColor());
-                    g.fillRect(boundingBox.x, boundingBox.y, boundingBox.width, boundingBox.height);
-                }
-                if (match.getBorderColor() != null) {
-                    g.setColor(match.getBorderColor());
-                    g.drawRect(boundingBox.x, boundingBox.y, boundingBox.width, boundingBox.height);
-                }
-                if (plugin.isHotkeyActive() && boundingBox.contains(mouse.getX(), mouse.getY())) {
-                    hoveredItem = item.getId();
-
-                    g.setColor(match.isHidden() ? config.hiddenColor() : Color.WHITE);
-                    g.drawRect(boundingBox.x, boundingBox.y, boundingBox.width, boundingBox.height);
-                }
-                if (config.hotkeyShowClickboxes() && plugin.isHotkeyActive()) {
-                    renderClickboxes(g, boundingBox, item, match, hoveredHide::set, hoveredHighlight::set);
-                }
-
-                text.render(g);
-
-                if (match.getIcon() != null) {
-                    var cacheKey = match.getIcon().getCacheKey(item);
-                    var d = renderIcon(g, cacheKey, textPoint, currentOffset);
-                    leftOffset += d.width;
-                }
-                if (match.isShowDespawn() || plugin.isHotkeyActive()) {
-                    var type = plugin.isHotkeyActive() ? DespawnTimerType.PIE : config.despawnTimerType();
-                    renderDespawnTimer(g, type, item, textPoint, textWidth, fm.getHeight(), currentOffset, leftOffset);
-                }
-
-                currentOffset += textHeight + BOX_PAD + 3;
             }
         }
 
-        plugin.setHoveredItem(hoveredItem);
+        plugin.setHoveredItem(hoveredItem.get());
         plugin.setHoveredHide(hoveredHide.get());
         plugin.setHoveredHighlight(hoveredHighlight.get());
         return null;
+    }
+
+    private int renderClassic(DisplayConfig match, Graphics2D g, PluginTileItem item, Tile tile, long count,
+                              int currentOffset, net.runelite.api.Point mouse,  Consumer<Integer> onHoverHide,
+                              Consumer<Integer> onHoverHighlight, Consumer<Integer> onHoveredItem){
+
+        var leftOffset = 0;
+        var overrideHidden = plugin.isHotkeyActive() && config.hotkeyShowHiddenItems();
+        if (match.isHideOverlay() && !overrideHidden) {
+           return -1;
+        }
+
+        var loc = LocalPoint.fromWorld(client.getTopLevelWorldView(), tile.getWorldLocation());
+        if (loc == null) {
+            return -1;
+        }
+        if (tile.getItemLayer() == null) {
+            return -1;
+        }
+
+        if (config.fontMode() == FontMode.PLUGIN) {
+            g.setFont(match.getFont());
+        } // otherwise we don't have to do anything, the font is already set
+
+        var displayText = buildDisplayText(item, count, match);
+        var textPoint = getCanvasTextLocation(client, g, loc, displayText, tile.getItemLayer().getHeight() +  config.overlayZOffset());
+        if (textPoint == null) {
+            return -1;
+        }
+
+        var fm = g.getFontMetrics(g.getFont());
+        var textWidth = fm.stringWidth(displayText);
+        var textHeight = fm.getHeight();
+
+        var text = new TextComponent();
+        text.setText(displayText);
+        text.setColor(match.isHidden() ? config.hiddenColor() : match.getTextColor());
+        text.setPosition(new Point(textPoint.getX(), textPoint.getY() - currentOffset));
+        if (match.getTextAccentColor() != null) {
+            text.setAccentColor(match.getTextAccentColor());
+        }
+        if (match.getTextAccent() != null) {
+            text.setTextAccent(match.getTextAccent());
+        }
+
+        var boundingBox = new Rectangle(
+                textPoint.getX() - BOX_PAD, textPoint.getY() - currentOffset - textHeight - BOX_PAD,
+                textWidth + 2 * BOX_PAD, textHeight + 2 * BOX_PAD
+        );
+
+        if (match.getBackgroundColor() != null) {
+            g.setColor(match.getBackgroundColor());
+            g.fillRect(boundingBox.x, boundingBox.y, boundingBox.width, boundingBox.height);
+        }
+        if (match.getBorderColor() != null) {
+            g.setColor(match.getBorderColor());
+            g.drawRect(boundingBox.x, boundingBox.y, boundingBox.width, boundingBox.height);
+        }
+        if (plugin.isHotkeyActive() && boundingBox.contains(mouse.getX(), mouse.getY())) {
+            onHoveredItem.accept(item.getId());
+
+            g.setColor(match.isHidden() ? config.hiddenColor() : Color.WHITE);
+            g.drawRect(boundingBox.x, boundingBox.y, boundingBox.width, boundingBox.height);
+        }
+        if (config.hotkeyShowClickboxes() && plugin.isHotkeyActive()) {
+            renderClickboxes(g, boundingBox, item, match, onHoverHide, onHoverHighlight);
+        }
+
+        text.render(g);
+
+        if (match.getIcon() != null) {
+            var cacheKey = match.getIcon().getCacheKey(item);
+            var d = renderIcon(g, cacheKey, textPoint, currentOffset);
+            leftOffset += d.width;
+        }
+        if (match.isShowDespawn() || plugin.isHotkeyActive()) {
+            var type = plugin.isHotkeyActive() ? DespawnTimerType.PIE : config.despawnTimerType();
+            renderDespawnTimer(g, type, item, textPoint, textWidth, currentOffset, leftOffset, true);
+        }
+        return textHeight;
+    }
+
+    private int renderCompact(DisplayConfig match, Graphics2D g, PluginTileItem item, Tile tile, long count,
+                              int currentOffset, net.runelite.api.Point mouse,  Consumer<Integer> onHoverHide,
+                              Consumer<Integer> onHoverHighlight, Consumer<Integer> onHoveredItem, int rowOffset,
+                              int rowSize){
+        // item square size- 1 px padding outside the bouding box, 1 px inside, item width, 1 px, 1 px.
+        var overrideHidden = plugin.isHotkeyActive() && config.hotkeyShowHiddenItems();
+        if (match.isHideOverlay() && !overrideHidden) {
+            return -1;
+        }
+
+        var loc = LocalPoint.fromWorld(client.getTopLevelWorldView(), tile.getWorldLocation());
+        if (loc == null) {
+            return -1;
+        }
+        if (tile.getItemLayer() == null || item == null) {
+            return -1;
+        }
+
+        if (config.fontMode() == FontMode.PLUGIN) {
+            g.setFont(match.getFont());
+        } // otherwise we don't have to do anything, the font is already set
+
+        var fm = g.getFontMetrics(g.getFont());
+        var boxHeight = config.compactRenderSize();
+        var boxWidth = Math.round(36 * boxHeight/(DEFAULT_IMAGE_HEIGHT*1.0f));
+
+        var originalImage = plugin.getItemManager().getImage(item.getId());
+        //var image = ImageUtil.resizeImage(originalImage, boxWidth, boxHeight,true);
+        var image = plugin.getIconIndex().get(match.getIcon().getCacheKey(item,config.compactRenderSize()));
+        if(image == null){
+            plugin.getIconIndex().inc(match.getIcon(), item,config.compactRenderSize());
+            image = plugin.getIconIndex().get(match.getIcon().getCacheKey(item,config.compactRenderSize()));
+        }
+        boxHeight = image.getHeight();
+        boxWidth = image.getWidth();
+        var fullBoxWidth = boxWidth+4;
+        var imagePoint = getCanvasImageLocation(client, loc, image, tile.getItemLayer().getHeight() +  config.overlayZOffset());
+        if(imagePoint == null){
+            return -1;
+        }
+        var boundingBox = new Rectangle(
+                imagePoint.getX() + (fullBoxWidth)*rowOffset - Math.round(fullBoxWidth*((rowSize-1)/2f)), imagePoint.getY() - currentOffset - boxHeight ,
+                boxWidth + 2, boxHeight + 2
+        );
+
+        if (match.getBackgroundColor() != null) {
+            g.setColor(match.getBackgroundColor());
+            g.fillRect(boundingBox.x, boundingBox.y, boundingBox.width, boundingBox.height);
+        }
+        if (match.getBorderColor() != null) {
+            g.setColor(match.getBorderColor());
+            g.drawRect(boundingBox.x, boundingBox.y, boundingBox.width, boundingBox.height);
+        }
+        if (plugin.isHotkeyActive() && boundingBox.contains(mouse.getX(), mouse.getY())) {
+            onHoveredItem.accept(item.getId());
+
+            g.setColor(match.isHidden() ? config.hiddenColor() : Color.WHITE);
+            g.drawRect(boundingBox.x, boundingBox.y, boundingBox.width, boundingBox.height);
+        }
+        if (config.hotkeyShowClickboxes() && plugin.isHotkeyActive()) {
+            renderClickboxes(g, boundingBox, item, match, onHoverHide, onHoverHighlight);
+        }
+        var displayText = "";
+        if(item.getQuantity() > 1){
+            displayText = abbreviate(item.getQuantity());
+        }
+        var text = new TextComponent();
+        g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,match.getTextColor().getAlpha()/255f));
+        g.drawImage(image, boundingBox.x+BOX_PAD/2, boundingBox.y+BOX_PAD/2, null);
+        if (match.isShowDespawn() || plugin.isHotkeyActive()) {
+            var type = plugin.isHotkeyActive() ? DespawnTimerType.PIE : config.despawnTimerType();
+            renderDespawnTimer(g, type, item, new net.runelite.api.Point(boundingBox.x + BOX_PAD/2 , boundingBox.y+fm.getHeight()+BOX_PAD/2),  boxWidth+2, 13-boxHeight, -1, false);
+        }
+        g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,1));
+        if(count > 1){
+            displayText += "x"+count;
+        }
+        text.setText(displayText);
+
+        text.setColor(match.isHidden() ? config.hiddenColor() : match.getTextColor());
+        text.setPosition(new Point(boundingBox.x + BOX_PAD , boundingBox.y+fm.getHeight()+BOX_PAD ));
+        text.render(g);
+        return image.getHeight();
     }
 
     private Color getDespawnTextColor(PluginTileItem item) {
@@ -281,7 +409,7 @@ public class LootFiltersOverlay extends Overlay {
         g.drawString("audio: " + plugin.getQueuedAudio().size() + ", icon: " + plugin.getIconIndex().size(), 0, 80);
     }
 
-    private void renderDespawnTimer(Graphics2D g, DespawnTimerType type, PluginTileItem item, net.runelite.api.Point textPoint, int textWidth, int textHeight, int yOffset, int leftOffset) {
+    private void renderDespawnTimer(Graphics2D g, DespawnTimerType type, PluginTileItem item, net.runelite.api.Point textPoint, int textWidth, int yOffset, int leftOffset, boolean leftAlign) {
         var ticksRemaining = item.getDespawnTime() - client.getTickCount();
         if (ticksRemaining < 0) { // doesn't despawn
             return;
@@ -292,17 +420,27 @@ public class LootFiltersOverlay extends Overlay {
 
         if (type == DespawnTimerType.TICKS || type == DespawnTimerType.SECONDS) {
             var text = new TextComponent();
-            text.setText(type == DespawnTimerType.TICKS
+            var displyString = type == DespawnTimerType.TICKS
                     ? Integer.toString(ticksRemaining)
-                    : String.format("%.1f", (Duration.between(Instant.now(), item.getDespawnInstant())).toMillis() / 1000f));
+                    : String.format("%.1f", (Duration.between(Instant.now(), item.getDespawnInstant())).toMillis() / 1000f);
+            text.setText(displyString);
             text.setColor(getDespawnTextColor(item));
-            text.setPosition(new Point(textPoint.getX() + textWidth + 2 + 1, textPoint.getY() - yOffset));
+            int rightAlignedOffset = 0;
+            if(!leftAlign){
+                rightAlignedOffset = g.getFontMetrics(g.getFont()).stringWidth(displyString) + 4;
+                yOffset -= 2;
+            }
+            text.setPosition(new Point(textPoint.getX() + textWidth + 2 + 1-rightAlignedOffset, textPoint.getY() - yOffset));
             text.render(g);
         } else {
             var timer = new ProgressPieComponent();
             var total = item.getDespawnTime() - item.getSpawnTime();
             var remaining = item.getDespawnTime() - plugin.getClient().getTickCount();
-            timer.setPosition(new net.runelite.api.Point(textPoint.getX() - TIMER_RADIUS - BOX_PAD - 2 - leftOffset,
+            int rightAlignedOffset = 0;
+            if(!leftAlign){
+                rightAlignedOffset = textWidth;
+            }
+            timer.setPosition(new net.runelite.api.Point(textPoint.getX() - TIMER_RADIUS + rightAlignedOffset - BOX_PAD - 2 - leftOffset,
                     textPoint.getY() - yOffset - TIMER_RADIUS));
             timer.setProgress(remaining / (double) total);
             timer.setDiameter(TIMER_RADIUS * 2);
