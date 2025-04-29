@@ -97,16 +97,22 @@ public class Parser {
                     break;
                 case "area":
                     block.takeExpect(LIST_START);
-                    int x0 = block.takeExpectLiteral().expectInt(); block.takeExpect(COMMA);
-                    int y0 = block.takeExpectLiteral().expectInt(); block.takeExpect(COMMA);
-                    int z0 = block.takeExpectLiteral().expectInt(); block.takeExpect(COMMA);
-                    int x1 = block.takeExpectLiteral().expectInt(); block.takeExpect(COMMA);
-                    int y1 = block.takeExpectLiteral().expectInt(); block.takeExpect(COMMA);
-                    int z1 = block.takeExpectLiteral().expectInt(); block.takeOptional(COMMA);
+                    int x0 = block.takeExpectLiteral().expectInt();
+                    block.takeExpect(COMMA);
+                    int y0 = block.takeExpectLiteral().expectInt();
+                    block.takeExpect(COMMA);
+                    int z0 = block.takeExpectLiteral().expectInt();
+                    block.takeExpect(COMMA);
+                    int x1 = block.takeExpectLiteral().expectInt();
+                    block.takeExpect(COMMA);
+                    int y1 = block.takeExpectLiteral().expectInt();
+                    block.takeExpect(COMMA);
+                    int z1 = block.takeExpectLiteral().expectInt();
+                    block.takeOptional(COMMA);
                     block.takeExpect(LIST_END);
                     block.takeExpect(STMT_END);
 
-                    activationArea = new int[]{x0,y0,z0,x1,y1,z1};
+                    activationArea = new int[]{x0, y0, z0, x1, y1, z1};
                     break;
                 default:
                     throw new ParseException("unrecognized metavalue", tok);
@@ -177,47 +183,67 @@ public class Parser {
             switch (assign[0].getValue()) {
                 case "textColor":
                 case "color":
-                    builder.textColor(assign[1].expectColor()); break;
+                    builder.textColor(assign[1].expectColor());
+                    break;
                 case "backgroundColor":
-                    builder.backgroundColor(assign[1].expectColor()); break;
+                    builder.backgroundColor(assign[1].expectColor());
+                    break;
                 case "borderColor":
-                    builder.borderColor(assign[1].expectColor()); break;
+                    builder.borderColor(assign[1].expectColor());
+                    break;
                 case "hidden":
-                    builder.hidden(assign[1].expectBoolean()); break;
+                    builder.hidden(assign[1].expectBoolean());
+                    break;
                 case "showLootbeam":
                 case "showLootBeam":
-                    builder.showLootbeam(assign[1].expectBoolean()); break;
+                    builder.showLootbeam(assign[1].expectBoolean());
+                    break;
                 case "showValue":
-                    builder.showValue(assign[1].expectBoolean()); break;
+                    builder.showValue(assign[1].expectBoolean());
+                    break;
                 case "compact":
-                    builder.compact(assign[1].expectBoolean()); break;
+                    builder.compact(assign[1].expectBoolean());
+                    break;
                 case "showDespawn":
-                    builder.showDespawn(assign[1].expectBoolean()); break;
+                    builder.showDespawn(assign[1].expectBoolean());
+                    break;
                 case "notify":
-                    builder.notify(assign[1].expectBoolean()); break;
+                    builder.notify(assign[1].expectBoolean());
+                    break;
                 case "textAccent":
-                    builder.textAccent(TextAccent.fromOrdinal(assign[1].expectInt())); break;
+                    builder.textAccent(TextAccent.fromOrdinal(assign[1].expectInt()));
+                    break;
                 case "textAccentColor":
-                    builder.textAccentColor(assign[1].expectColor()); break;
+                    builder.textAccentColor(assign[1].expectColor());
+                    break;
                 case "lootbeamColor":
                 case "lootBeamColor":
-                    builder.lootbeamColor(assign[1].expectColor()); break;
+                    builder.lootbeamColor(assign[1].expectColor());
+                    break;
                 case "fontType":
-                    builder.fontType(FontType.fromOrdinal(assign[1].expectInt())); break;
+                    builder.fontType(FontType.fromOrdinal(assign[1].expectInt()));
+                    break;
                 case "menuTextColor":
-                    builder.menuTextColor(assign[1].expectColor()); break;
+                    builder.menuTextColor(assign[1].expectColor());
+                    break;
                 case "highlightTile":
-                    builder.highlightTile(assign[1].expectBoolean()); break;
+                    builder.highlightTile(assign[1].expectBoolean());
+                    break;
                 case "tileStrokeColor":
-                    builder.tileStrokeColor(assign[1].expectColor()); break;
+                    builder.tileStrokeColor(assign[1].expectColor());
+                    break;
                 case "tileFillColor":
-                    builder.tileFillColor(assign[1].expectColor()); break;
+                    builder.tileFillColor(assign[1].expectColor());
+                    break;
                 case "hideOverlay":
-                    builder.hideOverlay(assign[1].expectBoolean()); break;
+                    builder.hideOverlay(assign[1].expectBoolean());
+                    break;
                 case "sound":
-                    builder.sound(SoundProvider.fromExpr(assign[1])); break;
+                    builder.sound(SoundProvider.fromExpr(assign[1]));
+                    break;
                 case "menuSort":
-                    builder.menuSort(assign[1].expectInt()); break;
+                    builder.menuSort(assign[1].expectInt());
+                    break;
                 default:
                     throw new ParseException("unexpected identifier in display config block", assign[0]);
             }

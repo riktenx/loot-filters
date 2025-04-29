@@ -305,7 +305,7 @@ public class LootFiltersOverlay extends Overlay {
         g.drawImage(image, boundingBox.x + BOX_PAD / 2, boundingBox.y + BOX_PAD / 2, null);
         if (match.isShowDespawn() || plugin.isHotkeyActive()) {
             var type = plugin.isHotkeyActive() ? DespawnTimerType.PIE : config.despawnTimerType();
-            renderDespawnTimer(g, type, item, new net.runelite.api.Point(boundingBox.x + BOX_PAD / 2, boundingBox.y + boundingBox.height), boxWidth + 2,0, 0, true);
+            renderDespawnTimer(g, type, item, new net.runelite.api.Point(boundingBox.x + BOX_PAD / 2, boundingBox.y + boundingBox.height), boxWidth + 2, 0, 0, true);
         }
         g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1));
         if (count > 1) {
@@ -437,10 +437,10 @@ public class LootFiltersOverlay extends Overlay {
             var remaining = item.getDespawnTime() - plugin.getClient().getTickCount();
 
             Rectangle bar;
-            if(compact){
+            if (compact) {
                 bar = new Rectangle(textPoint.getX(), textPoint.getY() - 3, textWidth * remaining / total, 3);
-            }else{
-                bar = new Rectangle(textPoint.getX()-leftOffset-1, textPoint.getY() - 2 - yOffset, leftOffset * remaining / total-4, 3);
+            } else {
+                bar = new Rectangle(textPoint.getX() - leftOffset - 1, textPoint.getY() - 2 - yOffset, leftOffset * remaining / total - 4, 3);
             }
             g.setColor(getDespawnTextColor(item));
             g.fillRect(bar.x, bar.y, bar.width, bar.height);

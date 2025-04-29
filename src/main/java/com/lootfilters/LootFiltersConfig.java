@@ -20,20 +20,26 @@ import java.awt.Color;
 @ConfigGroup("loot-filters")
 public interface LootFiltersConfig extends Config {
     @ConfigItem(keyName = "preferredDefaultFilter", hidden = true, name = "", description = "")
-    default String getPreferredDefault() { return DefaultFilter.FILTERSCAPE.getName(); }
+    default String getPreferredDefault() {
+        return DefaultFilter.FILTERSCAPE.getName();
+    }
+
     @ConfigItem(keyName = "preferredDefaultFilter", hidden = true, name = "", description = "")
     void setPreferredDefault(String name);
 
     @ConfigSection(name = "Plugin panel", description = "", position = -2)
     String pluginPanel = "pluginPanel";
     String SHOW_PLUGIN_PANEL = "showPluginPanel";
+
     @ConfigItem(
             keyName = SHOW_PLUGIN_PANEL,
             name = "Enabled",
             description = "Show the plugin panel in the side nav. The entire plugin, including the active loot filter, will still operate if the panel is hidden.",
             section = pluginPanel
     )
-    default boolean showPluginPanel() { return true; }
+    default boolean showPluginPanel() {
+        return true;
+    }
 
     @ConfigSection(
             name = "General",
@@ -42,6 +48,7 @@ public interface LootFiltersConfig extends Config {
     )
     String general = "general";
     String CONFIG_KEY_FETCH_DEFAULT_FILTERS = "fetchDefaultFilters";
+
     @ConfigItem(
             keyName = CONFIG_KEY_FETCH_DEFAULT_FILTERS,
             name = "Fetch default filters",
@@ -49,7 +56,10 @@ public interface LootFiltersConfig extends Config {
             section = general,
             position = -2
     )
-    default boolean fetchDefaultFilters() { return true; }
+    default boolean fetchDefaultFilters() {
+        return true;
+    }
+
     @ConfigItem(
             keyName = "showUnmatchedItems",
             name = "Show unmatched items",
@@ -57,7 +67,10 @@ public interface LootFiltersConfig extends Config {
             section = general,
             position = 1
     )
-    default boolean showUnmatchedItems() { return true; }
+    default boolean showUnmatchedItems() {
+        return true;
+    }
+
     @ConfigItem(
             keyName = "ownershipFilter",
             name = "Ownership filter",
@@ -65,7 +78,10 @@ public interface LootFiltersConfig extends Config {
             section = general,
             position = 3
     )
-    default boolean ownershipFilter() { return false; }
+    default boolean ownershipFilter() {
+        return false;
+    }
+
     @ConfigItem(
             keyName = "itemSpawnFilter",
             name = "Item spawn filter",
@@ -73,7 +89,10 @@ public interface LootFiltersConfig extends Config {
             section = general,
             position = 4
     )
-    default boolean itemSpawnFilter() { return false; }
+    default boolean itemSpawnFilter() {
+        return false;
+    }
+
     @ConfigItem(
             keyName = "fontMode",
             name = "Font mode",
@@ -81,7 +100,10 @@ public interface LootFiltersConfig extends Config {
             section = general,
             position = 6
     )
-    default FontMode fontMode() { return FontMode.RUNELITE; }
+    default FontMode fontMode() {
+        return FontMode.RUNELITE;
+    }
+
     @ConfigItem(
             keyName = "soundVolume",
             name = "Sound volume",
@@ -91,7 +113,9 @@ public interface LootFiltersConfig extends Config {
     )
     @Range(max = 100)
     @Units(Units.PERCENT)
-    default int soundVolume() { return 100; }
+    default int soundVolume() {
+        return 100;
+    }
 
     @ConfigSection(
             name = "Hotkey",
@@ -99,6 +123,7 @@ public interface LootFiltersConfig extends Config {
             position = 1
     )
     String hotkey = "Hotkey";
+
     @ConfigItem(
             keyName = "hotkey",
             name = "Hotkey",
@@ -106,7 +131,10 @@ public interface LootFiltersConfig extends Config {
             section = hotkey,
             position = 0
     )
-    default Keybind hotkey() { return Keybind.ALT; }
+    default Keybind hotkey() {
+        return Keybind.ALT;
+    }
+
     @ConfigItem(
             keyName = "hotkeyShowHiddenItems",
             name = "Press: Show hidden items",
@@ -114,7 +142,10 @@ public interface LootFiltersConfig extends Config {
             section = hotkey,
             position = 1
     )
-    default boolean hotkeyShowHiddenItems() { return true; }
+    default boolean hotkeyShowHiddenItems() {
+        return true;
+    }
+
     @ConfigItem(
             keyName = "hotkeyShowClickboxes",
             name = "Press: Show hide/highlight box",
@@ -122,7 +153,10 @@ public interface LootFiltersConfig extends Config {
             section = hotkey,
             position = 2
     )
-    default boolean hotkeyShowClickboxes() { return true; }
+    default boolean hotkeyShowClickboxes() {
+        return true;
+    }
+
     @ConfigItem(
             keyName = "hotkeyShowValues",
             name = "Press: Show item values",
@@ -130,7 +164,10 @@ public interface LootFiltersConfig extends Config {
             section = hotkey,
             position = 3
     )
-    default boolean hotkeyShowValues() { return false; }
+    default boolean hotkeyShowValues() {
+        return false;
+    }
+
     @ConfigItem(
             keyName = "hotkeyDoubleTapTogglesOverlay",
             name = "Double-tap: toggle overlay",
@@ -138,7 +175,10 @@ public interface LootFiltersConfig extends Config {
             section = hotkey,
             position = 12
     )
-    default boolean hotkeyDoubleTapTogglesOverlay() { return true; }
+    default boolean hotkeyDoubleTapTogglesOverlay() {
+        return true;
+    }
+
     @ConfigItem(
             keyName = "hotkeyDoubleTapDelay",
             name = "Double-tap delay",
@@ -147,7 +187,9 @@ public interface LootFiltersConfig extends Config {
             position = 13
     )
     @Units(Units.MILLISECONDS)
-    default int hotkeyDoubleTapDelay() { return 250; }
+    default int hotkeyDoubleTapDelay() {
+        return 250;
+    }
 
     @ConfigSection(
             name = "Display settings",
@@ -155,6 +197,7 @@ public interface LootFiltersConfig extends Config {
             position = 2
     )
     String displayOverrides = "displayOverrides";
+
     @ConfigItem(
             keyName = "alwaysShowValue",
             name = "Show value",
@@ -162,7 +205,10 @@ public interface LootFiltersConfig extends Config {
             section = displayOverrides,
             position = 0
     )
-    default boolean alwaysShowValue() { return false; }
+    default boolean alwaysShowValue() {
+        return false;
+    }
+
     @ConfigItem(
             keyName = "valueDisplayType",
             name = "Value display",
@@ -170,7 +216,10 @@ public interface LootFiltersConfig extends Config {
             section = displayOverrides,
             position = 1
     )
-    default ValueDisplayType valueDisplayType() { return ValueDisplayType.HIGHEST; }
+    default ValueDisplayType valueDisplayType() {
+        return ValueDisplayType.HIGHEST;
+    }
+
     @ConfigItem(
             keyName = "dualValueDisplayType",
             name = "Dual-value display",
@@ -178,7 +227,10 @@ public interface LootFiltersConfig extends Config {
             section = displayOverrides,
             position = 2
     )
-    default DualValueDisplayType dualValueDisplay() { return DualValueDisplayType.COMPACT; }
+    default DualValueDisplayType dualValueDisplay() {
+        return DualValueDisplayType.COMPACT;
+    }
+
     @ConfigItem(
             keyName = "alwaysShowDespawn",
             name = "Show despawn",
@@ -186,7 +238,10 @@ public interface LootFiltersConfig extends Config {
             section = displayOverrides,
             position = 11
     )
-    default boolean alwaysShowDespawn() { return false; }
+    default boolean alwaysShowDespawn() {
+        return false;
+    }
+
     @ConfigItem(
             keyName = "despawnTimerType",
             name = "Despawn type",
@@ -194,7 +249,10 @@ public interface LootFiltersConfig extends Config {
             section = displayOverrides,
             position = 12
     )
-    default DespawnTimerType despawnTimerType() { return DespawnTimerType.TICKS; }
+    default DespawnTimerType despawnTimerType() {
+        return DespawnTimerType.TICKS;
+    }
+
     @ConfigItem(
             keyName = "despawnThreshold",
             name = "Despawn threshold",
@@ -203,7 +261,10 @@ public interface LootFiltersConfig extends Config {
             position = 13
     )
     @Units(Units.TICKS)
-    default int despawnThreshold() { return 0; }
+    default int despawnThreshold() {
+        return 0;
+    }
+
     @ConfigItem(
             keyName = "textAccent",
             name = "Text accent",
@@ -211,8 +272,12 @@ public interface LootFiltersConfig extends Config {
             section = displayOverrides,
             position = 23
     )
-    default TextAccent textAccent() { return TextAccent.USE_FILTER; }
-    String COMPACT_RENDER_SIZE  = "compactRenderSize";
+    default TextAccent textAccent() {
+        return TextAccent.USE_FILTER;
+    }
+
+    String COMPACT_RENDER_SIZE = "compactRenderSize";
+
     @Range(min = 16, max = 32)
     @ConfigItem(
             keyName = COMPACT_RENDER_SIZE,
@@ -221,7 +286,10 @@ public interface LootFiltersConfig extends Config {
             section = displayOverrides,
             position = 24
     )
-    default int compactRenderSize() { return 26; }
+    default int compactRenderSize() {
+        return 26;
+    }
+
     @ConfigItem(
             keyName = "compactRenderRowLength",
             name = "Compact row size",
@@ -229,7 +297,10 @@ public interface LootFiltersConfig extends Config {
             section = displayOverrides,
             position = 25
     )
-    default int compactRenderRowLength() { return 6; }
+    default int compactRenderRowLength() {
+        return 6;
+    }
+
     @ConfigItem(
             keyName = "highlightTiles",
             name = "Highlight tiles",
@@ -237,7 +308,10 @@ public interface LootFiltersConfig extends Config {
             section = displayOverrides,
             position = 26
     )
-    default boolean highlightTiles() { return false; }
+    default boolean highlightTiles() {
+        return false;
+    }
+
     @ConfigItem(
             keyName = "collapseEntries",
             name = "Menu: collapse entries",
@@ -245,7 +319,10 @@ public interface LootFiltersConfig extends Config {
             section = displayOverrides,
             position = 89
     )
-    default boolean collapseEntries() { return true; }
+    default boolean collapseEntries() {
+        return true;
+    }
+
     @ConfigItem(
             keyName = "deprioritizeHidden",
             name = "Menu: deprioritize hidden items",
@@ -253,7 +330,10 @@ public interface LootFiltersConfig extends Config {
             section = displayOverrides,
             position = 90
     )
-    default boolean deprioritizeHidden() { return false; }
+    default boolean deprioritizeHidden() {
+        return false;
+    }
+
     @ConfigItem(
             keyName = "recolorHidden",
             name = "Menu: recolor hidden items",
@@ -261,7 +341,10 @@ public interface LootFiltersConfig extends Config {
             section = displayOverrides,
             position = 91
     )
-    default boolean recolorHidden() { return false; }
+    default boolean recolorHidden() {
+        return false;
+    }
+
     @ConfigItem(
             keyName = "hiddenColor",
             name = "Hidden color",
@@ -269,18 +352,24 @@ public interface LootFiltersConfig extends Config {
             section = displayOverrides,
             position = 92
     )
-    default Color hiddenColor() { return Color.GRAY; }
+    default Color hiddenColor() {
+        return Color.GRAY;
+    }
 
     String CONFIG_KEY_OVERLAY_PRIORITY = "overlayPriority";
+
     @ConfigItem(
             keyName = CONFIG_KEY_OVERLAY_PRIORITY,
             name = "Overlay priority",
             description = "Changes the draw priority of the overlay." +
-            "<br>Only relative to overlays with the same order as this one.",
+                    "<br>Only relative to overlays with the same order as this one.",
             section = displayOverrides,
             position = 94
     )
-    default OverlayPriority overlayPriority() { return OverlayPriority.DEFAULT; }
+    default OverlayPriority overlayPriority() {
+        return OverlayPriority.DEFAULT;
+    }
+
     @ConfigItem(
             keyName = "overlayZOffset",
             name = "Overlay z-offset",
@@ -291,7 +380,9 @@ public interface LootFiltersConfig extends Config {
             position = 95
     )
     @Range(max = 32)
-    default int overlayZOffset() { return 16; }
+    default int overlayZOffset() {
+        return 16;
+    }
 
     @ConfigSection(
             name = "Item lists",
@@ -299,6 +390,7 @@ public interface LootFiltersConfig extends Config {
             position = 8
     )
     String itemLists = "itemLists";
+
     @ConfigItem(
             keyName = "highlightedItems",
             name = "Highlighted items",
@@ -306,7 +398,10 @@ public interface LootFiltersConfig extends Config {
             section = itemLists,
             position = 0
     )
-    default String highlightedItems() { return ""; }
+    default String highlightedItems() {
+        return "";
+    }
+
     @ConfigItem(
             keyName = "hiddenItems",
             name = "Hidden items",
@@ -314,9 +409,13 @@ public interface LootFiltersConfig extends Config {
             section = itemLists,
             position = 1
     )
-    default String hiddenItems() { return ""; }
+    default String hiddenItems() {
+        return "";
+    }
+
     @ConfigItem(keyName = "highlightedItems", name = "", description = "")
     void setHighlightedItems(String key);
+
     @ConfigItem(keyName = "hiddenItems", name = "", description = "")
     void setHiddenItems(String key);
 
@@ -327,7 +426,10 @@ public interface LootFiltersConfig extends Config {
             section = itemLists,
             position = 2
     )
-    default Color highlightColor() { return Color.decode("#aa00ff"); }
+    default Color highlightColor() {
+        return Color.decode("#aa00ff");
+    }
+
     @ConfigItem(
             keyName = "highlightLootbeam",
             name = "Highlight lootbeam",
@@ -335,7 +437,10 @@ public interface LootFiltersConfig extends Config {
             section = itemLists,
             position = 3
     )
-    default boolean highlightLootbeam() { return false; }
+    default boolean highlightLootbeam() {
+        return false;
+    }
+
     @ConfigItem(
             keyName = "highlightNotify",
             name = "Highlight notification",
@@ -343,7 +448,9 @@ public interface LootFiltersConfig extends Config {
             section = itemLists,
             position = 4
     )
-    default boolean highlightNotify() { return false; }
+    default boolean highlightNotify() {
+        return false;
+    }
 
     @ConfigSection(
             name = "Advanced highlight display",
@@ -351,23 +458,45 @@ public interface LootFiltersConfig extends Config {
             position = 9
     )
     String hdd = "Highlight display";
+
     @ConfigItem(position = 0, section = hdd,
             keyName = "hdBackgroundColor", name = "Background", description = "")
-    @Alpha default Color higlightBackgroundColor() { return null; }
+    @Alpha
+    default Color higlightBackgroundColor() {
+        return null;
+    }
+
     @ConfigItem(position = 1, section = hdd,
             keyName = "hdBorderColor", name = "Border", description = "")
-    @Alpha default Color highlightBorderColor() { return null; }
+    @Alpha
+    default Color highlightBorderColor() {
+        return null;
+    }
+
     @ConfigItem(position = 2, section = hdd,
             keyName = "hdLootbeamColor", name = "Lootbeam", description = "")
-    @Alpha default Color highlightLootbeamColor() { return null; }
+    @Alpha
+    default Color highlightLootbeamColor() {
+        return null;
+    }
+
     @ConfigItem(position = 3, section = hdd,
             keyName = "hdMenuTextColor", name = "Menu text", description = "")
-    @Alpha default Color highlightMenuTextColor() { return null; }
+    @Alpha
+    default Color highlightMenuTextColor() {
+        return null;
+    }
+
     @ConfigItem(position = 4, section = hdd, keyName = "hdMenuSort", name = "Menu sort priority", description = "")
-    default int highlightMenuSort() { return 0; }
+    default int highlightMenuSort() {
+        return 0;
+    }
+
     @ConfigItem(position = 9, section = hdd,
             keyName = "hdSound", name = "Sound", description = "Can be one of two types of values:<br><br>A number: play a game sound effect by ID<br>A string: play a custom audio file from .runelite/loot-filters/sounds, not all sound formats are supported")
-    default String highlightSound() { return ""; }
+    default String highlightSound() {
+        return "";
+    }
 
     @ConfigSection(
             name = "Item value rules",
@@ -375,6 +504,7 @@ public interface LootFiltersConfig extends Config {
             position = 99
     )
     String itemValueRules = "itemValueRules";
+
     @ConfigItem(
             keyName = "itemValueRulesReadme",
             name = "readme (hover over this)",
@@ -382,5 +512,7 @@ public interface LootFiltersConfig extends Config {
             section = itemValueRules,
             position = 0
     )
-    default boolean itemValueRulesReadme() { return false; }
+    default boolean itemValueRulesReadme() {
+        return false;
+    }
 }

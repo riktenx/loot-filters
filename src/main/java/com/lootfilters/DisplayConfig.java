@@ -77,13 +77,15 @@ public class DisplayConfig {
     public Color getTextColor() {
         return textColor != null ? textColor : Color.WHITE;
     }
-    public BufferedImageProvider getIcon(){
-        if(isCompact()){
+
+    public BufferedImageProvider getIcon() {
+        if (isCompact()) {
             return new BufferedImageProvider.CurrentItem();
-        }else{
+        } else {
             return icon;
         }
     }
+
     public Color getMenuTextColor() {
         if (isHidden()) {
             return DEFAULT_MENU_TEXT_COLOR;
@@ -112,37 +114,103 @@ public class DisplayConfig {
         return tileStrokeColor != null ? tileStrokeColor : textColor;
     }
 
-    public boolean isHidden() { return hidden != null && hidden; }
-    public boolean isShowLootbeam() { return !isHidden() && showLootbeam != null && showLootbeam; }
-    public boolean isShowValue() { return showValue != null && showValue; }
-    public boolean isShowDespawn() { return showDespawn != null && showDespawn; }
-    public boolean isNotify() { return !isHidden() && notify != null && notify; }
-    public boolean isHighlightTile() { return !isHidden() && highlightTile != null && highlightTile; }
-    public boolean isHideOverlay() { return isHidden() || (hideOverlay != null && hideOverlay); }
-    public boolean isCompact() {return compact != null && compact; }
+    public boolean isHidden() {
+        return hidden != null && hidden;
+    }
+
+    public boolean isShowLootbeam() {
+        return !isHidden() && showLootbeam != null && showLootbeam;
+    }
+
+    public boolean isShowValue() {
+        return showValue != null && showValue;
+    }
+
+    public boolean isShowDespawn() {
+        return showDespawn != null && showDespawn;
+    }
+
+    public boolean isNotify() {
+        return !isHidden() && notify != null && notify;
+    }
+
+    public boolean isHighlightTile() {
+        return !isHidden() && highlightTile != null && highlightTile;
+    }
+
+    public boolean isHideOverlay() {
+        return isHidden() || (hideOverlay != null && hideOverlay);
+    }
+
+    public boolean isCompact() {
+        return compact != null && compact;
+    }
+
     public DisplayConfig merge(DisplayConfig other) {
         var b = toBuilder();
-        if (other.textColor != null) { b.textColor(other.textColor); }
-        if (other.backgroundColor != null) { b.backgroundColor(other.backgroundColor); }
-        if (other.borderColor != null) { b.borderColor(other.borderColor); }
-        if (other.hidden != null) { b.hidden(other.hidden); }
-        if (other.showLootbeam != null) { b.showLootbeam(other.showLootbeam); }
-        if (other.showValue != null) { b.showValue(other.showValue); }
-        if (other.compact != null) { b.compact(other.compact); }
-        if (other.showDespawn != null) { b.showDespawn(other.showDespawn); }
-        if (other.notify != null) { b.notify(other.notify); }
-        if (other.textAccent != null) { b.textAccent(other.textAccent); }
-        if (other.textAccentColor != null) { b.textAccentColor(other.textAccentColor); }
-        if (other.lootbeamColor != null) { b.lootbeamColor(other.lootbeamColor); }
-        if (other.fontType != null) { b.fontType(other.fontType); }
-        if (other.menuTextColor != null) { b.menuTextColor(other.menuTextColor); }
-        if (other.highlightTile != null) { b.highlightTile(other.highlightTile); }
-        if (other.tileStrokeColor != null) { b.tileStrokeColor(other.tileStrokeColor); }
-        if (other.tileFillColor != null) { b.tileFillColor(other.tileFillColor); }
-        if (other.hideOverlay != null) { b.hideOverlay(other.hideOverlay); }
-        if (other.sound != null) { b.sound(other.sound); }
-        if (other.menuSort != null) { b.menuSort(other.menuSort); }
-        if (other.icon != null) { b.icon(other.icon); }
+        if (other.textColor != null) {
+            b.textColor(other.textColor);
+        }
+        if (other.backgroundColor != null) {
+            b.backgroundColor(other.backgroundColor);
+        }
+        if (other.borderColor != null) {
+            b.borderColor(other.borderColor);
+        }
+        if (other.hidden != null) {
+            b.hidden(other.hidden);
+        }
+        if (other.showLootbeam != null) {
+            b.showLootbeam(other.showLootbeam);
+        }
+        if (other.showValue != null) {
+            b.showValue(other.showValue);
+        }
+        if (other.compact != null) {
+            b.compact(other.compact);
+        }
+        if (other.showDespawn != null) {
+            b.showDespawn(other.showDespawn);
+        }
+        if (other.notify != null) {
+            b.notify(other.notify);
+        }
+        if (other.textAccent != null) {
+            b.textAccent(other.textAccent);
+        }
+        if (other.textAccentColor != null) {
+            b.textAccentColor(other.textAccentColor);
+        }
+        if (other.lootbeamColor != null) {
+            b.lootbeamColor(other.lootbeamColor);
+        }
+        if (other.fontType != null) {
+            b.fontType(other.fontType);
+        }
+        if (other.menuTextColor != null) {
+            b.menuTextColor(other.menuTextColor);
+        }
+        if (other.highlightTile != null) {
+            b.highlightTile(other.highlightTile);
+        }
+        if (other.tileStrokeColor != null) {
+            b.tileStrokeColor(other.tileStrokeColor);
+        }
+        if (other.tileFillColor != null) {
+            b.tileFillColor(other.tileFillColor);
+        }
+        if (other.hideOverlay != null) {
+            b.hideOverlay(other.hideOverlay);
+        }
+        if (other.sound != null) {
+            b.sound(other.sound);
+        }
+        if (other.menuSort != null) {
+            b.menuSort(other.menuSort);
+        }
+        if (other.icon != null) {
+            b.icon(other.icon);
+        }
         return b.build();
     }
 }
