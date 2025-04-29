@@ -50,12 +50,12 @@ public abstract class BufferedImageProvider {
         public BufferedImage getImage(LootFiltersPlugin plugin, PluginTileItem item, int... height) {
             var image = plugin.getItemManager().getImage(itemId);
             var imageHeight = height.length >= 1 ? height[0] : 16;
-            return ImageUtil.resizeImage(image, image.getWidth() * imageHeight / image.getHeight(), imageHeight, true);
+            return ImageUtil.resizeImage(image, image.getWidth() * imageHeight / image.getHeight(), imageHeight,true);
         }
 
         @Override
         public CacheKey getCacheKey(PluginTileItem item, int... height) {
-            return new CacheKey(1, itemId, 0, "", height.length >= 1 ? height[0] : 16);
+            return new CacheKey(1, itemId, 0, "",height.length >= 1 ? height[0] : 16);
         }
     }
 
@@ -76,7 +76,7 @@ public abstract class BufferedImageProvider {
 
         @Override
         public CacheKey getCacheKey(PluginTileItem item, int... height) {
-            return new CacheKey(2, 0, 0, filename, 16);
+            return new CacheKey(2, 0, 0, filename,16);
         }
     }
 
@@ -86,7 +86,7 @@ public abstract class BufferedImageProvider {
         public BufferedImage getImage(LootFiltersPlugin plugin, PluginTileItem item, int... height) {
             var image = plugin.getItemManager().getImage(item.getId(), item.getQuantity(), false);
             var imageHeight = height.length >= 1 ? height[0] : 16;
-            return ImageUtil.resizeImage(image, image.getWidth() * imageHeight / image.getHeight(), imageHeight, true);
+            return ImageUtil.resizeImage(image, image.getWidth() * imageHeight / image.getHeight(), imageHeight,true);
         }
 
         @Override
