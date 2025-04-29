@@ -77,7 +77,13 @@ public class DisplayConfig {
     public Color getTextColor() {
         return textColor != null ? textColor : Color.WHITE;
     }
-
+    public BufferedImageProvider getIcon(){
+        if(isCompact()){
+            return new BufferedImageProvider.CurrentItem();
+        }else{
+            return icon;
+        }
+    }
     public Color getMenuTextColor() {
         if (isHidden()) {
             return DEFAULT_MENU_TEXT_COLOR;

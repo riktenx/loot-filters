@@ -213,10 +213,11 @@ public interface LootFiltersConfig extends Config {
     )
     default TextAccent textAccent() { return TextAccent.USE_FILTER; }
     String COMPACT_RENDER_SIZE  = "compactRenderSize";
+    @Range(min = 16, max = 32)
     @ConfigItem(
             keyName = COMPACT_RENDER_SIZE,
-            name = "Compact icon size",
-            description = "Icon size for compact item rendering. Specifically, height in pixels, although it will sometimes adjust it slightly to preserve aspect ratio. Full size is 32, a good medium is 26.",
+            name = "Compact icon height",
+            description = "Icon size for compact item rendering. Specifically, height in pixels, although it will sometimes adjust it slightly to preserve aspect ratio. Full size is 32, a good medium is 26. Valid range is 16-32.",
             section = displayOverrides,
             position = 24
     )

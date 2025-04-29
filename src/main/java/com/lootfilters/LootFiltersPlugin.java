@@ -242,9 +242,6 @@ public class LootFiltersPlugin extends Plugin {
 				pluginPanel.reflowFilterSelect(getLoadedFilters(), selected);
 			}
 		}
-		if(event.getKey().equals(LootFiltersConfig.COMPACT_RENDER_SIZE)){
-			resetDisplay();
-		}
 
 		if (event.getKey().equals(SELECTED_FILTER_KEY)) {
 			var selected = getSelectedFilterName();

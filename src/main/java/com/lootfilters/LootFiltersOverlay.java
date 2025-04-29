@@ -6,6 +6,7 @@ import com.lootfilters.model.DualValueDisplayType;
 import com.lootfilters.model.FontMode;
 import com.lootfilters.model.PluginTileItem;
 import com.lootfilters.model.ValueDisplayType;
+import com.lootfilters.rule.TextAccent;
 import com.lootfilters.util.TextComponent;
 import net.runelite.api.Client;
 import net.runelite.api.ItemID;
@@ -15,17 +16,18 @@ import net.runelite.api.coords.LocalPoint;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPosition;
+import net.runelite.client.ui.overlay.components.ProgressBarComponent;
 import net.runelite.client.ui.overlay.components.ProgressPieComponent;
 import net.runelite.client.util.ImageUtil;
 
 import javax.inject.Inject;
 import java.awt.*;
+import java.awt.font.TextAttribute;
+import java.awt.font.TextLayout;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
@@ -97,22 +99,22 @@ public class LootFiltersOverlay extends Overlay {
                 if (match == null) {
                     continue;
                 }
-                matchedItems.add(Map.entry(item,match));
-                if(match.isCompact())
+                matchedItems.add(Map.entry(item, match));
+                if (match.isCompact())
                     remainingCompactMatches++;
             }
             matchedItems.sort(Comparator.comparingInt(o -> (o.getValue().isCompact() ? 0 : 1)));
             boolean renderingCompact = false;
-            for (var matchedItem: matchedItems){
+            for (var matchedItem : matchedItems) {
                 var count = itemCounts.get(matchedItem.getKey().getId());
                 var textHeight = 0;
-                if(matchedItem.getValue().isCompact()){
-                    var effectiveRowLength = config.compactRenderRowLength() > remainingCompactMatches? remainingCompactMatches : config.compactRenderRowLength();
+                if (matchedItem.getValue().isCompact()) {
+                    var effectiveRowLength = config.compactRenderRowLength() > remainingCompactMatches ? remainingCompactMatches : config.compactRenderRowLength();
                     textHeight = renderCompact(matchedItem.getValue(), g, matchedItem.getKey(), tile, count, currentOffset, mouse, hoveredHide::set,
                             hoveredHighlight::set, hoveredItem::set, compactRowPosition, effectiveRowLength);
-                    if(textHeight > 0){
+                    if (textHeight > 0) {
                         renderingCompact = true;
-                        if(compactRowPosition >= config.compactRenderRowLength()-1){
+                        if (compactRowPosition >= config.compactRenderRowLength() - 1) {
                             compactRowPosition = 0;
                             currentOffset += textHeight + BOX_PAD + 3;
                             remainingCompactMatches -= config.compactRenderRowLength();
@@ -121,17 +123,17 @@ public class LootFiltersOverlay extends Overlay {
                         }
                     }
                 } else {
-                    if(renderingCompact){
+                    if (renderingCompact) {
                         renderingCompact = false;
-                        currentOffset += config.compactRenderSize()/2;
-                        if(compactRowPosition > 0){
+                        currentOffset += config.compactRenderSize() / 2;
+                        if (compactRowPosition > 0) {
                             compactRowPosition = 0;
                             currentOffset += config.compactRenderSize() + BOX_PAD + 2;
                         }
                     }
                     textHeight = renderClassic(matchedItem.getValue(), g, matchedItem.getKey(), tile, count, currentOffset, mouse, hoveredHide::set,
                             hoveredHighlight::set, hoveredItem::set);
-                    if(textHeight > 0){
+                    if (textHeight > 0) {
 
                         currentOffset += textHeight + BOX_PAD + 3;
                     }
@@ -146,13 +148,13 @@ public class LootFiltersOverlay extends Overlay {
     }
 
     private int renderClassic(DisplayConfig match, Graphics2D g, PluginTileItem item, Tile tile, long count,
-                              int currentOffset, net.runelite.api.Point mouse,  Consumer<Integer> onHoverHide,
-                              Consumer<Integer> onHoverHighlight, Consumer<Integer> onHoveredItem){
+                              int currentOffset, net.runelite.api.Point mouse, Consumer<Integer> onHoverHide,
+                              Consumer<Integer> onHoverHighlight, Consumer<Integer> onHoveredItem) {
 
         var leftOffset = 0;
         var overrideHidden = plugin.isHotkeyActive() && config.hotkeyShowHiddenItems();
         if (match.isHideOverlay() && !overrideHidden) {
-           return -1;
+            return -1;
         }
 
         var loc = LocalPoint.fromWorld(client.getTopLevelWorldView(), tile.getWorldLocation());
@@ -168,7 +170,7 @@ public class LootFiltersOverlay extends Overlay {
         } // otherwise we don't have to do anything, the font is already set
 
         var displayText = buildDisplayText(item, count, match);
-        var textPoint = getCanvasTextLocation(client, g, loc, displayText, tile.getItemLayer().getHeight() +  config.overlayZOffset());
+        var textPoint = getCanvasTextLocation(client, g, loc, displayText, tile.getItemLayer().getHeight() + config.overlayZOffset());
         if (textPoint == null) {
             return -1;
         }
@@ -220,15 +222,15 @@ public class LootFiltersOverlay extends Overlay {
         }
         if (match.isShowDespawn() || plugin.isHotkeyActive()) {
             var type = plugin.isHotkeyActive() ? DespawnTimerType.PIE : config.despawnTimerType();
-            renderDespawnTimer(g, type, item, textPoint, textWidth, currentOffset, leftOffset, true);
+            renderDespawnTimer(g, type, item, textPoint, textWidth, currentOffset, leftOffset, false);
         }
         return textHeight;
     }
 
     private int renderCompact(DisplayConfig match, Graphics2D g, PluginTileItem item, Tile tile, long count,
-                              int currentOffset, net.runelite.api.Point mouse,  Consumer<Integer> onHoverHide,
+                              int currentOffset, net.runelite.api.Point mouse, Consumer<Integer> onHoverHide,
                               Consumer<Integer> onHoverHighlight, Consumer<Integer> onHoveredItem, int rowOffset,
-                              int rowSize){
+                              int rowSize) {
         var overrideHidden = plugin.isHotkeyActive() && config.hotkeyShowHiddenItems();
         if (match.isHideOverlay() && !overrideHidden) {
             return -1;
@@ -248,26 +250,26 @@ public class LootFiltersOverlay extends Overlay {
 
         var fm = g.getFontMetrics(g.getFont());
         var boxHeight = config.compactRenderSize();
-        var boxWidth = Math.round(36 * boxHeight/(DEFAULT_IMAGE_HEIGHT*1.0f));
+        var boxWidth = Math.round(36 * boxHeight / (DEFAULT_IMAGE_HEIGHT * 1.0f));
 
-        var image = plugin.getIconIndex().get(match.getIcon().getCacheKey(item,config.compactRenderSize()));
-        if(image == null){
-            plugin.getIconIndex().inc(match.getIcon(), item,config.compactRenderSize());
-            image = plugin.getIconIndex().get(match.getIcon().getCacheKey(item,config.compactRenderSize()));
-            if(image == null){
+        var image = plugin.getIconIndex().get(match.getIcon().getCacheKey(item, config.compactRenderSize()));
+        if (image == null) {
+            plugin.getIconIndex().inc(match.getIcon(), item, config.compactRenderSize());
+            image = plugin.getIconIndex().get(match.getIcon().getCacheKey(item, config.compactRenderSize()));
+            if (image == null) {
                 return -1;
             }
         }
         boxHeight = image.getHeight();
         boxWidth = image.getWidth();
-        var fullBoxWidth = boxWidth+4;
-        var imagePoint = getCanvasImageLocation(client, loc, image, tile.getItemLayer().getHeight() +  config.overlayZOffset());
-        if(imagePoint == null){
+        var fullBoxWidth = boxWidth + 4;
+        var imagePoint = getCanvasImageLocation(client, loc, image, tile.getItemLayer().getHeight() + config.overlayZOffset());
+        if (imagePoint == null) {
             return -1;
         }
         // item square size- 1 px padding outside the bounding box, 1 px inside, item width, 1 px, 1 px.
         var boundingBox = new Rectangle(
-                imagePoint.getX() + (fullBoxWidth)*rowOffset - Math.round(fullBoxWidth*((rowSize-1)/2f)), imagePoint.getY() - currentOffset - boxHeight ,
+                imagePoint.getX() + (fullBoxWidth) * rowOffset - Math.round(fullBoxWidth * ((rowSize - 1) / 2f)), imagePoint.getY() - currentOffset - boxHeight,
                 boxWidth + 2, boxHeight + 2
         );
 
@@ -289,25 +291,34 @@ public class LootFiltersOverlay extends Overlay {
             renderClickboxes(g, boundingBox, item, match, onHoverHide, onHoverHighlight);
         }
         var displayText = "";
-        if(item.getQuantity() > 1){
-            displayText = abbreviate(item.getQuantity());
+        if (item.getQuantity() > 1) {
+            if (item.getQuantity() < 1000) {
+                displayText += item.getQuantity();
+            } else if (item.getQuantity() < 99500) {
+                displayText += String.format("%.0fK", (float) item.getQuantity() / 1e3);
+            } else {
+                displayText += "Lots!";
+            }
         }
-        var text = new TextComponent();
-        g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,match.getTextColor().getAlpha()/255f));
-        g.drawImage(image, boundingBox.x+BOX_PAD/2, boundingBox.y+BOX_PAD/2, null);
+
+        g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, match.getTextColor().getAlpha() / 255f));
+        g.drawImage(image, boundingBox.x + BOX_PAD / 2, boundingBox.y + BOX_PAD / 2, null);
         if (match.isShowDespawn() || plugin.isHotkeyActive()) {
             var type = plugin.isHotkeyActive() ? DespawnTimerType.PIE : config.despawnTimerType();
-            renderDespawnTimer(g, type, item, new net.runelite.api.Point(boundingBox.x + BOX_PAD/2 , boundingBox.y+fm.getHeight()+BOX_PAD/2),  boxWidth+2, 13-boxHeight, -1, false);
+            renderDespawnTimer(g, type, item, new net.runelite.api.Point(boundingBox.x + BOX_PAD / 2, boundingBox.y + boundingBox.height), boxWidth + 2,0, 0, true);
         }
-        g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,1));
-        if(count > 1){
-            displayText += "x"+count;
+        g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1));
+        if (count > 1) {
+            displayText += "x" + count;
         }
-        text.setText(displayText);
+        if (config.compactRenderSize() >= 22) {
+            var text = new TextComponent();
+            text.setText(displayText);
+            text.setColor(match.isHidden() ? config.hiddenColor() : match.getTextColor());
+            text.setPosition(new Point(boundingBox.x + BOX_PAD / 2, boundingBox.y + fm.getHeight() + BOX_PAD / 2));
+            text.render(g);
+        }
 
-        text.setColor(match.isHidden() ? config.hiddenColor() : match.getTextColor());
-        text.setPosition(new Point(boundingBox.x + BOX_PAD , boundingBox.y+fm.getHeight()+BOX_PAD ));
-        text.render(g);
         return image.getHeight();
     }
 
@@ -410,7 +421,7 @@ public class LootFiltersOverlay extends Overlay {
         g.drawString("audio: " + plugin.getQueuedAudio().size() + ", icon: " + plugin.getIconIndex().size(), 0, 80);
     }
 
-    private void renderDespawnTimer(Graphics2D g, DespawnTimerType type, PluginTileItem item, net.runelite.api.Point textPoint, int textWidth, int yOffset, int leftOffset, boolean leftAlign) {
+    private void renderDespawnTimer(Graphics2D g, DespawnTimerType type, PluginTileItem item, net.runelite.api.Point textPoint, int textWidth, int yOffset, int leftOffset, boolean compact) {
         var ticksRemaining = item.getDespawnTime() - client.getTickCount();
         if (ticksRemaining < 0) { // doesn't despawn
             return;
@@ -419,29 +430,35 @@ public class LootFiltersOverlay extends Overlay {
             return;
         }
 
-        if (type == DespawnTimerType.TICKS || type == DespawnTimerType.SECONDS) {
+        if ((type == DespawnTimerType.BAR && leftOffset > 0) || compact) {
+            var total = item.getDespawnTime() - item.getSpawnTime();
+            if (total == 0)
+                return;
+            var remaining = item.getDespawnTime() - plugin.getClient().getTickCount();
+
+            Rectangle bar;
+            if(compact){
+                bar = new Rectangle(textPoint.getX(), textPoint.getY() - 3, textWidth * remaining / total, 3);
+            }else{
+                bar = new Rectangle(textPoint.getX()-leftOffset-1, textPoint.getY() - 2 - yOffset, leftOffset * remaining / total-4, 3);
+            }
+            g.setColor(getDespawnTextColor(item));
+            g.fillRect(bar.x, bar.y, bar.width, bar.height);
+        } else if (type == DespawnTimerType.TICKS || type == DespawnTimerType.SECONDS) {
             var text = new TextComponent();
+            var timeRounding = "%.1f";
             var displyString = type == DespawnTimerType.TICKS
                     ? Integer.toString(ticksRemaining)
-                    : String.format("%.1f", (Duration.between(Instant.now(), item.getDespawnInstant())).toMillis() / 1000f);
+                    : String.format(timeRounding, (Duration.between(Instant.now(), item.getDespawnInstant())).toMillis() / 1000f);
             text.setText(displyString);
             text.setColor(getDespawnTextColor(item));
-            int rightAlignedOffset = 0;
-            if(!leftAlign){
-                rightAlignedOffset = g.getFontMetrics(g.getFont()).stringWidth(displyString) + 4;
-                yOffset -= 2;
-            }
-            text.setPosition(new Point(textPoint.getX() + textWidth + 2 + 1-rightAlignedOffset, textPoint.getY() - yOffset));
+            text.setPosition(new Point(textPoint.getX() + textWidth + 2 + 1, textPoint.getY() - yOffset));
             text.render(g);
         } else {
             var timer = new ProgressPieComponent();
             var total = item.getDespawnTime() - item.getSpawnTime();
             var remaining = item.getDespawnTime() - plugin.getClient().getTickCount();
-            int rightAlignedOffset = 0;
-            if(!leftAlign){
-                rightAlignedOffset = textWidth;
-            }
-            timer.setPosition(new net.runelite.api.Point(textPoint.getX() - TIMER_RADIUS + rightAlignedOffset - BOX_PAD - 2 - leftOffset,
+            timer.setPosition(new net.runelite.api.Point(textPoint.getX() - TIMER_RADIUS - BOX_PAD - 2 - leftOffset,
                     textPoint.getY() - yOffset - TIMER_RADIUS));
             timer.setProgress(remaining / (double) total);
             timer.setDiameter(TIMER_RADIUS * 2);
