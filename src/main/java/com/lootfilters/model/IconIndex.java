@@ -52,7 +52,7 @@ public class IconIndex {
             for (var item : entry.getValue()) {
                 var match = plugin.getActiveFilter().findMatch(plugin, item);
                 if (match != null && match.getIcon() != null) {
-                    inc(match.getIcon(), item);
+                    inc(match.getIcon(), item, match.isCompact()? plugin.getConfig().compactRenderSize() : 16);
                 }
             }
         }

@@ -233,7 +233,7 @@ public class LootFiltersOverlay extends Overlay {
 
         var image = plugin.getIconIndex().get(match.getIcon().getCacheKey(item, config.compactRenderSize()));
         if (image == null) {
-            plugin.getIconIndex().inc(match.getIcon(), item, config.compactRenderSize());
+            //plugin.getIconIndex().inc(match.getIcon(), item, config.compactRenderSize());
             image = plugin.getIconIndex().get(match.getIcon().getCacheKey(item, config.compactRenderSize()));
             if (image == null) {
                 return -1;
