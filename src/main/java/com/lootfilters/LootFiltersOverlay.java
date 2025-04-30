@@ -30,6 +30,7 @@ import java.util.*;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import static com.lootfilters.util.TextUtil.abbreviate;
 import static com.lootfilters.util.TextUtil.abbreviateValue;
@@ -78,66 +79,129 @@ public class LootFiltersOverlay extends Overlay {
         }
         for (var entry : plugin.getTileItemIndex().entrySet()) {
             var items = entry.getValue();
-            var itemCounts = items.stream()
-                    .collect(groupingBy(TileItem::getId, counting()));
-
+            var textHeight = 0;
+            var itemCounts = items.stream().collect(groupingBy(TileItem::getId, counting()));
             var tile = entry.getKey();
             var currentOffset = 0;
             var compactRowPosition = 0;
             var rendered = new ArrayList<Integer>();
-            var matchedItems = new ArrayList<Map.Entry<PluginTileItem, DisplayConfig>>();
-            var remainingCompactMatches = 0;
-            for (var item : items) {
 
+            var partitionedItems = items.stream().collect(Collectors.partitioningBy(i -> plugin.getDisplayIndex().get(i).isCompact()));
+            var remainingCompactMatches = partitionedItems.get(true).size();
+            //Render the compact items
+            for (var item: partitionedItems.get(true)){
+                var match = plugin.getDisplayIndex().get(item);
+                if (match == null) {
+                    continue;
+                }
+                var effectiveRowLength = config.compactRenderRowLength() > remainingCompactMatches ? remainingCompactMatches : config.compactRenderRowLength();
+                textHeight = renderCompact(match, g, item, tile, itemCounts.get(item.getId()), currentOffset, mouse, hoveredHide::set,
+                        hoveredHighlight::set, hoveredItem::set, compactRowPosition, effectiveRowLength);
+                if (compactRowPosition >= config.compactRenderRowLength() - 1) {
+                    compactRowPosition = 0;
+                    currentOffset += textHeight + BOX_PAD + 3;
+                    remainingCompactMatches -= config.compactRenderRowLength();
+                } else {
+                    compactRowPosition++;
+                }
+            }
+            if(!partitionedItems.get(true).isEmpty()){
+                currentOffset += config.compactRenderSize() / 2;
+                if (compactRowPosition > 0) {
+                    currentOffset += config.compactRenderSize() + BOX_PAD + 2;
+                }
+            }
+
+            //Render all the non-compact items
+            for(var item: partitionedItems.get(false)){
+                var leftOffset = 0;
 
                 if (rendered.contains(item.getId())) {
                     continue;
                 }
                 rendered.add(item.getId());
 
+                var count = itemCounts.get(item.getId());
+
                 var match = plugin.getDisplayIndex().get(item);
                 if (match == null) {
                     continue;
                 }
-                matchedItems.add(Map.entry(item, match));
-                if (match.isCompact())
-                    remainingCompactMatches++;
-            }
-            matchedItems.sort(Comparator.comparingInt(o -> (o.getValue().isCompact() ? 0 : 1)));
-            boolean renderingCompact = false;
-            for (var matchedItem : matchedItems) {
-                var count = itemCounts.get(matchedItem.getKey().getId());
-                var textHeight = 0;
-                if (matchedItem.getValue().isCompact()) {
-                    var effectiveRowLength = config.compactRenderRowLength() > remainingCompactMatches ? remainingCompactMatches : config.compactRenderRowLength();
-                    textHeight = renderCompact(matchedItem.getValue(), g, matchedItem.getKey(), tile, count, currentOffset, mouse, hoveredHide::set,
-                            hoveredHighlight::set, hoveredItem::set, compactRowPosition, effectiveRowLength);
-                    if (textHeight > 0) {
-                        renderingCompact = true;
-                        if (compactRowPosition >= config.compactRenderRowLength() - 1) {
-                            compactRowPosition = 0;
-                            currentOffset += textHeight + BOX_PAD + 3;
-                            remainingCompactMatches -= config.compactRenderRowLength();
-                        } else {
-                            compactRowPosition++;
-                        }
-                    }
-                } else {
-                    if (renderingCompact) {
-                        renderingCompact = false;
-                        currentOffset += config.compactRenderSize() / 2;
-                        if (compactRowPosition > 0) {
-                            compactRowPosition = 0;
-                            currentOffset += config.compactRenderSize() + BOX_PAD + 2;
-                        }
-                    }
-                    textHeight = renderClassic(matchedItem.getValue(), g, matchedItem.getKey(), tile, count, currentOffset, mouse, hoveredHide::set,
-                            hoveredHighlight::set, hoveredItem::set);
-                    if (textHeight > 0) {
 
-                        currentOffset += textHeight + BOX_PAD + 3;
-                    }
+                var overrideHidden = plugin.isHotkeyActive() && config.hotkeyShowHiddenItems();
+                if (match.isHideOverlay() && !overrideHidden) {
+                    continue;
                 }
+
+                var loc = LocalPoint.fromWorld(client.getTopLevelWorldView(), tile.getWorldLocation());
+                if (loc == null) {
+                    continue;
+                }
+                if (tile.getItemLayer() == null) {
+                    continue;
+                }
+
+                if (config.fontMode() == FontMode.PLUGIN) {
+                    g.setFont(match.getFont());
+                } // otherwise we don't have to do anything, the font is already set
+
+                var displayText = buildDisplayText(item, count, match);
+                var textPoint = getCanvasTextLocation(client, g, loc, displayText, tile.getItemLayer().getHeight() + config.overlayZOffset());
+                if (textPoint == null) {
+                    continue;
+                }
+
+                var fm = g.getFontMetrics(g.getFont());
+                var textWidth = fm.stringWidth(displayText);
+                textHeight = fm.getHeight();
+
+                var text = new TextComponent();
+                text.setText(displayText);
+                text.setColor(match.isHidden() ? config.hiddenColor() : match.getTextColor());
+                text.setPosition(new Point(textPoint.getX(), textPoint.getY() - currentOffset));
+                if (match.getTextAccentColor() != null) {
+                    text.setAccentColor(match.getTextAccentColor());
+                }
+                if (match.getTextAccent() != null) {
+                    text.setTextAccent(match.getTextAccent());
+                }
+
+                var boundingBox = new Rectangle(
+                        textPoint.getX() - BOX_PAD, textPoint.getY() - currentOffset - textHeight - BOX_PAD,
+                        textWidth + 2 * BOX_PAD, textHeight + 2 * BOX_PAD
+                );
+
+                if (match.getBackgroundColor() != null) {
+                    g.setColor(match.getBackgroundColor());
+                    g.fillRect(boundingBox.x, boundingBox.y, boundingBox.width, boundingBox.height);
+                }
+                if (match.getBorderColor() != null) {
+                    g.setColor(match.getBorderColor());
+                    g.drawRect(boundingBox.x, boundingBox.y, boundingBox.width, boundingBox.height);
+                }
+                if (plugin.isHotkeyActive() && boundingBox.contains(mouse.getX(), mouse.getY())) {
+                    hoveredItem.set(item.getId());
+
+                    g.setColor(match.isHidden() ? config.hiddenColor() : Color.WHITE);
+                    g.drawRect(boundingBox.x, boundingBox.y, boundingBox.width, boundingBox.height);
+                }
+                if (config.hotkeyShowClickboxes() && plugin.isHotkeyActive()) {
+                    renderClickboxes(g, boundingBox, item, match, hoveredHide::set, hoveredHighlight::set);
+                }
+
+                text.render(g);
+
+                if (match.getIcon() != null) {
+                    var cacheKey = match.getIcon().getCacheKey(item);
+                    var d = renderIcon(g, cacheKey, textPoint, currentOffset);
+                    leftOffset += d.width;
+                }
+                if (match.isShowDespawn() || plugin.isHotkeyActive()) {
+                    var type = plugin.isHotkeyActive() ? DespawnTimerType.PIE : config.despawnTimerType();
+                    renderDespawnTimer(g, type, item, textPoint, textWidth, currentOffset, leftOffset, false);
+                }
+
+                currentOffset += textHeight + BOX_PAD + 3;
             }
         }
 
@@ -145,86 +209,6 @@ public class LootFiltersOverlay extends Overlay {
         plugin.setHoveredHide(hoveredHide.get());
         plugin.setHoveredHighlight(hoveredHighlight.get());
         return null;
-    }
-
-    private int renderClassic(DisplayConfig match, Graphics2D g, PluginTileItem item, Tile tile, long count,
-                              int currentOffset, net.runelite.api.Point mouse, Consumer<Integer> onHoverHide,
-                              Consumer<Integer> onHoverHighlight, Consumer<Integer> onHoveredItem) {
-
-        var leftOffset = 0;
-        var overrideHidden = plugin.isHotkeyActive() && config.hotkeyShowHiddenItems();
-        if (match.isHideOverlay() && !overrideHidden) {
-            return -1;
-        }
-
-        var loc = LocalPoint.fromWorld(client.getTopLevelWorldView(), tile.getWorldLocation());
-        if (loc == null) {
-            return -1;
-        }
-        if (tile.getItemLayer() == null) {
-            return -1;
-        }
-
-        if (config.fontMode() == FontMode.PLUGIN) {
-            g.setFont(match.getFont());
-        } // otherwise we don't have to do anything, the font is already set
-
-        var displayText = buildDisplayText(item, count, match);
-        var textPoint = getCanvasTextLocation(client, g, loc, displayText, tile.getItemLayer().getHeight() + config.overlayZOffset());
-        if (textPoint == null) {
-            return -1;
-        }
-
-        var fm = g.getFontMetrics(g.getFont());
-        var textWidth = fm.stringWidth(displayText);
-        var textHeight = fm.getHeight();
-
-        var text = new TextComponent();
-        text.setText(displayText);
-        text.setColor(match.isHidden() ? config.hiddenColor() : match.getTextColor());
-        text.setPosition(new Point(textPoint.getX(), textPoint.getY() - currentOffset));
-        if (match.getTextAccentColor() != null) {
-            text.setAccentColor(match.getTextAccentColor());
-        }
-        if (match.getTextAccent() != null) {
-            text.setTextAccent(match.getTextAccent());
-        }
-
-        var boundingBox = new Rectangle(
-                textPoint.getX() - BOX_PAD, textPoint.getY() - currentOffset - textHeight - BOX_PAD,
-                textWidth + 2 * BOX_PAD, textHeight + 2 * BOX_PAD
-        );
-
-        if (match.getBackgroundColor() != null) {
-            g.setColor(match.getBackgroundColor());
-            g.fillRect(boundingBox.x, boundingBox.y, boundingBox.width, boundingBox.height);
-        }
-        if (match.getBorderColor() != null) {
-            g.setColor(match.getBorderColor());
-            g.drawRect(boundingBox.x, boundingBox.y, boundingBox.width, boundingBox.height);
-        }
-        if (plugin.isHotkeyActive() && boundingBox.contains(mouse.getX(), mouse.getY())) {
-            onHoveredItem.accept(item.getId());
-
-            g.setColor(match.isHidden() ? config.hiddenColor() : Color.WHITE);
-            g.drawRect(boundingBox.x, boundingBox.y, boundingBox.width, boundingBox.height);
-        }
-        if (config.hotkeyShowClickboxes() && plugin.isHotkeyActive()) {
-            renderClickboxes(g, boundingBox, item, match, onHoverHide, onHoverHighlight);
-        }
-
-        text.render(g);
-
-        if (match.getIcon() != null) {
-            var cacheKey = match.getIcon().getCacheKey(item);
-            var d = renderIcon(g, cacheKey, textPoint, currentOffset);
-            leftOffset += d.width;
-        }
-        if (match.isShowDespawn() || plugin.isHotkeyActive()) {
-            var type = plugin.isHotkeyActive() ? DespawnTimerType.PIE : config.despawnTimerType();
-            renderDespawnTimer(g, type, item, textPoint, textWidth, currentOffset, leftOffset, false);
-        }
-        return textHeight;
     }
 
     private int renderCompact(DisplayConfig match, Graphics2D g, PluginTileItem item, Tile tile, long count,
