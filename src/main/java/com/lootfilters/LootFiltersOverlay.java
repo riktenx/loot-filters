@@ -6,7 +6,6 @@ import com.lootfilters.model.DualValueDisplayType;
 import com.lootfilters.model.FontMode;
 import com.lootfilters.model.PluginTileItem;
 import com.lootfilters.model.ValueDisplayType;
-import com.lootfilters.rule.TextAccent;
 import com.lootfilters.util.TextComponent;
 import net.runelite.api.Client;
 import net.runelite.api.ItemID;
@@ -16,14 +15,10 @@ import net.runelite.api.coords.LocalPoint;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPosition;
-import net.runelite.client.ui.overlay.components.ProgressBarComponent;
 import net.runelite.client.ui.overlay.components.ProgressPieComponent;
-import net.runelite.client.util.ImageUtil;
 
 import javax.inject.Inject;
 import java.awt.*;
-import java.awt.font.TextAttribute;
-import java.awt.font.TextLayout;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
@@ -79,7 +74,7 @@ public class LootFiltersOverlay extends Overlay {
         }
         for (var entry : plugin.getTileItemIndex().entrySet()) {
             var items = entry.getValue();
-            var textHeight = 0;
+
             var itemCounts = items.stream().collect(groupingBy(TileItem::getId, counting()));
             var tile = entry.getKey();
             var currentOffset = 0;
@@ -95,7 +90,7 @@ public class LootFiltersOverlay extends Overlay {
                     continue;
                 }
                 var effectiveRowLength = config.compactRenderRowLength() > remainingCompactMatches ? remainingCompactMatches : config.compactRenderRowLength();
-                textHeight = renderCompact(match, g, item, tile, itemCounts.get(item.getId()), currentOffset, mouse, hoveredHide::set,
+                var textHeight = renderCompact(match, g, item, tile, itemCounts.get(item.getId()), currentOffset, mouse, hoveredHide::set,
                         hoveredHighlight::set, hoveredItem::set, compactRowPosition, effectiveRowLength);
                 if (compactRowPosition >= config.compactRenderRowLength() - 1) {
                     compactRowPosition = 0;
@@ -153,7 +148,7 @@ public class LootFiltersOverlay extends Overlay {
 
                 var fm = g.getFontMetrics(g.getFont());
                 var textWidth = fm.stringWidth(displayText);
-                textHeight = fm.getHeight();
+                var textHeight = fm.getHeight();
 
                 var text = new TextComponent();
                 text.setText(displayText);
