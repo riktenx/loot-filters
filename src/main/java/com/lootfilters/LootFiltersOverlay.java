@@ -97,11 +97,21 @@ public class LootFiltersOverlay extends Overlay {
             }));
             var remainingCompactMatches = partitionedItems.get(true).size();
             // compact
+            var compactItemIndex = 1;
             for (var item : partitionedItems.get(true)) {
                 var match = plugin.getDisplayIndex().get(item);
                 if (match == null) {
                     continue;
                 }
+
+                if (compactItemIndex != itemCounts.get(item.getId())) {
+                    compactItemIndex++;
+                    remainingCompactMatches--;
+                    continue;
+                }
+                compactItemIndex = 1;
+                rendered.add(item.getId());
+
                 var effectiveRowLength = config.compactRenderRowLength() > remainingCompactMatches ? remainingCompactMatches : config.compactRenderRowLength();
                 var textHeight = renderCompact(match, g, item, tile, itemCounts.get(item.getId()), currentOffset, mouse,
                         hoveredHide::set, compactRowPosition, effectiveRowLength);
