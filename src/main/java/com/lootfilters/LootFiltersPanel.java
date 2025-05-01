@@ -12,6 +12,7 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import java.awt.Color;
 import java.awt.Desktop;
@@ -36,6 +37,8 @@ import static net.runelite.client.util.ImageUtil.loadImageResource;
 @Slf4j
 public class LootFiltersPanel extends PluginPanel {
     private static final String NONE_ITEM = "<none>";
+    private static final String NONE_DESCRIPTION = "Select a filter to show its description.";
+    private static final String BLANK_DESCRIPTION = "<no description provided>";
     private static final String TUTORIAL_TEXT = "// Welcome to the loot filter\n" +
             "// For more information on \n" +
             "// usage, please check\n" +
@@ -45,11 +48,15 @@ public class LootFiltersPanel extends PluginPanel {
     private final LootFiltersPlugin plugin;
     private final JComboBox<String> filterSelect;
     private final JPanel root;
+    private final JTextArea filterDescription;
 
     public LootFiltersPanel(LootFiltersPlugin plugin) {
         this.plugin = plugin;
 
         filterSelect = new JComboBox<>();
+        filterDescription = new JTextArea();
+        filterDescription.setLineWrap(true);
+        filterDescription.setEditable(false);
 
         root = new JPanel();
         root.setLayout(new BoxLayout(root, BoxLayout.Y_AXIS));
@@ -108,10 +115,12 @@ public class LootFiltersPanel extends PluginPanel {
         root.add(mid);
         root.add(filterSelect);
         root.add(bottom);
+        root.add(filterDescription);
 
         add(root);
 
         reflowFilterSelect(plugin.getLoadedFilters(), plugin.getSelectedFilterName());
+        reflowFilterDescription();
     }
 
     private void onCreateEmptyFilter() {
@@ -268,6 +277,7 @@ public class LootFiltersPanel extends PluginPanel {
     private void onReloadFilters() {
         plugin.reloadFilters();
         reflowFilterSelect(plugin.getLoadedFilters(), plugin.getSelectedFilterName());
+        reflowFilterDescription();
     }
 
     private void onBrowseFolder() {
@@ -295,5 +305,19 @@ public class LootFiltersPanel extends PluginPanel {
             plugin.setSelectedFilterName(null);
         }
         filterSelect.addActionListener(this::onFilterSelect);
+    }
+
+    public void reflowFilterDescription() {
+        if (plugin.getSelectedFilterName() == null) {
+            filterDescription.setText(NONE_DESCRIPTION);
+            return;
+        }
+
+        var filter = plugin.getActiveFilter();
+        var desc = filter.getDescription();
+        if (desc == null || desc.isBlank()) {
+            desc = BLANK_DESCRIPTION;
+        }
+        filterDescription.setText(desc.replaceAll("<br>", "\n"));
     }
 }
