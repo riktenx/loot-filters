@@ -12,6 +12,7 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import java.awt.Color;
 import java.awt.Desktop;
 import java.awt.FlowLayout;
@@ -29,6 +30,7 @@ import static com.lootfilters.util.TextUtil.quote;
 import static javax.swing.JOptionPane.showConfirmDialog;
 import static javax.swing.JOptionPane.showInputDialog;
 import static javax.swing.JOptionPane.showMessageDialog;
+import static javax.swing.SwingUtilities.invokeLater;
 import static net.runelite.client.util.ImageUtil.loadImageResource;
 
 @Slf4j
@@ -56,7 +58,8 @@ public class LootFiltersPanel extends PluginPanel {
     }
 
     private void init() {
-        var top = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        var top = new JPanel();
+        top.setLayout(new BoxLayout(top, BoxLayout.X_AXIS));
         var mid = new JPanel(new FlowLayout(FlowLayout.LEFT));
         var bottom = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
@@ -75,7 +78,7 @@ public class LootFiltersPanel extends PluginPanel {
                 "Reload filters from disk.",
                 this::onReloadFilters);
         var browseFolder = createIconButton("folder_icon",
-                "View the filters directory in the system file browser.",
+                "View the plugin directory, where filters, sound files, and icon files should be placed, in the system file browser.",
                 this::onBrowseFolder);
 
         var openFiltersite = new JLabel("<html><u>filterscape.xyz</u></html>");
@@ -91,10 +94,9 @@ public class LootFiltersPanel extends PluginPanel {
             }
         });
 
+        top.add(Box.createHorizontalStrut(1));
         top.add(importClipboard);
-        top.add(createNew);
-        top.add(importConfig);
-        top.add(Box.createHorizontalStrut(110));
+        top.add(Box.createGlue());
         top.add(reloadFilters);
         top.add(browseFolder);
 
@@ -161,6 +163,7 @@ public class LootFiltersPanel extends PluginPanel {
 
         LootFilter newFilter;
         try {
+            plugin.addChatMessage("Importing...");
             newFilter = LootFilter.fromSourcesWithPreamble(Map.of("clipboard", newSrc));
         } catch (CompileException e) {
             plugin.addChatMessage("Import failed: " + e.getMessage());
@@ -177,7 +180,7 @@ public class LootFiltersPanel extends PluginPanel {
             if (!filter.getName().equals(newFilter.getName())) {
                 continue;
             }
-            if (!confirm("Filter " + quote(filter.getName()) + " already exists in " + quote(filter.getFilename()) + ". Update it?")) {
+            if (!confirm("Filter " + quote(filter.getName()) + " already exists. Update it?")) {
                 return;
             }
 
@@ -188,6 +191,7 @@ public class LootFiltersPanel extends PluginPanel {
                 return;
             }
 
+            plugin.setSelectedFilterName(newFilter.getName());
             onReloadFilters();
             return;
         }
@@ -199,6 +203,7 @@ public class LootFiltersPanel extends PluginPanel {
             return;
         }
 
+        plugin.setSelectedFilterName(newFilter.getName());
         onReloadFilters();
     }
 
@@ -267,7 +272,7 @@ public class LootFiltersPanel extends PluginPanel {
 
     private void onBrowseFolder() {
         try {
-            Desktop.getDesktop().open(LootFiltersPlugin.FILTER_DIRECTORY);
+            Desktop.getDesktop().open(LootFiltersPlugin.PLUGIN_DIRECTORY);
         } catch (Exception e) {
             log.warn("browse filters", e);
         }
