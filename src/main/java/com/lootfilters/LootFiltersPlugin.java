@@ -252,6 +252,8 @@ public class LootFiltersPlugin extends Plugin {
 
 		loadSelectedFilter();
 		resetDisplay();
+
+		pluginPanel.reflowFilterDescription();
 	}
 
 	@Subscribe
