@@ -77,13 +77,11 @@ public class DisplayConfig {
     public Color getTextColor() {
         return textColor != null ? textColor : Color.WHITE;
     }
-    public BufferedImageProvider getIcon(){
-        if(isCompact()){
-            return new BufferedImageProvider.CurrentItem();
-        }else{
-            return icon;
-        }
+
+    public BufferedImageProvider getIcon() {
+        return isCompact() ? new BufferedImageProvider.CurrentItem() : icon;
     }
+
     public Color getMenuTextColor() {
         if (isHidden()) {
             return DEFAULT_MENU_TEXT_COLOR;
@@ -119,7 +117,11 @@ public class DisplayConfig {
     public boolean isNotify() { return !isHidden() && notify != null && notify; }
     public boolean isHighlightTile() { return !isHidden() && highlightTile != null && highlightTile; }
     public boolean isHideOverlay() { return isHidden() || (hideOverlay != null && hideOverlay); }
-    public boolean isCompact() {return compact != null && compact; }
+
+    public boolean isCompact() {
+        return !isHidden() && compact != null && compact;
+    }
+
     public DisplayConfig merge(DisplayConfig other) {
         var b = toBuilder();
         if (other.textColor != null) { b.textColor(other.textColor); }

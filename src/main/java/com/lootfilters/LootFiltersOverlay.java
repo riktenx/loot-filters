@@ -18,10 +18,16 @@ import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.components.ProgressPieComponent;
 
 import javax.inject.Inject;
-import java.awt.*;
+import java.awt.AlphaComposite;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
@@ -32,13 +38,17 @@ import static com.lootfilters.util.TextUtil.abbreviateValue;
 import static com.lootfilters.util.TextUtil.withParentheses;
 import static java.util.stream.Collectors.counting;
 import static java.util.stream.Collectors.groupingBy;
-import static net.runelite.api.Perspective.*;
+import static net.runelite.api.Perspective.getCanvasImageLocation;
+import static net.runelite.api.Perspective.getCanvasTextLocation;
+import static net.runelite.api.Perspective.getCanvasTilePoly;
+import static net.runelite.client.ui.FontManager.getRunescapeSmallFont;
 
 public class LootFiltersOverlay extends Overlay {
     private static final int BOX_PAD = 2;
     private static final int CLICKBOX_SIZE = 8;
     private static final int TIMER_RADIUS = 5;
     private static final int DEFAULT_IMAGE_HEIGHT = 32;
+    private static final int DEFAULT_IMAGE_WIDTH = 36;
 
     private final Client client;
     private final LootFiltersPlugin plugin;
@@ -81,17 +91,20 @@ public class LootFiltersOverlay extends Overlay {
             var compactRowPosition = 0;
             var rendered = new ArrayList<Integer>();
 
-            var partitionedItems = items.stream().collect(Collectors.partitioningBy(i -> plugin.getDisplayIndex().get(i).isCompact()));
+            var partitionedItems = items.stream().collect(Collectors.partitioningBy(i -> {
+                var display = plugin.getDisplayIndex().get(i);
+                return display != null && display.isCompact();
+            }));
             var remainingCompactMatches = partitionedItems.get(true).size();
-            //Render the compact items
-            for (var item: partitionedItems.get(true)){
+            // compact
+            for (var item : partitionedItems.get(true)) {
                 var match = plugin.getDisplayIndex().get(item);
                 if (match == null) {
                     continue;
                 }
                 var effectiveRowLength = config.compactRenderRowLength() > remainingCompactMatches ? remainingCompactMatches : config.compactRenderRowLength();
-                var textHeight = renderCompact(match, g, item, tile, itemCounts.get(item.getId()), currentOffset, mouse, hoveredHide::set,
-                        hoveredHighlight::set, hoveredItem::set, compactRowPosition, effectiveRowLength);
+                var textHeight = renderCompact(match, g, item, tile, itemCounts.get(item.getId()), currentOffset, mouse,
+                        hoveredHide::set, compactRowPosition, effectiveRowLength);
                 if (compactRowPosition >= config.compactRenderRowLength() - 1) {
                     compactRowPosition = 0;
                     currentOffset += textHeight + BOX_PAD + 3;
@@ -100,15 +113,15 @@ public class LootFiltersOverlay extends Overlay {
                     compactRowPosition++;
                 }
             }
-            if(!partitionedItems.get(true).isEmpty()){
+            if (!partitionedItems.get(true).isEmpty()) {
                 currentOffset += config.compactRenderSize() / 2;
                 if (compactRowPosition > 0) {
                     currentOffset += config.compactRenderSize() + BOX_PAD + 2;
                 }
             }
 
-            //Render all the non-compact items
-            for(var item: partitionedItems.get(false)){
+            // non-compact
+            for (var item : partitionedItems.get(false)) {
                 var leftOffset = 0;
 
                 if (rendered.contains(item.getId())) {
@@ -207,8 +220,7 @@ public class LootFiltersOverlay extends Overlay {
     }
 
     private int renderCompact(DisplayConfig match, Graphics2D g, PluginTileItem item, Tile tile, long count,
-                              int currentOffset, net.runelite.api.Point mouse, Consumer<Integer> onHoverHide,
-                              Consumer<Integer> onHoverHighlight, Consumer<Integer> onHoveredItem, int rowOffset,
+                              int currentOffset, net.runelite.api.Point mouse, Consumer<Integer> onHoveredItem, int rowOffset,
                               int rowSize) {
         var overrideHidden = plugin.isHotkeyActive() && config.hotkeyShowHiddenItems();
         if (match.isHideOverlay() && !overrideHidden) {
@@ -219,26 +231,22 @@ public class LootFiltersOverlay extends Overlay {
         if (loc == null) {
             return -1;
         }
-        if (tile.getItemLayer() == null || item == null) {
+        if (tile.getItemLayer() == null) {
             return -1;
         }
 
-        if (config.fontMode() == FontMode.PLUGIN) {
-            g.setFont(match.getFont());
-        } // otherwise we don't have to do anything, the font is already set
+        // force the small font in compact mode because it's small
+        g.setFont(getRunescapeSmallFont());
 
         var fm = g.getFontMetrics(g.getFont());
         var boxHeight = config.compactRenderSize();
-        var boxWidth = Math.round(36 * boxHeight / (DEFAULT_IMAGE_HEIGHT * 1.0f));
+        var boxWidth = Math.round(DEFAULT_IMAGE_WIDTH * boxHeight / (float) DEFAULT_IMAGE_HEIGHT);
 
         var image = plugin.getIconIndex().get(match.getIcon().getCacheKey(item, config.compactRenderSize()));
         if (image == null) {
-            //plugin.getIconIndex().inc(match.getIcon(), item, config.compactRenderSize());
-            image = plugin.getIconIndex().get(match.getIcon().getCacheKey(item, config.compactRenderSize()));
-            if (image == null) {
-                return -1;
-            }
+            return -1;
         }
+
         boxHeight = image.getHeight();
         boxWidth = image.getWidth();
         var fullBoxWidth = boxWidth + 4;
@@ -265,9 +273,6 @@ public class LootFiltersOverlay extends Overlay {
 
             g.setColor(match.isHidden() ? config.hiddenColor() : Color.WHITE);
             g.drawRect(boundingBox.x, boundingBox.y, boundingBox.width, boundingBox.height);
-        }
-        if (config.hotkeyShowClickboxes() && plugin.isHotkeyActive()) {
-            renderClickboxes(g, boundingBox, item, match, onHoverHide, onHoverHighlight);
         }
         var displayText = "";
         if (item.getQuantity() > 1) {
