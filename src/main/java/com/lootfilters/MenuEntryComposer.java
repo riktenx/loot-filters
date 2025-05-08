@@ -27,7 +27,7 @@ public class MenuEntryComposer {
         }
 
         var item = getItemForEntry(entry);
-        var match = plugin.getActiveFilter().findMatch(plugin, item);
+        var match = plugin.getDisplayIndex().get(item);
         if (match == null) {
             entry.setTarget(buildTargetText(item, DisplayConfig.DEFAULT_MENU_TEXT_COLOR));
             return;
