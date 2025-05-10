@@ -2,6 +2,7 @@ package com.lootfilters;
 
 import com.lootfilters.model.PluginTileItem;
 import lombok.AllArgsConstructor;
+import net.runelite.api.KeyCode;
 import net.runelite.api.MenuAction;
 import net.runelite.api.MenuEntry;
 import net.runelite.api.coords.WorldPoint;
@@ -10,6 +11,7 @@ import java.awt.Color;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -58,6 +60,9 @@ public class MenuEntryComposer {
         if (plugin.getConfig().collapseEntries()) {
             entries = collapseEntries(entries);
         }
+        if (plugin.getClient().isKeyPressed(KeyCode.KC_SHIFT)) {
+            entries = addAnalyzers(entries);
+        }
         plugin.getClient().getMenu().setMenuEntries(entries);
     }
 
@@ -105,6 +110,33 @@ public class MenuEntryComposer {
         Collections.reverse(collapsed);
 
         return collapsed.toArray(MenuEntry[]::new);
+    }
+
+    private MenuEntry[] addAnalyzers(MenuEntry[] entries) {
+        return Arrays.stream(entries)
+                .flatMap(it -> isGroundItem(it)
+                        ? withAnalyzer(it).stream()
+                        : Stream.of(it))
+                .toArray(MenuEntry[]::new);
+    }
+
+    private List<MenuEntry> withAnalyzer(MenuEntry entry) {
+        var item = getItemForEntry(entry);
+        var display = plugin.getDisplayIndex().get(item);
+        Consumer<MenuEntry> onClick = (e) -> {
+            if (display == null) {
+                plugin.addChatMessage(item.getName() + " had no matches");
+            } else {
+                plugin.addChatMessage(item.getName() + " matched lines " + display.getEvalSource());
+            }
+        };
+
+        var analyzer = plugin.getClient().getMenu().createMenuEntry(-1)
+                .setOption("Analyze")
+                .setTarget(entry.getTarget())
+                .setType(MenuAction.RUNELITE)
+                .onClick(onClick);
+        return List.of(entry, analyzer);
     }
 
     private MenuEntry withCount(MenuEntry entry, long count) {
