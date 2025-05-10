@@ -109,14 +109,17 @@ public class LootFilter {
                 continue;
             }
 
-            if (matcher.isTerminal()) {
-                return display == null
-                        ? matcher.getDisplay()
-                        : display.merge(matcher.getDisplay());
+            if (display == null) {
+                display = matcher.getDisplay().toBuilder()
+                        .evalSource(new ArrayList<>())
+                        .build();
             } else {
-                display = display == null
-                        ? matcher.getDisplay()
-                        : display.merge(matcher.getDisplay());
+                display = display.merge(matcher.getDisplay());
+            }
+            display.getEvalSource().add(matcher.getSourceLine());
+
+            if (matcher.isTerminal()) {
+                return display;
             }
         }
         return display;

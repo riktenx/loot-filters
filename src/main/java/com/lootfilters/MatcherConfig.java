@@ -18,6 +18,7 @@ import lombok.Getter;
 import lombok.ToString;
 import net.runelite.api.TileItem;
 import net.runelite.api.Varbits;
+import net.runelite.api.gameval.VarbitID;
 
 import java.awt.Color;
 import java.util.Arrays;
@@ -32,30 +33,25 @@ public class MatcherConfig {
     private final Rule rule;
     private final DisplayConfig display;
     private final boolean isTerminal;
-
-    public MatcherConfig(Rule rule, DisplayConfig display) {
-        this.rule = rule;
-        this.display = display;
-        this.isTerminal = true;
-    }
+    private final int sourceLine;
 
     public MatcherConfig withDisplay(Consumer<DisplayConfig.DisplayConfigBuilder> consumer) {
         var builder = display.toBuilder();
         consumer.accept(builder);
-        return new MatcherConfig(rule, builder.build(), isTerminal);
+        return new MatcherConfig(rule, builder.build(), isTerminal, sourceLine);
     }
 
     public static MatcherConfig ownershipFilter(boolean enabled) {
         var rule = new Rule("") {
             @Override public boolean test(LootFiltersPlugin plugin, PluginTileItem item) {
-                var accountType = plugin.getClient().getVarbitValue(Varbits.ACCOUNT_TYPE);
+                var accountType = plugin.getClient().getVarbitValue(VarbitID.IRONMAN);
                 return enabled && accountType != 0 && item.getOwnership() == TileItem.OWNERSHIP_OTHER;
             }
         };
         var display = DisplayConfig.builder()
                 .hidden(true)
                 .build();
-        return new MatcherConfig(rule, display);
+        return new MatcherConfig(rule, display, true, -1);
     }
 
     public static MatcherConfig itemSpawnFilter(boolean enabled) {
@@ -67,7 +63,7 @@ public class MatcherConfig {
         var display = DisplayConfig.builder()
                 .hidden(true)
                 .build();
-        return new MatcherConfig(rule, display);
+        return new MatcherConfig(rule, display, true, -2);
     }
 
     public static MatcherConfig showUnmatched(boolean enabled) {
@@ -79,7 +75,7 @@ public class MatcherConfig {
         var display = DisplayConfig.builder()
                 .textColor(java.awt.Color.WHITE)
                 .build();
-        return new MatcherConfig(rule, display, false);
+        return new MatcherConfig(rule, display, false, -3);
     }
 
     public static MatcherConfig highlight(LootFiltersConfig config) {
@@ -112,7 +108,7 @@ public class MatcherConfig {
                 .menuSort(config.highlightMenuSort())
                 .sound(sound)
                 .build();
-        return new MatcherConfig(rule, display);
+        return new MatcherConfig(rule, display, true, -4);
     }
 
     public static MatcherConfig hide(String rawNames) {
@@ -125,6 +121,6 @@ public class MatcherConfig {
         var display = DisplayConfig.builder()
                 .hidden(true)
                 .build();
-        return new MatcherConfig(rule, display);
+        return new MatcherConfig(rule, display, true, -5);
     }
 }
