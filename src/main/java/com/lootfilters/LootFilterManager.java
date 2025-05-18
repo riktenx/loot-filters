@@ -4,6 +4,7 @@ import com.lootfilters.lang.CompileException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.runelite.api.GameState;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Request;
@@ -62,8 +63,10 @@ public class LootFilterManager {
 
             filters.add(filter);
         }
-        plugin.addChatMessage(String.format("Loaded <col=%s>%d/%d</col> loot filters.",
-                filters.size() == files.length ? "00FF00" : "FF0000", filters.size(), files.length));
+        if (plugin.getClient().getGameState() == GameState.LOGGED_IN) {
+            plugin.addChatMessage(String.format("Loaded <col=%s>%d/%d</col> loot filters.",
+                    filters.size() == files.length ? "00FF00" : "FF0000", filters.size(), files.length));
+        }
         return filters;
     }
 
