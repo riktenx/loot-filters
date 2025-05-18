@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
+import net.runelite.api.Tile;
 import net.runelite.api.events.ClientTick;
 import net.runelite.api.events.CommandExecuted;
 import net.runelite.api.events.GameStateChanged;
@@ -261,8 +262,31 @@ public class LootFiltersPlugin extends Plugin {
 	public void onItemSpawned(ItemSpawned event) {
 		var tile = event.getTile();
 		var item = new PluginTileItem(this, tile, event.getItem());
-		tileItemIndex.put(tile, item);
 
+		tileItemIndex.put(tile, item);
+		addItem(tile, item);
+	}
+
+	@Subscribe
+	public void onItemDespawned(ItemDespawned event) {
+		var tile = event.getTile();
+		var item = tileItemIndex.findItem(event.getItem());
+
+		tileItemIndex.remove(tile, item);
+		removeItem(tile, item);
+	}
+
+	@Subscribe
+	public void onItemQuantityChanged(ItemQuantityChanged event) {
+		var tile = event.getTile();
+		var item = tileItemIndex.findItem(event.getItem());
+
+		item.setQuantityOverride(event.getNewQuantity());
+		removeItem(tile, item);
+		addItem(tile, item);
+	}
+
+	private void addItem(Tile tile, PluginTileItem item) {
 		var match = getActiveFilter().findMatch(this, item);
 		if (match == null) {
 			return;
@@ -284,48 +308,12 @@ public class LootFiltersPlugin extends Plugin {
 		}
 	}
 
-	@Subscribe
-	public void onItemDespawned(ItemDespawned event) {
-		var tile = event.getTile();
-		var item = new PluginTileItem(this, tile, event.getItem());
+	private void removeItem(Tile tile, PluginTileItem item) {
 		var display = displayIndex.get(item);
-		tileItemIndex.remove(tile, item); // all of these are ultimately idempotent
 		lootbeamIndex.remove(tile, item);
 		displayIndex.remove(item);
 		if (display != null && display.getIcon() != null) {
 			iconIndex.dec(display.getIcon(), item);
-		}
-	}
-
-	@Subscribe
-	public void onItemQuantityChanged(ItemQuantityChanged event) {
-		var tile = event.getTile();
-		var item = tileItemIndex.findItem(event.getItem());
-		item.setQuantityOverride(event.getNewQuantity());
-
-		var display = displayIndex.get(item);
-		if (display == null) {
-			return;
-		}
-
-		displayIndex.remove(item);
-		lootbeamIndex.remove(tile, item);
-		if (display.getIcon() != null) {
-			iconIndex.dec(display.getIcon(), item);
-		}
-
-		var newDisplay = getActiveFilter().findMatch(this, item);
-		if (newDisplay == null) {
-			return;
-		}
-
-		displayIndex.put(item, newDisplay);
-		if (newDisplay.isShowLootbeam()) {
-			var beam = new Lootbeam(client, clientThread, tile.getWorldLocation(), newDisplay.getLootbeamColor(), Lootbeam.Style.MODERN);
-			lootbeamIndex.put(tile, item, beam);
-		}
-		if (newDisplay.getIcon() != null) {
-			iconIndex.inc(newDisplay.getIcon(), item);
 		}
 	}
 
