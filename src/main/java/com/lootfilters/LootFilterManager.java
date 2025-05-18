@@ -63,9 +63,12 @@ public class LootFilterManager {
 
             filters.add(filter);
         }
-        if (plugin.getClient().getGameState() == GameState.LOGGED_IN) {
+
+        final boolean errors = filters.size() != files.length;
+
+        if (plugin.getClient().getGameState() == GameState.LOGGED_IN || errors) {
             plugin.addChatMessage(String.format("Loaded <col=%s>%d/%d</col> loot filters.",
-                    filters.size() == files.length ? "00FF00" : "FF0000", filters.size(), files.length));
+                    errors ? "FF0000" : "00FF00", filters.size(), files.length));
         }
         return filters;
     }
