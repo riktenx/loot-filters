@@ -2,6 +2,7 @@ package com.lootfilters;
 
 import com.lootfilters.model.PluginTileItem;
 import net.runelite.api.Tile;
+import net.runelite.api.TileItem;
 import net.runelite.api.coords.WorldPoint;
 
 import java.util.ArrayList;
@@ -16,6 +17,17 @@ public class TileItemIndex {
 
     public Set<Map.Entry<Tile, List<PluginTileItem>>> entrySet() {
         return itemIndex.entrySet();
+    }
+
+    public PluginTileItem findItem(TileItem item) {
+        for (var entry : itemIndex.entrySet()) {
+            for (var pItem : entry.getValue()) {
+                if (pItem.equals(item)) {
+                    return pItem;
+                }
+            }
+        }
+        return null;
     }
 
     public PluginTileItem findItem(Tile tile, int id) {

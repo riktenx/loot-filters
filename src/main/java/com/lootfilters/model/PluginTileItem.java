@@ -2,7 +2,8 @@ package com.lootfilters.model;
 
 import com.lootfilters.LootFiltersPlugin;
 import lombok.Getter;
-import net.runelite.api.ItemID;
+import lombok.Setter;
+import net.runelite.api.gameval.ItemID;
 import net.runelite.api.Model;
 import net.runelite.api.Node;
 import net.runelite.api.Tile;
@@ -20,6 +21,9 @@ public class PluginTileItem implements TileItem {
     @Getter private final int spawnTime;
     @Getter private final Instant despawnInstant;
 
+    @Setter
+    private int quantityOverride = -1;
+
     public PluginTileItem(LootFiltersPlugin plugin, Tile tile, TileItem item) {
         var composition = plugin.getItemManager().getItemComposition(item.getId());
 
@@ -34,9 +38,9 @@ public class PluginTileItem implements TileItem {
 
     public int getGePrice() {
         switch (getId()) {
-            case ItemID.COINS_995:
+            case ItemID.COINS:
                 return 1;
-            case ItemID.PLATINUM_TOKEN:
+            case ItemID.PLATINUM:
                 return 1000;
             default:
                 return gePrice;
@@ -45,7 +49,8 @@ public class PluginTileItem implements TileItem {
 
     @Override
     public boolean equals(Object other) {
-        return other instanceof PluginTileItem && ((PluginTileItem) other).item == item;
+        return other instanceof PluginTileItem && ((PluginTileItem) other).item == item
+                || other instanceof TileItem && other == item;
     }
 
     @Override
@@ -53,8 +58,12 @@ public class PluginTileItem implements TileItem {
         return item.hashCode();
     }
 
+    @Override
+    public int getQuantity() {
+        return quantityOverride > -1 ? quantityOverride : item.getQuantity();
+    }
+
     @Override public int getId() { return item.getId(); }
-    @Override public int getQuantity() { return item.getQuantity(); }
     @Override public int getVisibleTime() { return item.getVisibleTime(); }
     @Override public int getDespawnTime() { return item.getDespawnTime(); }
     @Override public int getOwnership() { return item.getOwnership(); }
