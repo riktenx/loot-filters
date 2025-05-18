@@ -17,6 +17,7 @@ import net.runelite.api.events.ClientTick;
 import net.runelite.api.events.CommandExecuted;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.ItemDespawned;
+import net.runelite.api.events.ItemQuantityChanged;
 import net.runelite.api.events.ItemSpawned;
 import net.runelite.api.events.MenuEntryAdded;
 import net.runelite.client.Notifier;
@@ -293,6 +294,38 @@ public class LootFiltersPlugin extends Plugin {
 		displayIndex.remove(item);
 		if (display != null && display.getIcon() != null) {
 			iconIndex.dec(display.getIcon(), item);
+		}
+	}
+
+	@Subscribe
+	public void onItemQuantityChanged(ItemQuantityChanged event) {
+		var tile = event.getTile();
+		var item = tileItemIndex.findItem(event.getItem());
+		item.setQuantityOverride(event.getNewQuantity());
+
+		var display = displayIndex.get(item);
+		if (display == null) {
+			return;
+		}
+
+		displayIndex.remove(item);
+		lootbeamIndex.remove(tile, item);
+		if (display.getIcon() != null) {
+			iconIndex.dec(display.getIcon(), item);
+		}
+
+		var newDisplay = getActiveFilter().findMatch(this, item);
+		if (newDisplay == null) {
+			return;
+		}
+
+		displayIndex.put(item, newDisplay);
+		if (newDisplay.isShowLootbeam()) {
+			var beam = new Lootbeam(client, clientThread, tile.getWorldLocation(), newDisplay.getLootbeamColor(), Lootbeam.Style.MODERN);
+			lootbeamIndex.put(tile, item, beam);
+		}
+		if (newDisplay.getIcon() != null) {
+			iconIndex.inc(newDisplay.getIcon(), item);
 		}
 	}
 
