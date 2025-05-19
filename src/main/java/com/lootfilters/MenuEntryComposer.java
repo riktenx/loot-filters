@@ -60,7 +60,7 @@ public class MenuEntryComposer {
         if (plugin.getConfig().collapseEntries()) {
             entries = collapseEntries(entries);
         }
-        if (plugin.getClient().isKeyPressed(KeyCode.KC_SHIFT)) {
+        if (plugin.getConfig().showAnalyzer()) {
             entries = addAnalyzers(entries);
         }
         plugin.getClient().getMenu().setMenuEntries(entries);
@@ -114,29 +114,44 @@ public class MenuEntryComposer {
 
     private MenuEntry[] addAnalyzers(MenuEntry[] entries) {
         return Arrays.stream(entries)
-                .flatMap(it -> isGroundItem(it)
-                        ? withAnalyzer(it).stream()
+                .flatMap(it -> isGroundItem(it, false)
+                        ? Stream.of(it, getAnalyzer(it))
                         : Stream.of(it))
                 .toArray(MenuEntry[]::new);
     }
 
-    private List<MenuEntry> withAnalyzer(MenuEntry entry) {
+    private MenuEntry getAnalyzer(MenuEntry entry) {
         var item = getItemForEntry(entry);
         var display = plugin.getDisplayIndex().get(item);
         Consumer<MenuEntry> onClick = (e) -> {
             if (display == null) {
                 plugin.addChatMessage(item.getName() + " had no matches");
             } else {
-                plugin.addChatMessage(item.getName() + " matched lines " + display.getEvalSource());
+                var evalSource = display.getEvalSource();
+                if (evalSource.size() == 1) {
+                    if (evalSource.get(0) == -4) {
+                        plugin.addChatMessage(item.getName() + " is hidden by the 'Item lists' -> 'Hidden items' setting.");
+                        return;
+                    } else if (evalSource.get(0) == -3) {
+                        plugin.addChatMessage(item.getName() + " is highlighted by the 'Item lists' -> 'Highlighted items' setting.");
+                        return;
+                    } else if (evalSource.get(0) == -2) {
+                        plugin.addChatMessage(item.getName() + " is hidden by the 'General' -> 'Item spawn filter' setting.");
+                        return;
+                    } else if (evalSource.get(0) == -1) {
+                        plugin.addChatMessage(item.getName() + " is hidden by the 'General' -> 'Ownership filter' setting.");
+                        return;
+                    }
+                }
+                plugin.addChatMessage(item.getName() + " matched lines " + evalSource);
             }
         };
 
-        var analyzer = plugin.getClient().getMenu().createMenuEntry(-1)
-                .setOption("Analyze")
+        return plugin.getClient().getMenu().createMenuEntry(-1)
+                .setOption("Analyze (Loot Filter)")
                 .setTarget(entry.getTarget())
                 .setType(MenuAction.RUNELITE)
                 .onClick(onClick);
-        return List.of(entry, analyzer);
     }
 
     private MenuEntry withCount(MenuEntry entry, long count) {
@@ -159,14 +174,18 @@ public class MenuEntryComposer {
         return colorTag(color) + text;
     }
 
-    private static boolean isGroundItem(MenuEntry entry) {
+    private static boolean isGroundItem(MenuEntry entry, boolean includeExamine) {
         var type = entry.getType();
         return type == MenuAction.GROUND_ITEM_FIRST_OPTION
                 || type == MenuAction.GROUND_ITEM_SECOND_OPTION
                 || type == MenuAction.GROUND_ITEM_THIRD_OPTION
                 || type == MenuAction.GROUND_ITEM_FOURTH_OPTION
                 || type == MenuAction.GROUND_ITEM_FIFTH_OPTION
-                || type == MenuAction.EXAMINE_ITEM_GROUND;
+                || includeExamine && type == MenuAction.EXAMINE_ITEM_GROUND;
+    }
+
+    private static boolean isGroundItem(MenuEntry entry) {
+        return isGroundItem(entry, true);
     }
 
     // The results of a menu entry lookup are "indeterminate" if the item was stackable, and we found more than one.
