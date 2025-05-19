@@ -66,18 +66,6 @@ public class MatcherConfig {
         return new MatcherConfig(rule, display, true, -2);
     }
 
-    public static MatcherConfig showUnmatched(boolean enabled) {
-        var rule = new Rule("") {
-            @Override public boolean test(LootFiltersPlugin plugin, PluginTileItem item) {
-                return enabled;
-            }
-        };
-        var display = DisplayConfig.builder()
-                .textColor(java.awt.Color.WHITE)
-                .build();
-        return new MatcherConfig(rule, display, false, -3);
-    }
-
     public static MatcherConfig highlight(LootFiltersConfig config) {
         var rawNames = config.highlightedItems();
         var rule = new OrRule(
@@ -108,7 +96,7 @@ public class MatcherConfig {
                 .menuSort(config.highlightMenuSort())
                 .sound(sound)
                 .build();
-        return new MatcherConfig(rule, display, true, -4);
+        return new MatcherConfig(rule, display, true, -3);
     }
 
     public static MatcherConfig hide(String rawNames) {
@@ -121,6 +109,6 @@ public class MatcherConfig {
         var display = DisplayConfig.builder()
                 .hidden(true)
                 .build();
-        return new MatcherConfig(rule, display, true, -5);
+        return new MatcherConfig(rule, display, true, -4);
     }
 }

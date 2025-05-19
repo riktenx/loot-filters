@@ -14,6 +14,7 @@ import com.lootfilters.serde.ColorSerializer;
 import com.lootfilters.serde.RuleDeserializer;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.ToString;
 import net.runelite.api.coords.WorldPoint;
@@ -102,22 +103,15 @@ public class LootFilter {
         return ggson.toJson(this);
     }
 
-    public DisplayConfig findMatch(LootFiltersPlugin plugin, PluginTileItem item) {
-        DisplayConfig display = null;
+    public @NonNull DisplayConfig findMatch(LootFiltersPlugin plugin, PluginTileItem item) {
+        var display = new DisplayConfig(Color.WHITE);
         for (var matcher : matchers) {
             if (!matcher.getRule().test(plugin, item)) {
                 continue;
             }
 
-            if (display == null) {
-                display = matcher.getDisplay().toBuilder()
-                        .evalSource(new ArrayList<>())
-                        .build();
-            } else {
-                display = display.merge(matcher.getDisplay());
-            }
+            display = display.merge(matcher.getDisplay());
             display.getEvalSource().add(matcher.getSourceLine());
-
             if (matcher.isTerminal()) {
                 return display;
             }
