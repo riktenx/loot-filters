@@ -26,7 +26,13 @@ public class MenuEntryComposer {
             return;
         }
 
-        var item = getItemForEntry(entry);
+        var items = getItemsForEntry(entry);
+        if (isIndeterminate(items)) {
+            entry.setTarget(entry.getTarget() + " (???)");
+            return;
+        }
+
+        var item = items.get(0);
         var match = plugin.getDisplayIndex().get(item);
         if (match == null) {
             entry.setTarget(buildTargetText(item, DisplayConfig.DEFAULT_MENU_TEXT_COLOR));
@@ -60,10 +66,10 @@ public class MenuEntryComposer {
 
         var items = Arrays.copyOfRange(entries, bounds[0], bounds[1]);
         var sortedItems = Arrays.stream(items).sorted((i, j) -> {
-            var itemI = getItemForEntry(i);
-            var itemJ = getItemForEntry(j);
-            var displayI = plugin.getDisplayIndex().get(itemI);
-            var displayJ = plugin.getDisplayIndex().get(itemJ);
+            var itemsI = getItemsForEntry(i);
+            var itemsJ = getItemsForEntry(j);
+            var displayI = isIndeterminate(itemsI) ? null : plugin.getDisplayIndex().get(itemsI.get(0));
+            var displayJ = isIndeterminate(itemsJ) ? null : plugin.getDisplayIndex().get(itemsJ.get(0));
             var sortI = displayI != null ? displayI.getMenuSort() : 0;
             var sortJ = displayJ != null ? displayJ.getMenuSort() : 0;
             return sortI - sortJ;
@@ -104,7 +110,7 @@ public class MenuEntryComposer {
                 : entry;
     }
 
-    private PluginTileItem getItemForEntry(MenuEntry entry) {
+    private List<PluginTileItem> getItemsForEntry(MenuEntry entry) {
         var wv = plugin.getClient().getTopLevelWorldView();
         var point = WorldPoint.fromScene(wv, entry.getParam0(), entry.getParam1(), wv.getPlane());
         return plugin.getTileItemIndex().findItem(point, entry.getIdentifier());
@@ -126,6 +132,13 @@ public class MenuEntryComposer {
                 || type == MenuAction.GROUND_ITEM_FOURTH_OPTION
                 || type == MenuAction.GROUND_ITEM_FIFTH_OPTION
                 || type == MenuAction.EXAMINE_ITEM_GROUND;
+    }
+
+    // The results of a menu entry lookup are "indeterminate" if the item was stackable, and we found more than one.
+    // This limits what we can do in menu entry ops because we do not know what each menu entry actually points to
+    // when clicked (e.g. we cannot reliably display the quantity that will be taken).
+    private static boolean isIndeterminate(List<PluginTileItem> items) {
+        return items.isEmpty() || items.size() > 1 && items.get(0).isStackable();
     }
 
     private static String entrySlug(MenuEntry entry) {

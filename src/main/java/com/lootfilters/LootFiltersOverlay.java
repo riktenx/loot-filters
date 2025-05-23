@@ -7,6 +7,7 @@ import com.lootfilters.model.FontMode;
 import com.lootfilters.model.PluginTileItem;
 import com.lootfilters.model.ValueDisplayType;
 import com.lootfilters.util.TextComponent;
+import lombok.Value;
 import net.runelite.api.Client;
 import net.runelite.api.ItemID;
 import net.runelite.api.Tile;
@@ -79,20 +80,21 @@ public class LootFiltersOverlay extends Overlay {
         for (var entry : plugin.getTileItemIndex().entrySet()) {
             var items = entry.getValue();
             var itemCounts = items.stream()
-                    .collect(groupingBy(TileItem::getId, counting()));
+                    .collect(groupingBy(it -> new OverlayKey(it.getId(), it.getQuantity()), counting()));
 
             var tile = entry.getKey();
             var currentOffset = 0;
-            var rendered = new ArrayList<Integer>();
+            var rendered = new ArrayList<OverlayKey>();
             for (var item : items) {
                 var leftOffset = 0;
 
-                if (rendered.contains(item.getId())) {
+                var renderKey = new OverlayKey(item.getId(), item.getQuantity());
+                if (rendered.contains(renderKey)) {
                     continue;
                 }
-                rendered.add(item.getId());
+                rendered.add(renderKey);
 
-                var count = itemCounts.get(item.getId());
+                var count = itemCounts.get(renderKey);
 
                 var match = plugin.getDisplayIndex().get(item);
                 if (match == null) {
@@ -195,10 +197,12 @@ public class LootFiltersOverlay extends Overlay {
     private String buildDisplayText(PluginTileItem item, long unstackedCount, DisplayConfig display) {
         var text = item.getName();
 
+        // BOTH of these can be true, we want them to be visually different either way
         if (item.getQuantity() > 1) {
             text += " (" + abbreviate(item.getQuantity()) + ")";
-        } else if (unstackedCount > 1) {
-            text += " x" + unstackedCount; // we want these to be visually different
+        }
+        if (unstackedCount > 1) {
+            text += " x" + unstackedCount;
         }
 
         var isMoney = item.getId() == ItemID.COINS_995 || item.getId() == ItemID.PLATINUM_TOKEN; // value is redundant
@@ -382,5 +386,10 @@ public class LootFiltersOverlay extends Overlay {
         var y = textPoint.getY() - fontHeight - yOffset + (fontHeight - image.getHeight()) / 2;
         g.drawImage(image, x, y, null);
         return new Dimension(image.getWidth() + BOX_PAD, image.getHeight());
+    }
+
+    @Value
+    private static class OverlayKey {
+        int id, quantity;
     }
 }

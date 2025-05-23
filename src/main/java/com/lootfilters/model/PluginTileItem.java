@@ -20,6 +20,7 @@ public class PluginTileItem implements TileItem {
     @Getter private final WorldPoint worldPoint;
     @Getter private final int spawnTime;
     @Getter private final Instant despawnInstant;
+    @Getter private final boolean isStackable;
 
     @Setter
     private int quantityOverride = -1;
@@ -34,6 +35,7 @@ public class PluginTileItem implements TileItem {
         this.worldPoint = WorldPoint.fromLocalInstance(plugin.getClient(), tile.getLocalLocation());
         this.spawnTime = plugin.getClient().getTickCount();
         this.despawnInstant = Instant.now().plusMillis((getDespawnTime() - spawnTime) * 600L);
+        this.isStackable = composition.isStackable();
     }
 
     public int getGePrice() {
