@@ -13,6 +13,7 @@ import okhttp3.Response;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.MalformedInputException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +40,12 @@ public class LootFilterManager {
             String src;
             try {
                 src = Files.readString(file.toPath());
+            } catch (MalformedInputException e) {
+                plugin.addChatMessage("Failed to load filter from " + quote(file.getName()) + " because it is not a valid text file.");
+                log.warn("read file {}", file.getName(), e);
+                continue;
             } catch (Exception e) {
+                plugin.addChatMessage("Failed to load filter from " + quote(file.getName()) + ": " + e.getMessage());
                 log.warn("read file {}", file.getName(), e);
                 continue;
             }
@@ -64,11 +70,10 @@ public class LootFilterManager {
             filters.add(filter);
         }
 
-        final boolean errors = filters.size() != files.length;
-
-        if (plugin.getClient().getGameState() == GameState.LOGGED_IN || errors) {
+        var hadErrors = filters.size() != files.length;
+        if (plugin.getClient().getGameState() == GameState.LOGGED_IN || hadErrors) {
             plugin.addChatMessage(String.format("Loaded <col=%s>%d/%d</col> loot filters.",
-                    errors ? "FF0000" : "00FF00", filters.size(), files.length));
+                    hadErrors ? "FF0000" : "00FF00", filters.size(), files.length));
         }
         return filters;
     }
