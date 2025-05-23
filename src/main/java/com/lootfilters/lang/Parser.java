@@ -189,6 +189,8 @@ public class Parser {
                     builder.showLootbeam(assign[1].expectBoolean()); break;
                 case "showValue":
                     builder.showValue(assign[1].expectBoolean()); break;
+                case "compact":
+                    builder.compact(assign[1].expectBoolean()); break;
                 case "showDespawn":
                     builder.showDespawn(assign[1].expectBoolean()); break;
                 case "notify":
