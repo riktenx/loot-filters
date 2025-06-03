@@ -2,6 +2,7 @@ package com.lootfilters;
 
 import com.lootfilters.model.PluginTileItem;
 import lombok.AllArgsConstructor;
+import net.runelite.api.KeyCode;
 import net.runelite.api.MenuAction;
 import net.runelite.api.MenuEntry;
 import net.runelite.api.coords.WorldPoint;
@@ -10,6 +11,7 @@ import java.awt.Color;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -54,6 +56,9 @@ public class MenuEntryComposer {
         var entries = sortEntries(plugin.getClient().getMenu().getMenuEntries());
         if (plugin.getConfig().collapseEntries()) {
             entries = collapseEntries(entries);
+        }
+        if (plugin.getConfig().showAnalyzer()) {
+            entries = addAnalyzers(entries);
         }
         plugin.getClient().getMenu().setMenuEntries(entries);
     }
@@ -104,6 +109,48 @@ public class MenuEntryComposer {
         return collapsed.toArray(MenuEntry[]::new);
     }
 
+    private MenuEntry[] addAnalyzers(MenuEntry[] entries) {
+        return Arrays.stream(entries)
+                .flatMap(it -> isGroundItem(it, false)
+                        ? Stream.of(it, getAnalyzer(it))
+                        : Stream.of(it))
+                .toArray(MenuEntry[]::new);
+    }
+
+    private MenuEntry getAnalyzer(MenuEntry entry) {
+        var item = getItemForEntry(entry);
+        var display = plugin.getDisplayIndex().get(item);
+        Consumer<MenuEntry> onClick = (e) -> {
+            if (display == null) {
+                plugin.addChatMessage(item.getName() + " had no matches");
+            } else {
+                var evalSource = display.getEvalSource();
+                if (evalSource.size() == 1) {
+                    if (evalSource.get(0) == -4) {
+                        plugin.addChatMessage(item.getName() + " is hidden by the 'Item lists' -> 'Hidden items' setting.");
+                        return;
+                    } else if (evalSource.get(0) == -3) {
+                        plugin.addChatMessage(item.getName() + " is highlighted by the 'Item lists' -> 'Highlighted items' setting.");
+                        return;
+                    } else if (evalSource.get(0) == -2) {
+                        plugin.addChatMessage(item.getName() + " is hidden by the 'General' -> 'Item spawn filter' setting.");
+                        return;
+                    } else if (evalSource.get(0) == -1) {
+                        plugin.addChatMessage(item.getName() + " is hidden by the 'General' -> 'Ownership filter' setting.");
+                        return;
+                    }
+                }
+                plugin.addChatMessage(item.getName() + " matched lines " + evalSource);
+            }
+        };
+
+        return plugin.getClient().getMenu().createMenuEntry(-1)
+                .setOption("Analyze (Loot Filter)")
+                .setTarget(entry.getTarget())
+                .setType(MenuAction.RUNELITE)
+                .onClick(onClick);
+    }
+
     private MenuEntry withCount(MenuEntry entry, long count) {
         return count > 1
                 ? entry.setTarget(entry.getTarget() + " x" + count)
@@ -124,14 +171,18 @@ public class MenuEntryComposer {
         return colorTag(color) + text;
     }
 
-    private static boolean isGroundItem(MenuEntry entry) {
+    private static boolean isGroundItem(MenuEntry entry, boolean includeExamine) {
         var type = entry.getType();
         return type == MenuAction.GROUND_ITEM_FIRST_OPTION
                 || type == MenuAction.GROUND_ITEM_SECOND_OPTION
                 || type == MenuAction.GROUND_ITEM_THIRD_OPTION
                 || type == MenuAction.GROUND_ITEM_FOURTH_OPTION
                 || type == MenuAction.GROUND_ITEM_FIFTH_OPTION
-                || type == MenuAction.EXAMINE_ITEM_GROUND;
+                || includeExamine && type == MenuAction.EXAMINE_ITEM_GROUND;
+    }
+
+    private static boolean isGroundItem(MenuEntry entry) {
+        return isGroundItem(entry, true);
     }
 
     // The results of a menu entry lookup are "indeterminate" if the item was stackable, and we found more than one.
