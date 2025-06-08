@@ -2,6 +2,7 @@ package com.lootfilters;
 
 import com.lootfilters.model.PluginTileItem;
 import net.runelite.api.Tile;
+import net.runelite.api.TileItem;
 import net.runelite.api.coords.WorldPoint;
 
 import java.util.ArrayList;
@@ -9,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class TileItemIndex {
     private final Map<Tile, List<PluginTileItem>> itemIndex = new HashMap<>();
@@ -18,21 +20,31 @@ public class TileItemIndex {
         return itemIndex.entrySet();
     }
 
-    public PluginTileItem findItem(Tile tile, int id) {
+    public PluginTileItem findItem(TileItem item) {
+        for (var entry : itemIndex.entrySet()) {
+            for (var pItem : entry.getValue()) {
+                if (pItem.equals(item)) {
+                    return pItem;
+                }
+            }
+        }
+        return null;
+    }
+
+    public List<PluginTileItem> findItem(Tile tile, int id) {
         if (!itemIndex.containsKey(tile)) {
             return null;
         }
 
         return itemIndex.get(tile).stream()
                 .filter(it -> it.getId() == id)
-                .findFirst()
-                .orElse(null);
+                .collect(Collectors.toList());
     }
 
-    public PluginTileItem findItem(WorldPoint point, int id) {
+    public List<PluginTileItem> findItem(WorldPoint point, int id) {
         return pointIndex.containsKey(point)
                 ? findItem(pointIndex.get(point), id)
-                : null;
+                : List.of();
     }
 
     public void put(Tile tile, PluginTileItem item) {

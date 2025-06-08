@@ -13,10 +13,12 @@ import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
+import net.runelite.api.Tile;
 import net.runelite.api.events.ClientTick;
 import net.runelite.api.events.CommandExecuted;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.ItemDespawned;
+import net.runelite.api.events.ItemQuantityChanged;
 import net.runelite.api.events.ItemSpawned;
 import net.runelite.api.events.MenuEntryAdded;
 import net.runelite.client.Notifier;
@@ -252,14 +254,39 @@ public class LootFiltersPlugin extends Plugin {
 
 		loadSelectedFilter();
 		resetDisplay();
+
+		pluginPanel.reflowFilterDescription();
 	}
 
 	@Subscribe
 	public void onItemSpawned(ItemSpawned event) {
 		var tile = event.getTile();
 		var item = new PluginTileItem(this, tile, event.getItem());
-		tileItemIndex.put(tile, item);
 
+		tileItemIndex.put(tile, item);
+		addItem(tile, item);
+	}
+
+	@Subscribe
+	public void onItemDespawned(ItemDespawned event) {
+		var tile = event.getTile();
+		var item = tileItemIndex.findItem(event.getItem());
+
+		tileItemIndex.remove(tile, item);
+		removeItem(tile, item);
+	}
+
+	@Subscribe
+	public void onItemQuantityChanged(ItemQuantityChanged event) {
+		var tile = event.getTile();
+		var item = tileItemIndex.findItem(event.getItem());
+
+		item.setQuantityOverride(event.getNewQuantity());
+		removeItem(tile, item);
+		addItem(tile, item);
+	}
+
+	private void addItem(Tile tile, PluginTileItem item) {
 		var match = getActiveFilter().findMatch(this, item);
 		if (match == null) {
 			return;
@@ -284,12 +311,8 @@ public class LootFiltersPlugin extends Plugin {
 		}
 	}
 
-	@Subscribe
-	public void onItemDespawned(ItemDespawned event) {
-		var tile = event.getTile();
-		var item = new PluginTileItem(this, tile, event.getItem());
+	private void removeItem(Tile tile, PluginTileItem item) {
 		var display = displayIndex.get(item);
-		tileItemIndex.remove(tile, item); // all of these are ultimately idempotent
 		lootbeamIndex.remove(tile, item);
 		displayIndex.remove(item);
 		if (display != null && display.getIcon() != null) {

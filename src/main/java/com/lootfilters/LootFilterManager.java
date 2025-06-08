@@ -4,6 +4,7 @@ import com.lootfilters.lang.CompileException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.runelite.api.GameState;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Request;
@@ -12,6 +13,7 @@ import okhttp3.Response;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.MalformedInputException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +40,12 @@ public class LootFilterManager {
             String src;
             try {
                 src = Files.readString(file.toPath());
+            } catch (MalformedInputException e) {
+                plugin.addChatMessage("Failed to load filter from " + quote(file.getName()) + " because it is not a valid text file.");
+                log.warn("read file {}", file.getName(), e);
+                continue;
             } catch (Exception e) {
+                plugin.addChatMessage("Failed to load filter from " + quote(file.getName()) + ": " + e.getMessage());
                 log.warn("read file {}", file.getName(), e);
                 continue;
             }
@@ -62,8 +69,12 @@ public class LootFilterManager {
 
             filters.add(filter);
         }
-        plugin.addChatMessage(String.format("Loaded <col=%s>%d/%d</col> loot filters.",
-                filters.size() == files.length ? "00FF00" : "FF0000", filters.size(), files.length));
+
+        var hadErrors = filters.size() != files.length;
+        if (plugin.getClient().getGameState() == GameState.LOGGED_IN || hadErrors) {
+            plugin.addChatMessage(String.format("Loaded <col=%s>%d/%d</col> loot filters.",
+                    hadErrors ? "FF0000" : "00FF00", filters.size(), files.length));
+        }
         return filters;
     }
 

@@ -12,6 +12,8 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
 import java.awt.Color;
 import java.awt.Desktop;
 import java.awt.FlowLayout;
@@ -29,11 +31,14 @@ import static com.lootfilters.util.TextUtil.quote;
 import static javax.swing.JOptionPane.showConfirmDialog;
 import static javax.swing.JOptionPane.showInputDialog;
 import static javax.swing.JOptionPane.showMessageDialog;
+import static javax.swing.SwingUtilities.invokeLater;
 import static net.runelite.client.util.ImageUtil.loadImageResource;
 
 @Slf4j
 public class LootFiltersPanel extends PluginPanel {
     private static final String NONE_ITEM = "<none>";
+    private static final String NONE_DESCRIPTION = "Select a filter to show its description.";
+    private static final String BLANK_DESCRIPTION = "<no description provided>";
     private static final String TUTORIAL_TEXT = "// Welcome to the loot filter\n" +
             "// For more information on \n" +
             "// usage, please check\n" +
@@ -43,11 +48,15 @@ public class LootFiltersPanel extends PluginPanel {
     private final LootFiltersPlugin plugin;
     private final JComboBox<String> filterSelect;
     private final JPanel root;
+    private final JTextArea filterDescription;
 
     public LootFiltersPanel(LootFiltersPlugin plugin) {
         this.plugin = plugin;
 
         filterSelect = new JComboBox<>();
+        filterDescription = new JTextArea();
+        filterDescription.setLineWrap(true);
+        filterDescription.setEditable(false);
 
         root = new JPanel();
         root.setLayout(new BoxLayout(root, BoxLayout.Y_AXIS));
@@ -56,7 +65,8 @@ public class LootFiltersPanel extends PluginPanel {
     }
 
     private void init() {
-        var top = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        var top = new JPanel();
+        top.setLayout(new BoxLayout(top, BoxLayout.X_AXIS));
         var mid = new JPanel(new FlowLayout(FlowLayout.LEFT));
         var bottom = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
@@ -75,7 +85,7 @@ public class LootFiltersPanel extends PluginPanel {
                 "Reload filters from disk.",
                 this::onReloadFilters);
         var browseFolder = createIconButton("folder_icon",
-                "View the filters directory in the system file browser.",
+                "View the plugin directory, where filters, sound files, and icon files should be placed, in the system file browser.",
                 this::onBrowseFolder);
 
         var openFiltersite = new JLabel("<html><u>filterscape.xyz</u></html>");
@@ -91,10 +101,9 @@ public class LootFiltersPanel extends PluginPanel {
             }
         });
 
+        top.add(Box.createHorizontalStrut(1));
         top.add(importClipboard);
-        top.add(createNew);
-        top.add(importConfig);
-        top.add(Box.createHorizontalStrut(110));
+        top.add(Box.createGlue());
         top.add(reloadFilters);
         top.add(browseFolder);
 
@@ -106,10 +115,12 @@ public class LootFiltersPanel extends PluginPanel {
         root.add(mid);
         root.add(filterSelect);
         root.add(bottom);
+        root.add(filterDescription);
 
         add(root);
 
         reflowFilterSelect(plugin.getLoadedFilters(), plugin.getSelectedFilterName());
+        reflowFilterDescription();
     }
 
     private void onCreateEmptyFilter() {
@@ -161,6 +172,7 @@ public class LootFiltersPanel extends PluginPanel {
 
         LootFilter newFilter;
         try {
+            plugin.addChatMessage("Importing...");
             newFilter = LootFilter.fromSourcesWithPreamble(Map.of("clipboard", newSrc));
         } catch (CompileException e) {
             plugin.addChatMessage("Import failed: " + e.getMessage());
@@ -177,7 +189,7 @@ public class LootFiltersPanel extends PluginPanel {
             if (!filter.getName().equals(newFilter.getName())) {
                 continue;
             }
-            if (!confirm("Filter " + quote(filter.getName()) + " already exists in " + quote(filter.getFilename()) + ". Update it?")) {
+            if (!confirm("Filter " + quote(filter.getName()) + " already exists. Update it?")) {
                 return;
             }
 
@@ -188,6 +200,7 @@ public class LootFiltersPanel extends PluginPanel {
                 return;
             }
 
+            plugin.setSelectedFilterName(newFilter.getName());
             onReloadFilters();
             return;
         }
@@ -199,6 +212,7 @@ public class LootFiltersPanel extends PluginPanel {
             return;
         }
 
+        plugin.setSelectedFilterName(newFilter.getName());
         onReloadFilters();
     }
 
@@ -263,11 +277,12 @@ public class LootFiltersPanel extends PluginPanel {
     private void onReloadFilters() {
         plugin.reloadFilters();
         reflowFilterSelect(plugin.getLoadedFilters(), plugin.getSelectedFilterName());
+        reflowFilterDescription();
     }
 
     private void onBrowseFolder() {
         try {
-            Desktop.getDesktop().open(LootFiltersPlugin.FILTER_DIRECTORY);
+            Desktop.getDesktop().open(LootFiltersPlugin.PLUGIN_DIRECTORY);
         } catch (Exception e) {
             log.warn("browse filters", e);
         }
@@ -290,5 +305,19 @@ public class LootFiltersPanel extends PluginPanel {
             plugin.setSelectedFilterName(null);
         }
         filterSelect.addActionListener(this::onFilterSelect);
+    }
+
+    public void reflowFilterDescription() {
+        if (plugin.getSelectedFilterName() == null) {
+            filterDescription.setText(NONE_DESCRIPTION);
+            return;
+        }
+
+        var filter = plugin.getActiveFilter();
+        var desc = filter.getDescription();
+        if (desc == null || desc.isBlank()) {
+            desc = BLANK_DESCRIPTION;
+        }
+        filterDescription.setText(desc.replaceAll("<br>", "\n"));
     }
 }

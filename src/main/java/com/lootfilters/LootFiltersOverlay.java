@@ -7,6 +7,7 @@ import com.lootfilters.model.FontMode;
 import com.lootfilters.model.PluginTileItem;
 import com.lootfilters.model.ValueDisplayType;
 import com.lootfilters.util.TextComponent;
+import lombok.Value;
 import net.runelite.api.Client;
 import net.runelite.api.ItemID;
 import net.runelite.api.Tile;
@@ -85,11 +86,13 @@ public class LootFiltersOverlay extends Overlay {
         for (var entry : plugin.getTileItemIndex().entrySet()) {
             var items = entry.getValue();
 
-            var itemCounts = items.stream().collect(groupingBy(TileItem::getId, counting()));
+            var itemCounts = items.stream()
+                    .collect(groupingBy(it -> new OverlayKey(it.getId(), it.getQuantity()), counting()));
+
             var tile = entry.getKey();
             var currentOffset = 0;
             var compactRowPosition = 0;
-            var rendered = new ArrayList<Integer>();
+            var rendered = new ArrayList<OverlayKey>();
 
             var partitionedItems = items.stream().collect(Collectors.partitioningBy(i -> {
                 var display = plugin.getDisplayIndex().get(i);
@@ -99,6 +102,7 @@ public class LootFiltersOverlay extends Overlay {
             // compact
             var compactItemIndex = 1;
             for (var item : partitionedItems.get(true)) {
+                var renderKey = new OverlayKey(item.getId(), item.getQuantity());
                 var match = plugin.getDisplayIndex().get(item);
                 if (match == null) {
                     continue;
@@ -110,8 +114,7 @@ public class LootFiltersOverlay extends Overlay {
                     continue;
                 }
                 compactItemIndex = 1;
-                rendered.add(item.getId());
-
+                rendered.add(renderKey);
                 var effectiveRowLength = config.compactRenderRowLength() > remainingCompactMatches ? remainingCompactMatches : config.compactRenderRowLength();
                 var textHeight = renderCompact(match, g, item, tile, itemCounts.get(item.getId()), currentOffset, mouse,
                         hoveredHide::set, compactRowPosition, effectiveRowLength);
@@ -134,12 +137,13 @@ public class LootFiltersOverlay extends Overlay {
             for (var item : partitionedItems.get(false)) {
                 var leftOffset = 0;
 
-                if (rendered.contains(item.getId())) {
+                var renderKey = new OverlayKey(item.getId(), item.getQuantity());
+                if (rendered.contains(renderKey)) {
                     continue;
                 }
-                rendered.add(item.getId());
+                rendered.add(renderKey);
 
-                var count = itemCounts.get(item.getId());
+                var count = itemCounts.get(renderKey);
 
                 var match = plugin.getDisplayIndex().get(item);
                 if (match == null) {
@@ -329,10 +333,12 @@ public class LootFiltersOverlay extends Overlay {
     private String buildDisplayText(PluginTileItem item, long unstackedCount, DisplayConfig display) {
         var text = item.getName();
 
+        // BOTH of these can be true, we want them to be visually different either way
         if (item.getQuantity() > 1) {
             text += " (" + abbreviate(item.getQuantity()) + ")";
-        } else if (unstackedCount > 1) {
-            text += " x" + unstackedCount; // we want these to be visually different
+        }
+        if (unstackedCount > 1) {
+            text += " x" + unstackedCount;
         }
 
         var isMoney = item.getId() == ItemID.COINS_995 || item.getId() == ItemID.PLATINUM_TOKEN; // value is redundant
@@ -532,5 +538,10 @@ public class LootFiltersOverlay extends Overlay {
         var y = textPoint.getY() - fontHeight - yOffset + (fontHeight - image.getHeight()) / 2;
         g.drawImage(image, x, y, null);
         return new Dimension(image.getWidth() + BOX_PAD, image.getHeight());
+    }
+
+    @Value
+    private static class OverlayKey {
+        int id, quantity;
     }
 }
