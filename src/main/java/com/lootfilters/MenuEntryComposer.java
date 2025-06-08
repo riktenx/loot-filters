@@ -28,7 +28,10 @@ public class MenuEntryComposer {
 
         var items = getItemsForEntry(entry);
         if (isIndeterminate(items)) {
-            entry.setTarget(entry.getTarget() + " (???)");
+            var quantity = items.stream().mapToInt(PluginTileItem::getQuantity).sum();
+            var deprioritized = plugin.getConfig().deprioritizeHidden() && items.stream().allMatch(this::isHidden);
+            entry.setTarget(entry.getTarget() + " (" + quantity + ")");
+            entry.setDeprioritized(deprioritized);
             return;
         }
 
@@ -143,5 +146,10 @@ public class MenuEntryComposer {
 
     private static String entrySlug(MenuEntry entry) {
         return entry.getType().toString() + entry.getIdentifier() + entry.getParam0() + entry.getParam1();
+    }
+
+    private boolean isHidden(PluginTileItem item) {
+        var display = plugin.getDisplayIndex().get(item);
+        return display != null && display.isHidden();
     }
 }
