@@ -7,6 +7,8 @@ import com.lootfilters.model.FontMode;
 import com.lootfilters.model.PluginTileItem;
 import com.lootfilters.model.ValueDisplayType;
 import com.lootfilters.util.TextComponent;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.Value;
 import net.runelite.api.Client;
 import net.runelite.api.ItemID;
@@ -28,17 +30,13 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 import static com.lootfilters.util.TextUtil.abbreviate;
 import static com.lootfilters.util.TextUtil.abbreviateValue;
 import static com.lootfilters.util.TextUtil.withParentheses;
-import static java.util.stream.Collectors.counting;
-import static java.util.stream.Collectors.groupingBy;
 import static net.runelite.api.Perspective.getCanvasImageLocation;
 import static net.runelite.api.Perspective.getCanvasTextLocation;
 import static net.runelite.api.Perspective.getCanvasTilePoly;
@@ -84,39 +82,18 @@ public class LootFiltersOverlay extends Overlay {
             highlightTiles(g, entry.getKey(), entry.getValue());
         }
         for (var entry : plugin.getTileItemIndex().entrySet()) {
-            var items = entry.getValue();
-
-            var itemCounts = items.stream()
-                    .collect(groupingBy(it -> new OverlayKey(it.getId(), it.getQuantity()), counting()));
-
+            var items = createItemCollection(entry.getValue());
             var tile = entry.getKey();
             var currentOffset = 0;
             var compactRowPosition = 0;
-            var rendered = new ArrayList<OverlayKey>();
 
-            var partitionedItems = items.stream().collect(Collectors.partitioningBy(i -> {
-                var display = plugin.getDisplayIndex().get(i);
-                return display != null && display.isCompact();
-            }));
-            var remainingCompactMatches = partitionedItems.get(true).size();
-            // compact
-            var compactItemIndex = 1;
-            for (var item : partitionedItems.get(true)) {
-                var renderKey = new OverlayKey(item.getId(), item.getQuantity());
-                var match = plugin.getDisplayIndex().get(item);
-                if (match == null) {
-                    continue;
-                }
 
-                if (compactItemIndex != itemCounts.get(item.getId())) {
-                    compactItemIndex++;
-                    remainingCompactMatches--;
-                    continue;
-                }
-                compactItemIndex = 1;
-                rendered.add(renderKey);
+            var remainingCompactMatches = items.get(true).size();
+
+            for (var item : items.get(true)) {
                 var effectiveRowLength = config.compactRenderRowLength() > remainingCompactMatches ? remainingCompactMatches : config.compactRenderRowLength();
-                var textHeight = renderCompact(match, g, item, tile, itemCounts.get(item.getId()), currentOffset, mouse,
+                var textHeight = renderCompact(item.getOverlayKey().getDisplayConfig(), g, item.getFirstItem(), tile,
+                        item.getCounts().getCount(), item.getCounts().getQuantity(), currentOffset, mouse,
                         hoveredHide::set, compactRowPosition, effectiveRowLength);
                 if (compactRowPosition >= config.compactRenderRowLength() - 1) {
                     compactRowPosition = 0;
@@ -126,7 +103,8 @@ public class LootFiltersOverlay extends Overlay {
                     compactRowPosition++;
                 }
             }
-            if (!partitionedItems.get(true).isEmpty()) {
+
+            if (!items.get(true).isEmpty()) {
                 currentOffset += config.compactRenderSize() / 2;
                 if (compactRowPosition > 0) {
                     currentOffset += config.compactRenderSize() + BOX_PAD + 2;
@@ -134,21 +112,10 @@ public class LootFiltersOverlay extends Overlay {
             }
 
             // non-compact
-            for (var item : partitionedItems.get(false)) {
+
+            for (var item : items.get(false)) {
                 var leftOffset = 0;
-
-                var renderKey = new OverlayKey(item.getId(), item.getQuantity());
-                if (rendered.contains(renderKey)) {
-                    continue;
-                }
-                rendered.add(renderKey);
-
-                var count = itemCounts.get(renderKey);
-
-                var match = plugin.getDisplayIndex().get(item);
-                if (match == null) {
-                    continue;
-                }
+                var match = item.getOverlayKey().getDisplayConfig();
 
                 var overrideHidden = plugin.isHotkeyActive() && config.hotkeyShowHiddenItems();
                 if (match.isHideOverlay() && !overrideHidden) {
@@ -167,7 +134,7 @@ public class LootFiltersOverlay extends Overlay {
                     g.setFont(match.getFont());
                 } // otherwise we don't have to do anything, the font is already set
 
-                var displayText = buildDisplayText(item, count, match);
+                var displayText = buildDisplayText(item.getFirstItem(), item.getCounts().getCount(), item.getCounts().getQuantity(), match);
                 var textPoint = getCanvasTextLocation(client, g, loc, displayText, tile.getItemLayer().getHeight() + config.overlayZOffset());
                 if (textPoint == null) {
                     continue;
@@ -202,29 +169,30 @@ public class LootFiltersOverlay extends Overlay {
                     g.drawRect(boundingBox.x, boundingBox.y, boundingBox.width, boundingBox.height);
                 }
                 if (plugin.isHotkeyActive() && boundingBox.contains(mouse.getX(), mouse.getY())) {
-                    hoveredItem.set(item.getId());
-
+                    hoveredItem.set(item.getOverlayKey().getId());
                     g.setColor(match.isHidden() ? config.hiddenColor() : Color.WHITE);
                     g.drawRect(boundingBox.x, boundingBox.y, boundingBox.width, boundingBox.height);
                 }
                 if (config.hotkeyShowClickboxes() && plugin.isHotkeyActive()) {
-                    renderClickboxes(g, boundingBox, item, match, hoveredHide::set, hoveredHighlight::set);
+                    renderClickboxes(g, boundingBox, item.getFirstItem(), match, hoveredHide::set, hoveredHighlight::set);
                 }
 
                 text.render(g);
 
                 if (match.getIcon() != null) {
-                    var cacheKey = match.getIcon().getCacheKey(item);
+                    var cacheKey = match.getIcon().getCacheKey(item.getFirstItem());
                     var d = renderIcon(g, cacheKey, textPoint, currentOffset);
                     leftOffset += d.width;
                 }
                 if (match.isShowDespawn() || plugin.isHotkeyActive()) {
                     var type = plugin.isHotkeyActive() ? DespawnTimerType.PIE : config.despawnTimerType();
-                    renderDespawnTimer(g, type, item, textPoint, textWidth, currentOffset, leftOffset, false);
+                    renderDespawnTimer(g, type, item.getFirstItem(), textPoint, textWidth, currentOffset, leftOffset, false);
                 }
 
                 currentOffset += textHeight + BOX_PAD + 3;
             }
+
+
         }
 
         plugin.setHoveredItem(hoveredItem.get());
@@ -233,7 +201,8 @@ public class LootFiltersOverlay extends Overlay {
         return null;
     }
 
-    private int renderCompact(DisplayConfig match, Graphics2D g, PluginTileItem item, Tile tile, long count,
+
+    private int renderCompact(DisplayConfig match, Graphics2D g, PluginTileItem item, Tile tile, long count, long quantity,
                               int currentOffset, net.runelite.api.Point mouse, Consumer<Integer> onHoveredItem, int rowOffset,
                               int rowSize) {
         var overrideHidden = plugin.isHotkeyActive() && config.hotkeyShowHiddenItems();
@@ -289,11 +258,11 @@ public class LootFiltersOverlay extends Overlay {
             g.drawRect(boundingBox.x, boundingBox.y, boundingBox.width, boundingBox.height);
         }
         var displayText = "";
-        if (item.getQuantity() > 1) {
-            if (item.getQuantity() < 1000) {
-                displayText += item.getQuantity();
-            } else if (item.getQuantity() < 99500) {
-                displayText += String.format("%.0fK", (float) item.getQuantity() / 1e3);
+        if (quantity > 1) {
+            if (quantity < 1000) {
+                displayText += quantity;
+            } else if (quantity < 99500) {
+                displayText += String.format("%.0fK", (float) quantity / 1e3);
             } else {
                 displayText += "Lots!";
             }
@@ -303,7 +272,7 @@ public class LootFiltersOverlay extends Overlay {
         g.drawImage(image, boundingBox.x + BOX_PAD / 2, boundingBox.y + BOX_PAD / 2, null);
         if (match.isShowDespawn() || plugin.isHotkeyActive()) {
             var type = plugin.isHotkeyActive() ? DespawnTimerType.PIE : config.despawnTimerType();
-            renderDespawnTimer(g, type, item, new net.runelite.api.Point(boundingBox.x + BOX_PAD / 2, boundingBox.y + boundingBox.height), boxWidth + 2,0, 0, true);
+            renderDespawnTimer(g, type, item, new net.runelite.api.Point(boundingBox.x + BOX_PAD / 2, boundingBox.y + boundingBox.height), boxWidth + 2, 0, 0, true);
         }
         g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1));
         if (count > 1) {
@@ -330,12 +299,12 @@ public class LootFiltersOverlay extends Overlay {
         return Color.GREEN;
     }
 
-    private String buildDisplayText(PluginTileItem item, long unstackedCount, DisplayConfig display) {
+    private String buildDisplayText(PluginTileItem item, long unstackedCount, long quantity, DisplayConfig display) {
         var text = item.getName();
 
         // BOTH of these can be true, we want them to be visually different either way
-        if (item.getQuantity() > 1) {
-            text += " (" + abbreviate(item.getQuantity()) + ")";
+        if (quantity > 1) {
+            text += " (" + (abbreviate((int) Math.min(Integer.MAX_VALUE, quantity))) + ")";
         }
         if (unstackedCount > 1) {
             text += " x" + unstackedCount;
@@ -347,8 +316,9 @@ public class LootFiltersOverlay extends Overlay {
             return text;
         }
 
-        var ge = item.getGePrice() * item.getQuantity();
-        var ha = item.getHaPrice() * item.getQuantity();
+        //TODO fix this and let it actually work with values over max int, need to add to the abbreviator
+        var ge = (int) Math.min(Integer.MAX_VALUE, item.getGePrice() * quantity);
+        var ha = (int) Math.min(Integer.MAX_VALUE, item.getHaPrice() * quantity);
         switch (showBecauseHotkey ? ValueDisplayType.BOTH : config.valueDisplayType()) {
             case HIGHEST:
                 return ge == 0 && ha == 0 ? text
@@ -421,7 +391,8 @@ public class LootFiltersOverlay extends Overlay {
         g.drawString("audio: " + plugin.getQueuedAudio().size() + ", icon: " + plugin.getIconIndex().size(), 0, 80);
     }
 
-    private void renderDespawnTimer(Graphics2D g, DespawnTimerType type, PluginTileItem item, net.runelite.api.Point textPoint, int textWidth, int yOffset, int leftOffset, boolean compact) {
+    private void renderDespawnTimer(Graphics2D g, DespawnTimerType type, PluginTileItem
+            item, net.runelite.api.Point textPoint, int textWidth, int yOffset, int leftOffset, boolean compact) {
         var ticksRemaining = item.getDespawnTime() - client.getTickCount();
         if (ticksRemaining < 0) { // doesn't despawn
             return;
@@ -437,10 +408,10 @@ public class LootFiltersOverlay extends Overlay {
             var remaining = item.getDespawnTime() - plugin.getClient().getTickCount();
 
             Rectangle bar;
-            if(compact){
+            if (compact) {
                 bar = new Rectangle(textPoint.getX(), textPoint.getY() - 3, textWidth * remaining / total, 3);
-            }else{
-                bar = new Rectangle(textPoint.getX()-leftOffset-1, textPoint.getY() - 2 - yOffset, leftOffset * remaining / total-4, 3);
+            } else {
+                bar = new Rectangle(textPoint.getX() - leftOffset - 1, textPoint.getY() - 2 - yOffset, leftOffset * remaining / total - 4, 3);
             }
             g.setColor(getDespawnTextColor(item));
             g.fillRect(bar.x, bar.y, bar.width, bar.height);
@@ -527,7 +498,8 @@ public class LootFiltersOverlay extends Overlay {
         g.setStroke(origStroke);
     }
 
-    private Dimension renderIcon(Graphics2D g, BufferedImageProvider.CacheKey cacheKey, net.runelite.api.Point textPoint, int yOffset) {
+    private Dimension renderIcon(Graphics2D g, BufferedImageProvider.CacheKey cacheKey, net.runelite.api.Point
+            textPoint, int yOffset) {
         var image = plugin.getIconIndex().get(cacheKey);
         if (image == null) {
             return new Dimension(0, 0);
@@ -540,8 +512,58 @@ public class LootFiltersOverlay extends Overlay {
         return new Dimension(image.getWidth() + BOX_PAD, image.getHeight());
     }
 
+    private Map<Boolean, Deque<RenderItem>> createItemCollection(List<PluginTileItem> items) {
+        Map<Boolean, Deque<RenderItem>> itemCollection = new HashMap<>();
+        itemCollection.put(true, new ArrayDeque<>());
+        itemCollection.put(false, new ArrayDeque<>());
+
+        var countMap = new HashMap<OverlayKey, ItemCounts>();
+        for (var item : items) {
+            var match = plugin.getDisplayIndex().get(item);
+            if (match == null) {
+                continue;
+            }
+            var key = new OverlayKey(item.getId(), match);
+            var existingVal = countMap.get(key);
+            if (existingVal == null) {
+                var quant = new ItemCounts(1, item.getQuantity());
+                countMap.put(key, quant);
+                itemCollection.get(key.displayConfig.isCompact() && !key.displayConfig.isHidden()).add(new RenderItem(item, key, quant));
+            } else {
+                if (item.isStackable()) {
+                    existingVal.quantity += item.getQuantity();
+                }
+                existingVal.count++;
+            }
+        }
+        return itemCollection;
+    }
+
     @Value
     private static class OverlayKey {
-        int id, quantity;
+        int id;
+        DisplayConfig displayConfig;
+    }
+
+    @Value
+    private static class RenderItem {
+        PluginTileItem firstItem;
+        OverlayKey overlayKey;
+        ItemCounts counts;
+    }
+
+    @Getter
+    @Setter
+    private static class ItemCounts {
+        //Number of individual items/stacks
+        int count;
+        //Total sum of all stacks combined
+        int quantity;
+
+        public ItemCounts(int count, int quantity) {
+            this.count = count;
+            this.quantity = quantity;
+        }
     }
 }
+
