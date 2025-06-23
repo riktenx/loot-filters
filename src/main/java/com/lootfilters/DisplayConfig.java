@@ -28,6 +28,7 @@ public class DisplayConfig {
     private final Boolean hidden;
     private final Boolean showLootbeam;
     private final Boolean showValue;
+    private final Boolean compact;
     private final Boolean showDespawn;
     private final Boolean notify;
     private final TextAccent textAccent;
@@ -52,6 +53,7 @@ public class DisplayConfig {
         hidden = false;
         showLootbeam = false;
         showValue = false;
+        compact = false;
         showDespawn = false;
         notify = false;
         textAccent = null;
@@ -74,6 +76,10 @@ public class DisplayConfig {
 
     public Color getTextColor() {
         return textColor != null ? textColor : Color.WHITE;
+    }
+
+    public BufferedImageProvider getIcon() {
+        return isCompact() ? new BufferedImageProvider.CurrentItem() : icon;
     }
 
     public Color getMenuTextColor() {
@@ -112,6 +118,10 @@ public class DisplayConfig {
     public boolean isHighlightTile() { return !isHidden() && highlightTile != null && highlightTile; }
     public boolean isHideOverlay() { return isHidden() || (hideOverlay != null && hideOverlay); }
 
+    public boolean isCompact() {
+        return !isHidden() && compact != null && compact;
+    }
+
     public DisplayConfig merge(DisplayConfig other) {
         var b = toBuilder();
         if (other.textColor != null) { b.textColor(other.textColor); }
@@ -120,6 +130,7 @@ public class DisplayConfig {
         if (other.hidden != null) { b.hidden(other.hidden); }
         if (other.showLootbeam != null) { b.showLootbeam(other.showLootbeam); }
         if (other.showValue != null) { b.showValue(other.showValue); }
+        if (other.compact != null) { b.compact(other.compact); }
         if (other.showDespawn != null) { b.showDespawn(other.showDespawn); }
         if (other.notify != null) { b.notify(other.notify); }
         if (other.textAccent != null) { b.textAccent(other.textAccent); }

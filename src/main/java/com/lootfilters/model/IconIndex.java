@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 public class IconIndex {
@@ -16,10 +17,10 @@ public class IconIndex {
         return index.containsKey(key) ? index.get(key).image : null;
     }
 
-    public void inc(BufferedImageProvider provider, PluginTileItem item) {
-        index.compute(provider.getCacheKey(item), (k, entry) -> {
+    public void inc(BufferedImageProvider provider, PluginTileItem item, int... height) {
+        index.compute(provider.getCacheKey(item, height), (k, entry) -> {
             if (entry == null) {
-                return new CacheEntry(provider.getImage(plugin, item));
+                return new CacheEntry(provider.getImage(plugin, item, height));
             }
 
             ++entry.refCount;
@@ -27,12 +28,11 @@ public class IconIndex {
         });
     }
 
-    public void dec(BufferedImageProvider provider, PluginTileItem item) {
-        index.compute(provider.getCacheKey(item), (k, entry) -> {
+    public void dec(BufferedImageProvider provider, PluginTileItem item, int... height) {
+        index.compute(provider.getCacheKey(item, height), (k, entry) -> {
             if (entry == null) {
                 return null;
             }
-
             --entry.refCount;
             return entry.refCount == 0 ? null : entry;
         });
@@ -52,7 +52,7 @@ public class IconIndex {
             for (var item : entry.getValue()) {
                 var match = plugin.getActiveFilter().findMatch(plugin, item);
                 if (match != null && match.getIcon() != null) {
-                    inc(match.getIcon(), item);
+                    inc(match.getIcon(), item, match.isCompact() ? plugin.getConfig().compactRenderSize() : 16);
                 }
             }
         }
