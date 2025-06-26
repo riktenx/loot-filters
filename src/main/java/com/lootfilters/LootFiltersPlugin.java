@@ -50,6 +50,7 @@ import java.util.concurrent.Executors;
 
 import static com.lootfilters.util.FilterUtil.withConfigRules;
 import static net.runelite.client.RuneLite.RUNELITE_DIR;
+import static net.runelite.client.util.ColorUtil.colorToHexCode;
 import static net.runelite.client.util.ImageUtil.loadImageResource;
 
 @Slf4j
@@ -363,7 +364,7 @@ public class LootFiltersPlugin extends Plugin {
 			// CA_ID:{id}|<msg> is used to embed CA information into a GAMEMESSAGE chat. A side effect of this is that
 			// whenever you have |s in a chat message, everything before the first | gets cut off. So, we just throw one
 			// at the front of everything as a prophylactic measure since we might show || tokens in parse errors.
-			var chatMsg = String.format("|<col=00ffff>[Loot Filters]</col>: %s", msg);
+			var chatMsg = String.format("|<col=%s>[Loot Filters]</col>: %s", colorToHexCode(config.chatPrefixColor()), msg);
 			client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", chatMsg, "loot-filters", false);
 		}
 		queuedChatMessages.clear();
