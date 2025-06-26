@@ -41,6 +41,14 @@ public interface LootFiltersConfig extends Config {
             position = 0
     )
     String general = "general";
+    @ConfigItem(
+            keyName = "chatPrefixColor",
+            name = "Chat prefix color",
+            description = "Color of the chat prefix used to identify messages from this plugin.",
+            section = general,
+            position = -3
+    )
+    default Color chatPrefixColor() { return Color.decode("#00ffff"); }
     String CONFIG_KEY_FETCH_DEFAULT_FILTERS = "fetchDefaultFilters";
     @ConfigItem(
             keyName = CONFIG_KEY_FETCH_DEFAULT_FILTERS,
@@ -229,7 +237,7 @@ public interface LootFiltersConfig extends Config {
             position = 25
     )
     @Range(min = 1, max = 128)
-    default int compactRenderRowLength() { return 6; }
+    default int compactRenderRowLength() { return 4; }
     @ConfigItem(
             keyName = "highlightTiles",
             name = "Highlight tiles",
@@ -327,6 +335,7 @@ public interface LootFiltersConfig extends Config {
             section = itemLists,
             position = 2
     )
+    @Alpha
     default Color highlightColor() { return Color.decode("#aa00ff"); }
     @ConfigItem(
             keyName = "highlightLootbeam",
@@ -344,28 +353,21 @@ public interface LootFiltersConfig extends Config {
             position = 4
     )
     default boolean highlightNotify() { return false; }
-
-    @ConfigSection(
-            name = "Advanced highlight display",
-            description = "Configure advanced item highlight display. Not all filter-based display properties are supported.",
-            position = 9
-    )
-    String hdd = "Highlight display";
-    @ConfigItem(position = 0, section = hdd,
+    @ConfigItem(position = 5, section = itemLists,
             keyName = "hdBackgroundColor", name = "Background", description = "")
     @Alpha default Color higlightBackgroundColor() { return null; }
-    @ConfigItem(position = 1, section = hdd,
+    @ConfigItem(position = 6, section = itemLists,
             keyName = "hdBorderColor", name = "Border", description = "")
-    @Alpha default Color highlightBorderColor() { return null; }
-    @ConfigItem(position = 2, section = hdd,
+    @Alpha default Color highlightBorderColor() { return Color.decode("#aa00ff"); }
+    @ConfigItem(position = 7, section = itemLists,
             keyName = "hdLootbeamColor", name = "Lootbeam", description = "")
     @Alpha default Color highlightLootbeamColor() { return null; }
-    @ConfigItem(position = 3, section = hdd,
+    @ConfigItem(position = 8, section = itemLists,
             keyName = "hdMenuTextColor", name = "Menu text", description = "")
     @Alpha default Color highlightMenuTextColor() { return null; }
-    @ConfigItem(position = 4, section = hdd, keyName = "hdMenuSort", name = "Menu sort priority", description = "")
+    @ConfigItem(position = 9, section = itemLists, keyName = "hdMenuSort", name = "Menu sort priority", description = "")
     default int highlightMenuSort() { return 0; }
-    @ConfigItem(position = 9, section = hdd,
+    @ConfigItem(position = 10, section = itemLists,
             keyName = "hdSound", name = "Sound", description = "Can be one of two types of values:<br><br>A number: play a game sound effect by ID<br>A string: play a custom audio file from .runelite/loot-filters/sounds, not all sound formats are supported")
     default String highlightSound() { return ""; }
 
@@ -377,10 +379,10 @@ public interface LootFiltersConfig extends Config {
     String itemValueRules = "itemValueRules";
     @ConfigItem(
             keyName = "itemValueRulesReadme",
-            name = "readme (hover over this)",
-            description = "Unlike the ground items plugin, item value rules are managed by your active loot filter.<br>Both of the default filters shipped with the plugin - FilterScape and Joe's filter - include item value tiers with thresholds similar to that of the ground items plugin.<br>You can configure both the value thresholds and display settings for these on https://filterscape.xyz/.<br><br>(this toggle has no effect)",
+            name = "README (hover)",
+            description = "Unlike the ground items plugin, item value rules are managed by your active loot filter.<br>Both of the default filters shipped with the plugin - FilterScape and Joe's filter - include item value tiers with thresholds similar to that of the ground items plugin.<br>You can configure both the value thresholds and display settings for these on https://filterscape.xyz/.",
             section = itemValueRules,
             position = 0
     )
-    default boolean itemValueRulesReadme() { return false; }
+    void itemValueRulesReadme();
 }
