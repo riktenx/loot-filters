@@ -237,7 +237,7 @@ public interface LootFiltersConfig extends Config {
             position = 25
     )
     @Range(min = 1, max = 128)
-    default int compactRenderRowLength() { return 6; }
+    default int compactRenderRowLength() { return 4; }
     @ConfigItem(
             keyName = "highlightTiles",
             name = "Highlight tiles",
