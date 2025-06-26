@@ -299,12 +299,12 @@ public class LootFiltersOverlay extends Overlay {
         return Color.GREEN;
     }
 
-    private String buildDisplayText(PluginTileItem item, long unstackedCount, long quantity, DisplayConfig display) {
+    private String buildDisplayText(PluginTileItem item, int unstackedCount, int quantity, DisplayConfig display) {
         var text = item.getName();
 
         // BOTH of these can be true, we want them to be visually different either way
         if (quantity > 1) {
-            text += " (" + (abbreviate((int) Math.min(Integer.MAX_VALUE, quantity))) + ")";
+            text += " (" + abbreviate(quantity) + ")";
         }
         if (unstackedCount > 1) {
             text += " x" + unstackedCount;
@@ -316,9 +316,8 @@ public class LootFiltersOverlay extends Overlay {
             return text;
         }
 
-        //TODO fix this and let it actually work with values over max int, need to add to the abbreviator
-        var ge = (int) Math.min(Integer.MAX_VALUE, item.getGePrice() * quantity);
-        var ha = (int) Math.min(Integer.MAX_VALUE, item.getHaPrice() * quantity);
+        var ge = item.getGePrice() * quantity;
+        var ha = item.getHaPrice() * quantity;
         switch (showBecauseHotkey ? ValueDisplayType.BOTH : config.valueDisplayType()) {
             case HIGHEST:
                 return ge == 0 && ha == 0 ? text
@@ -490,8 +489,7 @@ public class LootFiltersOverlay extends Overlay {
         g.setStroke(origStroke);
     }
 
-    private Dimension renderIcon(Graphics2D g, BufferedImageProvider.CacheKey cacheKey, net.runelite.api.Point
-            textPoint, int yOffset) {
+    private Dimension renderIcon(Graphics2D g, BufferedImageProvider.CacheKey cacheKey, net.runelite.api.Point textPoint, int yOffset) {
         var image = plugin.getIconIndex().get(cacheKey);
         if (image == null) {
             return new Dimension(0, 0);
