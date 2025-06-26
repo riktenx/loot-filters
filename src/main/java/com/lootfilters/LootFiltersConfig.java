@@ -376,10 +376,7 @@ public interface LootFiltersConfig extends Config {
             section = itemValueRules,
             position = 0
     )
-<<<<<<< HEAD
     void itemValueRulesReadme();
-=======
-    default boolean itemValueRulesReadme() { return false; }
 
     @ConfigSection(
             name = "Advanced",
@@ -396,5 +393,4 @@ public interface LootFiltersConfig extends Config {
             position = 0
     )
     default boolean showAnalyzer() { return false; }
->>>>>>> 2d1fd45 (improve this somewhat)
 }

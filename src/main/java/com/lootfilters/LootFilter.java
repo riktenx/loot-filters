@@ -96,13 +96,6 @@ public class LootFilter {
         return fromSourcesWithPreamble(Map.of(UNKNOWN_SOURCE_NAME, source));
     }
 
-    public String toJson(Gson gson) {
-        var ggson = gson.newBuilder()
-                .registerTypeAdapter(Color.class, new ColorSerializer())
-                .create();
-        return ggson.toJson(this);
-    }
-
     public @NonNull DisplayConfig findMatch(LootFiltersPlugin plugin, PluginTileItem item) {
         var display = new DisplayConfig(Color.WHITE);
         for (var matcher : matchers) {
@@ -111,19 +104,11 @@ public class LootFilter {
             }
 
             display = display.merge(matcher.getDisplay());
-            display.getEvalSource().add(matcher.getSourceLine());
+            display.getEvalTrace().add(matcher.getSourceLine());
             if (matcher.isTerminal()) {
                 return display;
             }
         }
         return display;
-    }
-
-    public boolean isInActivationArea(WorldPoint p) {
-        if (activationArea == null) {
-            return false;
-        }
-        return p.getX() >= activationArea[0] && p.getY() >= activationArea[1] && p.getPlane() >= activationArea[2]
-                && p.getX() <= activationArea[3] && p.getY() <= activationArea[4] && p.getPlane() <= activationArea[5];
     }
 }

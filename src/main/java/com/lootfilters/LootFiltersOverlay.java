@@ -520,9 +520,6 @@ public class LootFiltersOverlay extends Overlay {
         var countMap = new HashMap<OverlayKey, ItemCounts>();
         for (var item : items) {
             var match = plugin.getDisplayIndex().get(item);
-            if (match == null) {
-                continue;
-            }
             var key = new OverlayKey(item.getId(), match);
             var existingVal = countMap.get(key);
             if (existingVal == null) {

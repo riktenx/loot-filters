@@ -2,7 +2,6 @@ package com.lootfilters;
 
 import com.lootfilters.model.PluginTileItem;
 import lombok.AllArgsConstructor;
-import net.runelite.api.KeyCode;
 import net.runelite.api.MenuAction;
 import net.runelite.api.MenuEntry;
 import net.runelite.api.coords.WorldPoint;
@@ -39,10 +38,6 @@ public class MenuEntryComposer {
 
         var item = items.get(0);
         var match = plugin.getDisplayIndex().get(item);
-        if (match == null) {
-            entry.setTarget(buildTargetText(item, DisplayConfig.DEFAULT_MENU_TEXT_COLOR));
-            return;
-        }
 
         entry.setDeprioritized(plugin.getConfig().deprioritizeHidden() && match.isHidden());
         var color = match.isHidden() && plugin.getConfig().recolorHidden()
@@ -121,34 +116,27 @@ public class MenuEntryComposer {
     }
 
     private MenuEntry getAnalyzer(MenuEntry entry) {
-        var item = getItemForEntry(entry);
+        var item = getItemsForEntry(entry).get(0);
         var display = plugin.getDisplayIndex().get(item);
         Consumer<MenuEntry> onClick = (e) -> {
-            if (display == null) {
-                plugin.addChatMessage(item.getName() + " had no matches");
+            var trace = display.getEvalTrace();
+            if (trace.isEmpty()) {
+                plugin.addChatMessage(item.getName() + " did not match any config list or filter rule.");
+            } else if (trace.size() == 1 && trace.get(0) == -4) {
+                plugin.addChatMessage(item.getName() + " is hidden by the 'Item lists' -> 'Hidden items' setting.");
+            } else if (trace.size() == 1 && trace.get(0) == -3) {
+                plugin.addChatMessage(item.getName() + " is highlighted by the 'Item lists' -> 'Highlighted items' setting.");
+            } else if (trace.size() == 1 && trace.get(0) == -2) {
+                plugin.addChatMessage(item.getName() + " is hidden by the 'General' -> 'Item spawn filter' setting.");
+            } else if (trace.size() == 1 && trace.get(0) == -1) {
+                plugin.addChatMessage(item.getName() + " is hidden by the 'General' -> 'Ownership filter' setting.");
             } else {
-                var evalSource = display.getEvalSource();
-                if (evalSource.size() == 1) {
-                    if (evalSource.get(0) == -4) {
-                        plugin.addChatMessage(item.getName() + " is hidden by the 'Item lists' -> 'Hidden items' setting.");
-                        return;
-                    } else if (evalSource.get(0) == -3) {
-                        plugin.addChatMessage(item.getName() + " is highlighted by the 'Item lists' -> 'Highlighted items' setting.");
-                        return;
-                    } else if (evalSource.get(0) == -2) {
-                        plugin.addChatMessage(item.getName() + " is hidden by the 'General' -> 'Item spawn filter' setting.");
-                        return;
-                    } else if (evalSource.get(0) == -1) {
-                        plugin.addChatMessage(item.getName() + " is hidden by the 'General' -> 'Ownership filter' setting.");
-                        return;
-                    }
-                }
-                plugin.addChatMessage(item.getName() + " matched lines " + evalSource);
+                plugin.addChatMessage(item.getName() + " matched lines " + trace);
             }
         };
 
         return plugin.getClient().getMenu().createMenuEntry(-1)
-                .setOption("Analyze (Loot Filter)")
+                .setOption("[Loot Filters]: Analyze")
                 .setTarget(entry.getTarget())
                 .setType(MenuAction.RUNELITE)
                 .onClick(onClick);
