@@ -289,9 +289,6 @@ public class LootFiltersPlugin extends Plugin {
 
 	private void addItem(Tile tile, PluginTileItem item) {
 		var match = getActiveFilter().findMatch(this, item);
-		if (match == null) {
-			return;
-		}
 
 		displayIndex.put(item, match);
 		if (match.isShowLootbeam()) {

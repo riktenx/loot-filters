@@ -10,6 +10,7 @@ import java.awt.Color;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -37,10 +38,6 @@ public class MenuEntryComposer {
 
         var item = items.get(0);
         var match = plugin.getDisplayIndex().get(item);
-        if (match == null) {
-            entry.setTarget(buildTargetText(item, DisplayConfig.DEFAULT_MENU_TEXT_COLOR));
-            return;
-        }
 
         entry.setDeprioritized(plugin.getConfig().deprioritizeHidden() && match.isHidden());
         var color = match.isHidden() && plugin.getConfig().recolorHidden()
@@ -57,6 +54,9 @@ public class MenuEntryComposer {
         var entries = sortEntries(plugin.getClient().getMenu().getMenuEntries());
         if (plugin.getConfig().collapseEntries()) {
             entries = collapseEntries(entries);
+        }
+        if (plugin.getConfig().showAnalyzer()) {
+            entries = addAnalyzers(entries);
         }
         plugin.getClient().getMenu().setMenuEntries(entries);
     }
@@ -107,6 +107,41 @@ public class MenuEntryComposer {
         return collapsed.toArray(MenuEntry[]::new);
     }
 
+    private MenuEntry[] addAnalyzers(MenuEntry[] entries) {
+        return Arrays.stream(entries)
+                .flatMap(it -> isGroundItem(it, false)
+                        ? Stream.of(it, getAnalyzer(it))
+                        : Stream.of(it))
+                .toArray(MenuEntry[]::new);
+    }
+
+    private MenuEntry getAnalyzer(MenuEntry entry) {
+        var item = getItemsForEntry(entry).get(0);
+        var display = plugin.getDisplayIndex().get(item);
+        Consumer<MenuEntry> onClick = (e) -> {
+            var trace = display.getEvalTrace();
+            if (trace.isEmpty()) {
+                plugin.addChatMessage(item.getName() + " did not match any config list or filter rule.");
+            } else if (trace.size() == 1 && trace.get(0) == -4) {
+                plugin.addChatMessage(item.getName() + " is hidden by the 'Item lists' -> 'Hidden items' setting.");
+            } else if (trace.size() == 1 && trace.get(0) == -3) {
+                plugin.addChatMessage(item.getName() + " is highlighted by the 'Item lists' -> 'Highlighted items' setting.");
+            } else if (trace.size() == 1 && trace.get(0) == -2) {
+                plugin.addChatMessage(item.getName() + " is hidden by the 'General' -> 'Item spawn filter' setting.");
+            } else if (trace.size() == 1 && trace.get(0) == -1) {
+                plugin.addChatMessage(item.getName() + " is hidden by the 'General' -> 'Ownership filter' setting.");
+            } else {
+                plugin.addChatMessage(item.getName() + " matched lines " + trace);
+            }
+        };
+
+        return plugin.getClient().getMenu().createMenuEntry(-1)
+                .setOption("[Loot Filters]: Analyze")
+                .setTarget(entry.getTarget())
+                .setType(MenuAction.RUNELITE)
+                .onClick(onClick);
+    }
+
     private MenuEntry withCount(MenuEntry entry, long count) {
         return count > 1
                 ? entry.setTarget(entry.getTarget() + " x" + count)
@@ -127,14 +162,18 @@ public class MenuEntryComposer {
         return colorTag(color) + text;
     }
 
-    private static boolean isGroundItem(MenuEntry entry) {
+    private static boolean isGroundItem(MenuEntry entry, boolean includeExamine) {
         var type = entry.getType();
         return type == MenuAction.GROUND_ITEM_FIRST_OPTION
                 || type == MenuAction.GROUND_ITEM_SECOND_OPTION
                 || type == MenuAction.GROUND_ITEM_THIRD_OPTION
                 || type == MenuAction.GROUND_ITEM_FOURTH_OPTION
                 || type == MenuAction.GROUND_ITEM_FIFTH_OPTION
-                || type == MenuAction.EXAMINE_ITEM_GROUND;
+                || includeExamine && type == MenuAction.EXAMINE_ITEM_GROUND;
+    }
+
+    private static boolean isGroundItem(MenuEntry entry) {
+        return isGroundItem(entry, true);
     }
 
     // The results of a menu entry lookup are "indeterminate" if the item was stackable, and we found more than one.

@@ -59,14 +59,6 @@ public interface LootFiltersConfig extends Config {
     )
     default boolean fetchDefaultFilters() { return true; }
     @ConfigItem(
-            keyName = "showUnmatchedItems",
-            name = "Show unmatched items",
-            description = "Give a default text overlay to items that don't match the active filter.",
-            section = general,
-            position = 1
-    )
-    default boolean showUnmatchedItems() { return true; }
-    @ConfigItem(
             keyName = "ownershipFilter",
             name = "Ownership filter",
             description = "When enabled, filters out any items you cannot pick up. This filter overrides ALL other rules/config.",
@@ -385,4 +377,20 @@ public interface LootFiltersConfig extends Config {
             position = 0
     )
     void itemValueRulesReadme();
+
+    @ConfigSection(
+            name = "Advanced",
+            description = "Don't use these unless you know what you're doing.",
+            position = 999
+    )
+    String advanced = "advanced";
+    @ConfigItem(
+            keyName = "showAnalyzer",
+            name = "Menu: add Analyzers",
+            description = "Adds an \"Analyze\" right-click menu entry for each ground item that tells you how a given" +
+                    " item was evaluated against your plugin config and loot filter. Useful for debugging.",
+            section = advanced,
+            position = 0
+    )
+    default boolean showAnalyzer() { return false; }
 }

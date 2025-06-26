@@ -71,9 +71,9 @@ public class Parser {
             if (tok.is(META)) {
                 parseMeta();
             } else if (tok.is(IF) || tok.is(RULE)) {
-                parseMatcher(true);
+                parseMatcher(true, tok.getLocation().getLineNumber());
             } else if (tok.is(APPLY)) {
-                parseMatcher(false);
+                parseMatcher(false, tok.getLocation().getLineNumber());
             } else {
                 throw new ParseException("unexpected token", tok);
             }
@@ -114,7 +114,7 @@ public class Parser {
         }
     }
 
-    private void parseMatcher(boolean isTerminal) {
+    private void parseMatcher(boolean isTerminal, int sourceLine) {
         var operators = new Stack<Token>();
         var rulesPostfix = new ArrayList<Rule>();
         tokens.walkExpression(EXPR_START, EXPR_END, it -> {
@@ -224,7 +224,7 @@ public class Parser {
         }
         tokens.takeExpect(BLOCK_END);
 
-        matchers.add(new MatcherConfig(buildRule(rulesPostfix), builder.build(), isTerminal));
+        matchers.add(new MatcherConfig(buildRule(rulesPostfix), builder.build(), isTerminal, sourceLine));
     }
 
     private void unwindUnary(Stack<Token> operators, ArrayList<Rule> postfix) {

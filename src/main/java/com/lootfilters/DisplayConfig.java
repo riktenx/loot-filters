@@ -13,6 +13,8 @@ import net.runelite.client.ui.FontManager;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Builder(toBuilder = true)
@@ -46,6 +48,9 @@ public class DisplayConfig {
     private final Integer menuSort;
     private final BufferedImageProvider icon;
 
+    // ideally this would be in EvalDisplayConfig which extends DisplayConfig but that's just more code tbh
+    private final List<Integer> evalTrace;
+
     public DisplayConfig(Color textColor) {
         this.textColor = textColor;
         backgroundColor = null;
@@ -68,6 +73,7 @@ public class DisplayConfig {
         sound = null;
         menuSort = null;
         icon = null;
+        evalTrace = new ArrayList<>();
     }
 
     public Color getLootbeamColor() {
