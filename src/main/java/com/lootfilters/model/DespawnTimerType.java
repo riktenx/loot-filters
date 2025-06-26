@@ -6,8 +6,7 @@ import lombok.AllArgsConstructor;
 public enum DespawnTimerType {
     TICKS("ticks"),
     SECONDS("seconds"),
-    PIE("pie"),
-    BAR("bar");
+    PIE("pie");
     private final String label;
 
     @Override

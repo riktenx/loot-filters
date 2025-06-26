@@ -401,18 +401,10 @@ public class LootFiltersOverlay extends Overlay {
             return;
         }
 
-        if ((type == DespawnTimerType.BAR && leftOffset > 0) || compact) {
+        if (compact) { // bar
             var total = item.getDespawnTime() - item.getSpawnTime();
-            if (total == 0)
-                return;
             var remaining = item.getDespawnTime() - plugin.getClient().getTickCount();
-
-            Rectangle bar;
-            if (compact) {
-                bar = new Rectangle(textPoint.getX(), textPoint.getY() - 3, textWidth * remaining / total, 3);
-            } else {
-                bar = new Rectangle(textPoint.getX() - leftOffset - 1, textPoint.getY() - 2 - yOffset, leftOffset * remaining / total - 4, 3);
-            }
+            var bar = new Rectangle(textPoint.getX(), textPoint.getY() - 3, textWidth * remaining / total, 3);
             g.setColor(getDespawnTextColor(item));
             g.fillRect(bar.x, bar.y, bar.width, bar.height);
         } else if (type == DespawnTimerType.TICKS || type == DespawnTimerType.SECONDS) {
@@ -425,7 +417,7 @@ public class LootFiltersOverlay extends Overlay {
             text.setColor(getDespawnTextColor(item));
             text.setPosition(new Point(textPoint.getX() + textWidth + 2 + 1, textPoint.getY() - yOffset));
             text.render(g);
-        } else {
+        } else { // pie
             var timer = new ProgressPieComponent();
             var total = item.getDespawnTime() - item.getSpawnTime();
             var remaining = item.getDespawnTime() - plugin.getClient().getTickCount();
