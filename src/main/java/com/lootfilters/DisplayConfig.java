@@ -76,6 +76,10 @@ public class DisplayConfig {
         evalTrace = new ArrayList<>();
     }
 
+    public SoundProvider getSound() {
+        return !isHidden() ? sound : null;
+    }
+
     public Color getLootbeamColor() {
         return lootbeamColor != null ? lootbeamColor : textColor;
     }
