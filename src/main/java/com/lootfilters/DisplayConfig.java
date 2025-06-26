@@ -57,6 +57,7 @@ public class DisplayConfig {
         hidden = false;
         showLootbeam = false;
         showValue = false;
+        compact = false;
         showDespawn = false;
         notify = false;
         textAccent = null;
@@ -71,7 +72,6 @@ public class DisplayConfig {
         sound = null;
         menuSort = null;
         icon = null;
-        compact = false;
         evalSource = null;
     }
 

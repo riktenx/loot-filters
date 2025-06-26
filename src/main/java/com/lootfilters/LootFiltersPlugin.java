@@ -290,7 +290,7 @@ public class LootFiltersPlugin extends Plugin {
 	private void addItem(Tile tile, PluginTileItem item) {
 		var match = getActiveFilter().findMatch(this, item);
 
-        displayIndex.put(item, match);
+		displayIndex.put(item, match);
 		if (match.isShowLootbeam()) {
 			var beam = new Lootbeam(client, clientThread, tile.getWorldLocation(), match.getLootbeamColor(), Lootbeam.Style.MODERN);
 			lootbeamIndex.put(tile, item, beam);
