@@ -94,7 +94,7 @@ public class LootFiltersOverlay extends Overlay {
                 var effectiveRowLength = config.compactRenderRowLength() > remainingCompactMatches ? remainingCompactMatches : config.compactRenderRowLength();
                 var textHeight = renderCompact(item.getOverlayKey().getDisplayConfig(), g, item.getFirstItem(), tile,
                         item.getCounts().getCount(), item.getCounts().getQuantity(), currentOffset, mouse,
-                        hoveredHide::set, compactRowPosition, effectiveRowLength);
+                        hoveredItem::set, compactRowPosition, effectiveRowLength);
                 if (compactRowPosition >= config.compactRenderRowLength() - 1) {
                     compactRowPosition = 0;
                     currentOffset += textHeight + BOX_PAD + 3;
