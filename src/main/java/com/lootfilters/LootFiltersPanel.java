@@ -71,15 +71,9 @@ public class LootFiltersPanel extends PluginPanel {
         var bottom = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
         var label = new JLabel("Active filter:");
-        var createNew = createIconButton("create_filter",
-                "Create a new empty filter.",
-                this::onCreateEmptyFilter);
         var importClipboard = createIconButton("paste_icon",
                 "Import filter from clipboard.",
                 this::onImportClipboard);
-        var importConfig = createIconButton("import_config",
-                "Import item highlight and hide lists into a new filter. Doing this will also reset those lists.",
-                this::onImportConfig);
 
         var reloadFilters = createIconButton("reload_icon",
                 "Reload filters from disk.",
@@ -167,6 +161,16 @@ public class LootFiltersPanel extends PluginPanel {
         var newSrc = getClipboard();
         if (newSrc == null) {
             plugin.addChatMessage("Import failed: no text in clipboard.");
+            return;
+        }
+
+        if (newSrc.startsWith("https://filterscape.xyz/import")) {
+            plugin.addChatMessage("This is a link to import a filter on filterscape.xyz, taking you there now...");
+            try {
+                Desktop.getDesktop().browse(URI.create(newSrc + "&pluginRedirect=true"));
+            } catch (Exception ex) {
+                log.warn("open filterscape.xyz", ex);
+            }
             return;
         }
 
