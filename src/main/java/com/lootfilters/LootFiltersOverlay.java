@@ -191,8 +191,6 @@ public class LootFiltersOverlay extends Overlay {
 
                 currentOffset += textHeight + BOX_PAD + 3;
             }
-
-
         }
 
         plugin.setHoveredItem(hoveredItem.get());
@@ -201,12 +199,11 @@ public class LootFiltersOverlay extends Overlay {
         return null;
     }
 
-
-    private int renderCompact(DisplayConfig match, Graphics2D g, PluginTileItem item, Tile tile, long count, long quantity,
+    private int renderCompact(DisplayConfig display, Graphics2D g, PluginTileItem item, Tile tile, long count, long quantity,
                               int currentOffset, net.runelite.api.Point mouse, Consumer<Integer> onHoveredItem, int rowOffset,
                               int rowSize) {
         var overrideHidden = plugin.isHotkeyActive() && config.hotkeyShowHiddenItems();
-        if (match.isHideOverlay() && !overrideHidden) {
+        if (display.isHideOverlay() && !overrideHidden) {
             return -1;
         }
 
@@ -218,14 +215,13 @@ public class LootFiltersOverlay extends Overlay {
             return -1;
         }
 
-        // force the small font in compact mode because it's small
-        g.setFont(getRunescapeSmallFont());
+        g.setFont(getRunescapeSmallFont()); // force the small font in compact mode because it's small
 
         var fm = g.getFontMetrics(g.getFont());
         var boxHeight = config.compactRenderSize();
         var boxWidth = Math.round(DEFAULT_IMAGE_WIDTH * boxHeight / (float) DEFAULT_IMAGE_HEIGHT);
 
-        var image = plugin.getIconIndex().get(match.getIcon().getCacheKey(item, config.compactRenderSize()));
+        var image = plugin.getIconIndex().get(display.getIcon().getCacheKey(item, config.compactRenderSize()));
         if (image == null) {
             return -1;
         }
@@ -243,18 +239,18 @@ public class LootFiltersOverlay extends Overlay {
                 boxWidth + 2, boxHeight + 2
         );
 
-        if (match.getBackgroundColor() != null) {
-            g.setColor(match.getBackgroundColor());
+        if (display.getBackgroundColor() != null) {
+            g.setColor(display.getBackgroundColor());
             g.fillRect(boundingBox.x, boundingBox.y, boundingBox.width, boundingBox.height);
         }
-        if (match.getBorderColor() != null) {
-            g.setColor(match.getBorderColor());
+        if (display.getBorderColor() != null) {
+            g.setColor(display.getBorderColor());
             g.drawRect(boundingBox.x, boundingBox.y, boundingBox.width, boundingBox.height);
         }
         if (plugin.isHotkeyActive() && boundingBox.contains(mouse.getX(), mouse.getY())) {
             onHoveredItem.accept(item.getId());
 
-            g.setColor(match.isHidden() ? config.hiddenColor() : Color.WHITE);
+            g.setColor(display.isHidden() ? config.hiddenColor() : Color.WHITE);
             g.drawRect(boundingBox.x, boundingBox.y, boundingBox.width, boundingBox.height);
         }
         var displayText = "";
@@ -268,9 +264,9 @@ public class LootFiltersOverlay extends Overlay {
             }
         }
 
-        g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, match.getTextColor().getAlpha() / 255f));
+        g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, display.getTextColor().getAlpha() / 255f));
         g.drawImage(image, boundingBox.x + BOX_PAD / 2, boundingBox.y + BOX_PAD / 2, null);
-        if (match.isShowDespawn() || plugin.isHotkeyActive()) {
+        if (display.isShowDespawn() || plugin.isHotkeyActive()) {
             var type = plugin.isHotkeyActive() ? DespawnTimerType.PIE : config.despawnTimerType();
             renderDespawnTimer(g, type, item, new net.runelite.api.Point(boundingBox.x + BOX_PAD / 2, boundingBox.y + boundingBox.height), boxWidth + 2, 0, 0, true);
         }
@@ -278,13 +274,11 @@ public class LootFiltersOverlay extends Overlay {
         if (count > 1) {
             displayText += "x" + count;
         }
-        if (config.compactRenderSize() >= 22) {
-            var text = new TextComponent();
-            text.setText(displayText);
-            text.setColor(match.isHidden() ? config.hiddenColor() : match.getTextColor());
-            text.setPosition(new Point(boundingBox.x + BOX_PAD / 2, boundingBox.y + fm.getHeight() + BOX_PAD / 2));
-            text.render(g);
-        }
+        var text = new TextComponent();
+        text.setText(displayText);
+        text.setColor(display.isHidden() ? config.hiddenColor() : display.getTextColor());
+        text.setPosition(new Point(boundingBox.x + BOX_PAD / 2, boundingBox.y + fm.getHeight() + BOX_PAD / 2));
+        text.render(g);
 
         return image.getHeight();
     }
@@ -466,7 +460,7 @@ public class LootFiltersOverlay extends Overlay {
 
         for (var item : items) {
             var match = plugin.getDisplayIndex().get(item);
-            if (match != null && match.isHighlightTile()) {
+            if (match.isHighlightTile()) {
                 highlightTile(g, tile, match);
             }
         }
@@ -515,7 +509,7 @@ public class LootFiltersOverlay extends Overlay {
             if (existingVal == null) {
                 var quant = new ItemCounts(1, item.getQuantity());
                 countMap.put(key, quant);
-                itemCollection.get(key.displayConfig.isCompact() && !key.displayConfig.isHidden()).add(new RenderItem(item, key, quant));
+                itemCollection.get(key.displayConfig.isCompact()).add(new RenderItem(item, key, quant));
             } else {
                 if (item.isStackable()) {
                     existingVal.quantity += item.getQuantity();

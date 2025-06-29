@@ -54,6 +54,10 @@ import static com.lootfilters.lang.Token.Type.RULE;
 import static com.lootfilters.lang.Token.Type.STMT_END;
 import static com.lootfilters.lang.Token.Type.TRUE;
 
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// !! DO NOT add features to the RS2F language without consulting Rikten X first. !!
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//
 // Parser somewhat mixes canonical stages 2 (parse) and 3/4 (syntax/semantic analysis) but the filter language is
 // restricted enough that it should be fine for now.
 @RequiredArgsConstructor
@@ -189,8 +193,6 @@ public class Parser {
                     builder.showLootbeam(assign[1].expectBoolean()); break;
                 case "showValue":
                     builder.showValue(assign[1].expectBoolean()); break;
-                case "compact":
-                    builder.compact(assign[1].expectBoolean()); break;
                 case "showDespawn":
                     builder.showDespawn(assign[1].expectBoolean()); break;
                 case "notify":

@@ -97,7 +97,9 @@ public class LootFilter {
     }
 
     public @NonNull DisplayConfig findMatch(LootFiltersPlugin plugin, PluginTileItem item) {
-        var display = new DisplayConfig(Color.WHITE);
+        var display = new DisplayConfig(Color.WHITE).toBuilder()
+                .compact(plugin.getConfig().compactMode())
+                .build();
         for (var matcher : matchers) {
             if (!matcher.getRule().test(plugin, item)) {
                 continue;

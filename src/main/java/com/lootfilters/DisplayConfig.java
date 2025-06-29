@@ -58,7 +58,7 @@ public class DisplayConfig {
         hidden = false;
         showLootbeam = false;
         showValue = false;
-        compact = false;
+        compact = false; // compact is currently a config-only setting and not supported in rs2f
         showDespawn = false;
         notify = false;
         textAccent = null;
@@ -129,7 +129,7 @@ public class DisplayConfig {
     public boolean isHideOverlay() { return isHidden() || (hideOverlay != null && hideOverlay); }
 
     public boolean isCompact() {
-        return !isHidden() && compact != null && compact;
+        return compact != null && compact;
     }
 
     public DisplayConfig merge(DisplayConfig other) {

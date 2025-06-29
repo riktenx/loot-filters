@@ -12,13 +12,15 @@ import java.util.stream.Collectors;
 import static com.lootfilters.util.CollectionUtil.append;
 import static com.lootfilters.util.TextUtil.quote;
 
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// !! DO NOT add features to the RS2F language without consulting Rikten X first. !!
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 @RequiredArgsConstructor
 public class Preprocessor {
     private final TokenStream tokens;
 
     private final Map<String, Define> defines = new HashMap<>();
     private final List<Token> preproc = new ArrayList<>(); // pre-expansion w/ all preproc lines removed
-
 
     public TokenStream preprocess() throws PreprocessException {
         while (tokens.isNotEmpty()) {
@@ -33,7 +35,6 @@ public class Preprocessor {
                 }
             }
         }
-
 
         return new TokenStream(expandDefines(new ArrayList<>(), new TokenStream(preproc)));
     }

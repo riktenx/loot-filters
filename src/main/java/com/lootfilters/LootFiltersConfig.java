@@ -212,24 +212,6 @@ public interface LootFiltersConfig extends Config {
             position = 23
     )
     default TextAccent textAccent() { return TextAccent.USE_FILTER; }
-    @Range(min = 16, max = 32)
-    @ConfigItem(
-            keyName = "compactRenderSize",
-            name = "Compact icon height",
-            description = "Icon size for compact item rendering. Specifically, height in pixels, although it will sometimes adjust it slightly to preserve aspect ratio. Full size is 32, a good medium is 26. Valid range is 16-32.",
-            section = displayOverrides,
-            position = 24
-    )
-    default int compactRenderSize() { return 26; }
-    @ConfigItem(
-            keyName = "compactRenderRowLength",
-            name = "Compact row size",
-            description = "How many items to render per row for compact items.",
-            section = displayOverrides,
-            position = 25
-    )
-    @Range(min = 1, max = 128)
-    default int compactRenderRowLength() { return 4; }
     @ConfigItem(
             keyName = "highlightTiles",
             name = "Highlight tiles",
@@ -292,6 +274,32 @@ public interface LootFiltersConfig extends Config {
     )
     @Range(max = 32)
     default int overlayZOffset() { return 16; }
+    @ConfigItem(
+            keyName = "compactMode",
+            name = "Compact mode",
+            description = "Enable the \"compact\" overlay mode which renders icons instead of item names.<br>Certain display properties, such as the type of despawn timer, do not apply in compact mode.",
+            section = displayOverrides,
+            position = 100
+    )
+    default boolean compactMode() { return false; }
+    @Range(min = 22, max = 32)
+    @ConfigItem(
+            keyName = "compactRenderSize",
+            name = "Compact: icon height",
+            description = "Icon size for compact item rendering. Specifically, height in pixels, although it will sometimes adjust it slightly to preserve aspect ratio.",
+            section = displayOverrides,
+            position = 101
+    )
+    default int compactRenderSize() { return 26; }
+    @ConfigItem(
+            keyName = "compactRenderRowLength",
+            name = "Compact: row size",
+            description = "How many items to render per row for compact items.",
+            section = displayOverrides,
+            position = 102
+    )
+    @Range(min = 1, max = 128)
+    default int compactRenderRowLength() { return 4; }
 
     @ConfigSection(
             name = "Item lists",

@@ -10,6 +10,9 @@ import java.util.stream.Collectors;
 import static com.lootfilters.util.TextUtil.isLegalIdent;
 import static com.lootfilters.util.TextUtil.isNumeric;
 
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// !! DO NOT add features to the RS2F language without consulting Rikten X first. !!
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 @RequiredArgsConstructor
 public class Lexer {
     private static final LinkedHashMap<String, Token.Type> STATICS = new LinkedHashMap<>() {{
