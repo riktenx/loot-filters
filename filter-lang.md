@@ -108,6 +108,31 @@ There are **two (2)** top-level types of blocks
 Rules evaluate top-down for a given ground item, terminating on the first matched
 `rule`.
 
+### ⚠️ Nested rules are not supported
+
+For example, you cannot do the following:
+
+```
+rule (a) {
+  // 1
+  rule (b) {
+    // 2
+  }
+}
+```
+
+instead, you would have to do
+
+```
+apply (a) {
+  // 1
+}
+
+rule (a && b) {
+  // 2
+}
+```
+
 ### Example: terminal vs non-terminal
 
 Consider the following filter:
