@@ -167,15 +167,15 @@ public class MenuEntryComposer {
         return prefix + wrapWithColorTag(text, color);
     }
 
-    private static boolean isGroundItem(MenuEntry entry, boolean includeExamine) {
+    private static boolean isGroundItem(MenuEntry entry, boolean includeNonOptions) {
         var type = entry.getType();
         return type == MenuAction.GROUND_ITEM_FIRST_OPTION
                 || type == MenuAction.GROUND_ITEM_SECOND_OPTION
                 || type == MenuAction.GROUND_ITEM_THIRD_OPTION
                 || type == MenuAction.GROUND_ITEM_FOURTH_OPTION
                 || type == MenuAction.GROUND_ITEM_FIFTH_OPTION
-                || type == MenuAction.WIDGET_TARGET_ON_GROUND_ITEM
-                || includeExamine && type == MenuAction.EXAMINE_ITEM_GROUND;
+                || includeNonOptions && type == MenuAction.WIDGET_TARGET_ON_GROUND_ITEM
+                || includeNonOptions && type == MenuAction.EXAMINE_ITEM_GROUND;
     }
 
     private static boolean isGroundItem(MenuEntry entry) {
