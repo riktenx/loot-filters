@@ -16,10 +16,12 @@ import java.io.IOException;
 import java.nio.charset.MalformedInputException;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 import static com.lootfilters.util.TextUtil.quote;
 
@@ -35,7 +37,9 @@ public class LootFilterManager {
 
     public List<LootFilter> loadFilters() {
         var filters = new ArrayList<LootFilter>();
-        var files = LootFiltersPlugin.FILTER_DIRECTORY.listFiles();
+        var files = Arrays.stream(LootFiltersPlugin.FILTER_DIRECTORY.listFiles())
+                .filter(it -> !it.getName().startsWith("."))
+                .collect(Collectors.toList());
         for (var file : files) {
             String src;
             try {
@@ -70,10 +74,10 @@ public class LootFilterManager {
             filters.add(filter);
         }
 
-        var hadErrors = filters.size() != files.length;
+        var hadErrors = filters.size() != files.size();
         if (plugin.getClient().getGameState() == GameState.LOGGED_IN || hadErrors) {
             plugin.addChatMessage(String.format("Loaded <col=%s>%d/%d</col> loot filters.",
-                    hadErrors ? "FF0000" : "00FF00", filters.size(), files.length));
+                    hadErrors ? "FF0000" : "00FF00", filters.size(), files.size()));
         }
         return filters;
     }

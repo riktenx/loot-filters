@@ -11,7 +11,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.Value;
 import net.runelite.api.Client;
-import net.runelite.api.ItemID;
+import net.runelite.api.gameval.ItemID;
+import net.runelite.api.Player;
 import net.runelite.api.Tile;
 import net.runelite.api.TileItem;
 import net.runelite.api.coords.LocalPoint;
@@ -48,6 +49,7 @@ public class LootFiltersOverlay extends Overlay {
     private static final int TIMER_RADIUS = 5;
     private static final int DEFAULT_IMAGE_HEIGHT = 32;
     private static final int DEFAULT_IMAGE_WIDTH = 36;
+    private static final int MAX_DISTANCE = 24 * 128; // in LocalPoint units
 
     private final Client client;
     private final LootFiltersPlugin plugin;
@@ -78,12 +80,20 @@ public class LootFiltersOverlay extends Overlay {
         var hoveredHide = new AtomicInteger(-1);
         var hoveredHighlight = new AtomicInteger(-1);
 
+        var player = client.getLocalPlayer();
+
         for (var entry : plugin.getTileItemIndex().entrySet()) { // all tile draws have to go first so text is on top
-            highlightTiles(g, entry.getKey(), entry.getValue());
+            if (inRenderRange(player, entry.getKey())) {
+                highlightTiles(g, entry.getKey(), entry.getValue());
+            }
         }
         for (var entry : plugin.getTileItemIndex().entrySet()) {
-            var items = createItemCollection(entry.getValue());
             var tile = entry.getKey();
+            if (!inRenderRange(player, tile)) {
+                continue;
+            }
+
+            var items = createItemCollection(entry.getValue());
             var currentOffset = 0;
             var compactRowPosition = 0;
 
@@ -95,6 +105,10 @@ public class LootFiltersOverlay extends Overlay {
                 var textHeight = renderCompact(item.getOverlayKey().getDisplayConfig(), g, item.getFirstItem(), tile,
                         item.getCounts().getCount(), item.getCounts().getQuantity(), currentOffset, mouse,
                         hoveredItem::set, compactRowPosition, effectiveRowLength);
+                if (textHeight == -1) {
+                    continue; // didn't render
+                }
+
                 if (compactRowPosition >= config.compactRenderRowLength() - 1) {
                     compactRowPosition = 0;
                     currentOffset += textHeight + BOX_PAD + 3;
@@ -304,7 +318,7 @@ public class LootFiltersOverlay extends Overlay {
             text += " x" + unstackedCount;
         }
 
-        var isMoney = item.getId() == ItemID.COINS_995 || item.getId() == ItemID.PLATINUM_TOKEN; // value is redundant
+        var isMoney = item.getId() == ItemID.COINS || item.getId() == ItemID.PLATINUM; // value is redundant
         var showBecauseHotkey = config.hotkeyShowValues() && plugin.isHotkeyActive();
         if (isMoney || !(display.isShowValue() || showBecauseHotkey)) {
             return text;
@@ -545,6 +559,10 @@ public class LootFiltersOverlay extends Overlay {
             this.count = count;
             this.quantity = quantity;
         }
+    }
+
+    private static boolean inRenderRange(Player player, Tile tile) {
+        return player.getLocalLocation().distanceTo(tile.getLocalLocation()) <= MAX_DISTANCE;
     }
 }
 
