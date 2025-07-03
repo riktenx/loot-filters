@@ -17,6 +17,7 @@ import java.util.stream.Stream;
 import static com.lootfilters.util.CollectionUtil.findBounds;
 import static com.lootfilters.util.TextUtil.abbreviate;
 import static net.runelite.client.util.ColorUtil.colorTag;
+import static net.runelite.client.util.ColorUtil.wrapWithColorTag;
 
 @AllArgsConstructor
 public class MenuEntryComposer {
@@ -43,7 +44,7 @@ public class MenuEntryComposer {
         var color = match.isHidden() && plugin.getConfig().recolorHidden()
                 ? plugin.getConfig().hiddenColor()
                 : match.getMenuTextColor();
-        entry.setTarget(buildTargetText(item, color));
+        entry.setTarget(buildTargetText(item, entry.getTarget(), color));
     }
 
     public void onClientTick() { // sort -> collapse
@@ -154,12 +155,16 @@ public class MenuEntryComposer {
         return plugin.getTileItemIndex().findItem(point, entry.getIdentifier());
     }
 
-    private String buildTargetText(PluginTileItem item, Color color) {
-        var text = item.getName();
+    private String buildTargetText(PluginTileItem item, String baseTarget, Color color) {
+        var start = baseTarget.lastIndexOf('>'); // check for WIDGET_TARGET_ON_GROUND_ITEM
+
+        var text = baseTarget.substring(start > -1 ? start + 1 : 0);
         if (item.getQuantity() > 1) {
             text += " (" + abbreviate(item.getQuantity()) + ")";
         }
-        return colorTag(color) + text;
+
+        var prefix = start > -1 ? baseTarget.substring(0, start + 1) : "";
+        return prefix + wrapWithColorTag(text, color);
     }
 
     private static boolean isGroundItem(MenuEntry entry, boolean includeExamine) {
@@ -169,6 +174,7 @@ public class MenuEntryComposer {
                 || type == MenuAction.GROUND_ITEM_THIRD_OPTION
                 || type == MenuAction.GROUND_ITEM_FOURTH_OPTION
                 || type == MenuAction.GROUND_ITEM_FIFTH_OPTION
+                || type == MenuAction.WIDGET_TARGET_ON_GROUND_ITEM
                 || includeExamine && type == MenuAction.EXAMINE_ITEM_GROUND;
     }
 
