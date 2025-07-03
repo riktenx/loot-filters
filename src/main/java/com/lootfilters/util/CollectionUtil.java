@@ -14,12 +14,6 @@ public class CollectionUtil {
         return newList;
     }
 
-    public static <E> List<E> without(List<E> list, E element) {
-        var newList = new ArrayList<>(list);
-        newList.remove(element);
-        return newList;
-    }
-
     public static <E> int[] findBounds(List<E> list, Predicate<E> predicate) { // [start, end)
         var indices = new int[]{-1, -1};
         for (var i = 0; i < list.size(); ++i) {
