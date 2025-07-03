@@ -39,11 +39,6 @@ public class LootFiltersPanel extends PluginPanel {
     private static final String NONE_ITEM = "<none>";
     private static final String NONE_DESCRIPTION = "Select a filter to show its description.";
     private static final String BLANK_DESCRIPTION = "<no description provided>";
-    private static final String TUTORIAL_TEXT = "// Welcome to the loot filter\n" +
-            "// For more information on \n" +
-            "// usage, please check\n" +
-            "// https://github.com/riktenx/loot-filters/blob/userguide/filter-lang.md";
-    private static final String EXAMPLE_TEXT = "// Here's an example:\nif (name:\"Herring\") {\n  color = RED;\n}";
 
     private final LootFiltersPlugin plugin;
     private final JComboBox<String> filterSelect;
@@ -117,46 +112,6 @@ public class LootFiltersPanel extends PluginPanel {
         reflowFilterDescription();
     }
 
-    private void onCreateEmptyFilter() {
-        String[] templateOptions = {"blank script", "loot-filters/filterscape"};
-        var template = JOptionPane.showInputDialog(this, "Choose a template:", "Create new filter",
-                JOptionPane.PLAIN_MESSAGE, null, templateOptions, "blank script");
-        if (template == null) {
-            return;
-        }
-        if (template.equals(templateOptions[1])) {
-            showMessageDialog(this, "To set up filterscape, use the link in the plugin panel to navigate to filterscape.xyz");
-            return;
-        }
-
-        var newName = showInputDialog(this, "Please enter a name:");
-        if (newName == null || newName.isBlank()) {
-            return;
-        }
-        if (plugin.hasFilter(newName)) {
-            plugin.addChatMessage("There's already a filter named " + quote(newName) + ", abort.");
-            return;
-        }
-
-        String newSrc;
-        if (template.equals(templateOptions[0])) {
-            newSrc = "meta { name = " + quote(newName) + "; }\n" +
-                    String.join("\n", "", TUTORIAL_TEXT, "", EXAMPLE_TEXT);
-        } else { // ?
-            log.warn("selected nonexistent filter template");
-            return;
-        }
-
-        try {
-            plugin.getFilterManager().saveNewFilter(newName, newSrc);
-        } catch (Exception e) {
-            log.warn("create new filter", e);
-            return;
-        }
-
-        onReloadFilters();
-    }
-
     private void onImportClipboard() {
         var newSrc = getClipboard();
         if (newSrc == null) {
@@ -217,32 +172,6 @@ public class LootFiltersPanel extends PluginPanel {
         }
 
         plugin.setSelectedFilterName(newFilter.getName());
-        onReloadFilters();
-    }
-
-    private void onImportConfig() {
-        var initialName = plugin.getClient().getLocalPlayer() != null
-                ? plugin.getClient().getLocalPlayer().getName() + "/"
-                : "player/";
-        var finalName = showInputDialog(this, "Enter a filter name:", initialName);
-        if (finalName == null) {
-            return;
-        }
-        if (plugin.hasFilter(finalName)) {
-            plugin.addChatMessage("There's already a filter named " + quote(finalName) + ", abort.");
-            return;
-        }
-
-        var src = configToFilterSource(plugin.getConfig(), finalName, TUTORIAL_TEXT);
-        try {
-            plugin.getFilterManager().saveNewFilter(finalName, src);
-        } catch (Exception e) {
-            log.warn("import filter from config", e);
-            return;
-        }
-
-        plugin.getConfig().setHighlightedItems("");
-        plugin.getConfig().setHiddenItems("");
         onReloadFilters();
     }
 

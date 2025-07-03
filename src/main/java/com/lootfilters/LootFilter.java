@@ -52,15 +52,6 @@ public class LootFilter {
         this.matchers = matchers;
     }
 
-    public static LootFilter fromJson(Gson gson, String json) {
-        var ggson = gson.newBuilder()
-                .registerTypeAdapter(Color.class, new ColorDeserializer())
-                .registerTypeAdapter(Rule.class, new RuleDeserializer(gson))
-                .create();
-        return ggson.fromJson(json, LootFilter.class);
-    }
-
-
     public static LootFilter fromSourcesWithPreamble(Map<String, String> sources) throws CompileException {
         if (!sources.containsKey("preamble")) {
             // LinkedHashMap preserves insertion order for iteration ensuring preamble is handled first

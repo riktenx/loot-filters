@@ -12,10 +12,6 @@ public class TextUtil {
         return '"' + text + '"';
     }
 
-    public static boolean isWhitespace(char c) {
-        return c == ' ' || c == '\t' || c == '\n' || c == '\r';
-    }
-
     public static boolean isNumeric(char c) {
         return c >= '0' && c <= '9';
     }
@@ -59,13 +55,6 @@ public class TextUtil {
         return str
                 .replaceAll("\r\n", "\n")
                 .replaceAll("\r", "\n");
-    }
-
-    public static String loadFilterScript(String resource) throws IOException {
-        try (var r = TextUtil.class.getResourceAsStream("/com/lootfilters/scripts/" + resource)) {
-            assert r != null;
-            return normalizeCrlf(new String(r.readAllBytes()));
-        }
     }
 
     public static String setCsv(String csv, String value) {
