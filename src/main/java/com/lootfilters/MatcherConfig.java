@@ -41,31 +41,6 @@ public class MatcherConfig {
         return new MatcherConfig(rule, builder.build(), isTerminal, sourceLine);
     }
 
-    public static MatcherConfig ownershipFilter(boolean enabled) {
-        var rule = new Rule("") {
-            @Override public boolean test(LootFiltersPlugin plugin, PluginTileItem item) {
-                var accountType = plugin.getClient().getVarbitValue(VarbitID.IRONMAN);
-                return enabled && accountType != 0 && item.getOwnership() == TileItem.OWNERSHIP_OTHER;
-            }
-        };
-        var display = DisplayConfig.builder()
-                .hidden(true)
-                .build();
-        return new MatcherConfig(rule, display, true, -1);
-    }
-
-    public static MatcherConfig itemSpawnFilter(boolean enabled) {
-        var rule = new Rule("") {
-            @Override public boolean test(LootFiltersPlugin plugin, PluginTileItem item) {
-                return enabled && item.getOwnership() == TileItem.OWNERSHIP_NONE;
-            }
-        };
-        var display = DisplayConfig.builder()
-                .hidden(true)
-                .build();
-        return new MatcherConfig(rule, display, true, -2);
-    }
-
     public static MatcherConfig highlight(LootFiltersConfig config) {
         var rawNames = config.highlightedItems();
         var rule = new OrRule(
