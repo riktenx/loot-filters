@@ -59,22 +59,6 @@ public interface LootFiltersConfig extends Config {
     )
     default boolean fetchDefaultFilters() { return true; }
     @ConfigItem(
-            keyName = "ownershipFilter",
-            name = "Ownership filter",
-            description = "When enabled, filters out any items you cannot pick up. This filter overrides ALL other rules/config.",
-            section = general,
-            position = 3
-    )
-    default boolean ownershipFilter() { return false; }
-    @ConfigItem(
-            keyName = "itemSpawnFilter",
-            name = "Item spawn filter",
-            description = "When enabled, filters out item spawns (world spawns, ashes from fire, etc). This filter overrides ALL other rules/config.",
-            section = general,
-            position = 4
-    )
-    default boolean itemSpawnFilter() { return false; }
-    @ConfigItem(
             keyName = "fontMode",
             name = "Font mode",
             description = "<p>[runelite]: Respect the font type set in RuneLite -> Overlay settings -> Dynamic overlay font. Filter settings for font type will be ignored.</p><p>[plugin]: Respect the font type set by filter rules. Filter display defaults to the small font type.</p>",

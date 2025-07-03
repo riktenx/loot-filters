@@ -23,9 +23,6 @@ public class FilterUtil {
     public static LootFilter withConfigRules(LootFilter filter, LootFiltersConfig config) {
         var withConfig = new ArrayList<MatcherConfig>();
 
-        withConfig.add(MatcherConfig.ownershipFilter(config.ownershipFilter()));
-        withConfig.add(MatcherConfig.itemSpawnFilter(config.itemSpawnFilter()));
-
         withConfig.add(MatcherConfig.highlight(config));
         withConfig.add(MatcherConfig.hide(config.hiddenItems()));
 
