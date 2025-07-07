@@ -164,7 +164,7 @@ public class LootFiltersPlugin extends Plugin {
 	protected void startUp() {
 		initPluginDirectory();
 		overlayManager.add(overlay);
-        infoBoxManager.addInfoBox(overlayStateIndicator);
+		infoBoxManager.addInfoBox(overlayStateIndicator);
 
 		parsedUserFilters = filterManager.loadFilters();
 		loadSelectedFilter();
