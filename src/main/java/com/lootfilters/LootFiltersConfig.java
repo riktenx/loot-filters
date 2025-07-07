@@ -292,6 +292,22 @@ public interface LootFiltersConfig extends Config {
     )
     String itemLists = "itemLists";
     @ConfigItem(
+            keyName = "_",
+            name = "These lists take precedence over",
+            description = "",
+            section = itemLists,
+            position = -3
+    )
+    void itemListsDisclaimer0();
+    @ConfigItem(
+            keyName = "_",
+            name = "your selected loot filter.",
+            description = "",
+            section = itemLists,
+            position = -2
+    )
+    void itemListsDisclaimer1();
+    @ConfigItem(
             keyName = "highlightedItems",
             name = "Highlighted items",
             description = "Configure a list of items to highlight.",
