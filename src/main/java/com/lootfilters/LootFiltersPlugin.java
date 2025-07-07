@@ -36,6 +36,7 @@ import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.ui.overlay.OverlayManager;
+import net.runelite.client.ui.overlay.infobox.InfoBoxManager;
 import okhttp3.OkHttpClient;
 
 import javax.inject.Inject;
@@ -78,6 +79,7 @@ public class LootFiltersPlugin extends Plugin {
 	@Inject private LootFiltersOverlay overlay;
 	@Inject private LootFiltersMouseAdapter mouseAdapter;
 	@Inject private LootFiltersHotkeyListener hotkeyListener;
+	@Inject private OverlayStateIndicator overlayStateIndicator;
 
 	@Inject private Gson gson;
 	@Inject private OverlayManager overlayManager;
@@ -89,6 +91,7 @@ public class LootFiltersPlugin extends Plugin {
 	@Inject private SpriteManager spriteManager;
 	@Inject private OkHttpClient okHttpClient;
 	@Inject private AudioPlayer audioPlayer;
+	@Inject private InfoBoxManager infoBoxManager;
 
 	private LootFiltersPanel pluginPanel;
 	private NavigationButton pluginPanelNav;
@@ -104,23 +107,18 @@ public class LootFiltersPlugin extends Plugin {
 	private final Set<SoundProvider> queuedAudio = new HashSet<>();
 	private final List<String> queuedChatMessages = new ArrayList<>();
 
-	private LootFilter activeFilter;
-	private LootFilter currentAreaFilter;
+	@Getter private LootFilter activeFilter;
 	private List<LootFilter> parsedUserFilters;
 
 	@Setter private int hoveredItem = -1;
 	@Setter private int hoveredHide = -1;
 	@Setter private int hoveredHighlight = -1;
 	@Setter private boolean hotkeyActive = false;
-	@Setter private boolean overlayEnabled = true;
+	@Setter private boolean isOverlayEnabled = true;
 
 	@Inject @Named("developerMode") boolean developerMode;
 
 	@Getter private boolean debugEnabled = false;
-
-	public LootFilter getActiveFilter() {
-		return currentAreaFilter != null ? currentAreaFilter : activeFilter;
-	}
 
 	public String getSelectedFilterName() {
 		return configManager.getConfiguration(CONFIG_GROUP, SELECTED_FILTER_KEY);
@@ -166,6 +164,7 @@ public class LootFiltersPlugin extends Plugin {
 	protected void startUp() {
 		initPluginDirectory();
 		overlayManager.add(overlay);
+        infoBoxManager.addInfoBox(overlayStateIndicator);
 
 		parsedUserFilters = filterManager.loadFilters();
 		loadSelectedFilter();
@@ -173,7 +172,7 @@ public class LootFiltersPlugin extends Plugin {
 		pluginPanel = new LootFiltersPanel(this);
 		pluginPanelNav = NavigationButton.builder()
 				.tooltip("Loot Filters")
-				.icon(loadImageResource(this.getClass(), "/com/lootfilters/icons/panel.png"))
+				.icon(Icons.PANEL_ICON)
 				.panel(pluginPanel)
 				.build();
 		if (config.showPluginPanel()) {
@@ -192,6 +191,7 @@ public class LootFiltersPlugin extends Plugin {
 	@Override
 	protected void shutDown() {
 		overlayManager.remove(overlay);
+		infoBoxManager.removeInfoBox(overlayStateIndicator);
 
 		filterManager.getDefaultFilters().clear();
 		clearIndices();
@@ -214,7 +214,7 @@ public class LootFiltersPlugin extends Plugin {
 	}
 
 	@Subscribe
-	public void onConfigChanged(ConfigChanged event) throws Exception {
+	public void onConfigChanged(ConfigChanged event) {
 		if (!event.getGroup().equals(CONFIG_GROUP)) {
 			return;
 		}

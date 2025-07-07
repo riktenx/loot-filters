@@ -13,7 +13,6 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
-import javax.swing.SwingUtilities;
 import java.awt.Color;
 import java.awt.Desktop;
 import java.awt.FlowLayout;
@@ -22,17 +21,15 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
 
-import static com.lootfilters.util.FilterUtil.configToFilterSource;
 import static com.lootfilters.util.TextUtil.quote;
 import static javax.swing.JOptionPane.showConfirmDialog;
 import static javax.swing.JOptionPane.showInputDialog;
 import static javax.swing.JOptionPane.showMessageDialog;
-import static javax.swing.SwingUtilities.invokeLater;
-import static net.runelite.client.util.ImageUtil.loadImageResource;
 
 @Slf4j
 public class LootFiltersPanel extends PluginPanel {
@@ -66,14 +63,14 @@ public class LootFiltersPanel extends PluginPanel {
         var bottom = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
         var label = new JLabel("Active filter:");
-        var importClipboard = createIconButton("paste_icon",
+        var importClipboard = createIconButton(Icons.CLIPBOARD_PASTE,
                 "Import filter from clipboard.",
                 this::onImportClipboard);
 
-        var reloadFilters = createIconButton("reload_icon",
+        var reloadFilters = createIconButton(Icons.RELOAD,
                 "Reload filters from disk.",
                 this::onReloadFilters);
-        var browseFolder = createIconButton("folder_icon",
+        var browseFolder = createIconButton(Icons.FOLDER,
                 "View the plugin directory, where filters, sound files, and icon files should be placed, in the system file browser.",
                 this::onBrowseFolder);
 
@@ -180,8 +177,8 @@ public class LootFiltersPanel extends PluginPanel {
         plugin.setSelectedFilterName(NONE_ITEM.equals(selected) ? null : selected);
     }
 
-    private JButton createIconButton(String iconSource, String tooltip, Runnable onClick) {
-        var button = new JButton("", icon(iconSource));
+    private JButton createIconButton(BufferedImage icon, String tooltip, Runnable onClick) {
+        var button = new JButton("", new ImageIcon(icon));
         button.setToolTipText(tooltip);
         button.setBackground(null);
         button.setBorder(null);
@@ -200,11 +197,6 @@ public class LootFiltersPanel extends PluginPanel {
         } catch (Exception e) {
             return null;
         }
-    }
-
-    private static ImageIcon icon(String name) {
-        var img = loadImageResource(LootFiltersPanel.class, "/com/lootfilters/icons/" + name + ".png");
-        return new ImageIcon(img);
     }
 
     private void onReloadFilters() {
