@@ -34,12 +34,12 @@ public class LootFilter {
 
     private final String description;
     private final int[] activationArea;
-    private final List<MatcherConfig> matchers;
+    private final List<FilterRule> matchers;
 
     @Setter
     private String filename;
 
-    public LootFilter(String name, String description, int[] activationArea, List<MatcherConfig> matchers) {
+    public LootFilter(String name, String description, int[] activationArea, List<FilterRule> matchers) {
         this.name = name;
         this.description = description;
         this.activationArea = activationArea;
@@ -86,7 +86,7 @@ public class LootFilter {
                 .compact(plugin.getConfig().compactMode())
                 .build();
         for (var matcher : matchers) {
-            if (!matcher.getRule().test(plugin, item)) {
+            if (!matcher.getCond().test(plugin, item)) {
                 continue;
             }
 

@@ -2,7 +2,7 @@ package com.lootfilters.lang;
 
 import com.lootfilters.DisplayConfig;
 import com.lootfilters.LootFilter;
-import com.lootfilters.MatcherConfig;
+import com.lootfilters.FilterRule;
 import com.lootfilters.model.SoundProvider;
 import com.lootfilters.model.BufferedImageProvider;
 import com.lootfilters.ast.leaf.AccountTypeCondition;
@@ -64,7 +64,7 @@ import static com.lootfilters.lang.Token.Type.TRUE;
 @RequiredArgsConstructor
 public class Parser {
     private final TokenStream tokens;
-    private final List<MatcherConfig> matchers = new ArrayList<>();
+    private final List<FilterRule> matchers = new ArrayList<>();
 
     private String name;
     private String description;
@@ -227,7 +227,7 @@ public class Parser {
         }
         tokens.takeExpect(BLOCK_END);
 
-        matchers.add(new MatcherConfig(buildRule(rulesPostfix), builder.build(), isTerminal, sourceLine));
+        matchers.add(new FilterRule(buildRule(rulesPostfix), builder.build(), isTerminal, sourceLine));
     }
 
     private void unwindUnary(Stack<Token> operators, ArrayList<Condition> postfix) {

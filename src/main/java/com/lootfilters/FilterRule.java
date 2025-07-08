@@ -20,19 +20,19 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @EqualsAndHashCode
 @ToString
-public class MatcherConfig {
-    private final Condition rule;
+public class FilterRule {
+    private final Condition cond;
     private final DisplayConfig display;
     private final boolean isTerminal;
     private final int sourceLine;
 
-    public MatcherConfig withDisplay(Consumer<DisplayConfig.DisplayConfigBuilder> consumer) {
+    public FilterRule withDisplay(Consumer<DisplayConfig.DisplayConfigBuilder> consumer) {
         var builder = display.toBuilder();
         consumer.accept(builder);
-        return new MatcherConfig(rule, builder.build(), isTerminal, sourceLine);
+        return new FilterRule(cond, builder.build(), isTerminal, sourceLine);
     }
 
-    public static MatcherConfig highlight(LootFiltersConfig config) {
+    public static FilterRule highlight(LootFiltersConfig config) {
         var rawNames = config.highlightedItems();
         var rule = new OrCondition(
                 Arrays.stream(rawNames.split(","))
@@ -62,10 +62,10 @@ public class MatcherConfig {
                 .menuSort(config.highlightMenuSort())
                 .sound(sound)
                 .build();
-        return new MatcherConfig(rule, display, true, -3);
+        return new FilterRule(rule, display, true, -3);
     }
 
-    public static MatcherConfig hide(String rawNames) {
+    public static FilterRule hide(String rawNames) {
         var rule = new OrCondition(
                 Arrays.stream(rawNames.split(","))
                         .map(NamedQuantity::fromString)
@@ -75,6 +75,6 @@ public class MatcherConfig {
         var display = DisplayConfig.builder()
                 .hidden(true)
                 .build();
-        return new MatcherConfig(rule, display, true, -4);
+        return new FilterRule(rule, display, true, -4);
     }
 }
