@@ -2,7 +2,7 @@ package com.lootfilters.ast.leaf;
 
 import com.lootfilters.LootFiltersPlugin;
 import com.lootfilters.ast.LeafCondition;
-import com.lootfilters.ast.Ownership;
+import com.lootfilters.model.Ownership;
 import com.lootfilters.model.PluginTileItem;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

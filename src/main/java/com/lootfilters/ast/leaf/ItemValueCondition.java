@@ -1,8 +1,8 @@
 package com.lootfilters.ast.leaf;
 
 import com.lootfilters.LootFiltersPlugin;
-import com.lootfilters.ast.Comparator;
-import com.lootfilters.ast.ValueType;
+import com.lootfilters.model.Comparator;
+import com.lootfilters.model.ValueType;
 import com.lootfilters.model.PluginTileItem;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;

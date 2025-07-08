@@ -2,8 +2,8 @@ package com.lootfilters;
 
 import com.lootfilters.model.SoundProvider;
 import com.lootfilters.model.BufferedImageProvider;
-import com.lootfilters.ast.FontType;
-import com.lootfilters.ast.TextAccent;
+import com.lootfilters.model.FontType;
+import com.lootfilters.model.TextAccent;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;

@@ -3,7 +3,7 @@ package com.lootfilters.util;
 import com.lootfilters.LootFilter;
 import com.lootfilters.LootFiltersConfig;
 import com.lootfilters.MatcherConfig;
-import com.lootfilters.ast.TextAccent;
+import com.lootfilters.model.TextAccent;
 
 import java.util.ArrayList;
 import java.util.stream.Collectors;

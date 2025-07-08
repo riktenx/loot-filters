@@ -1,4 +1,4 @@
-package com.lootfilters.ast;
+package com.lootfilters.model;
 
 import com.lootfilters.lang.ParseException;
 import com.lootfilters.lang.Token;
