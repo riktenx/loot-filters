@@ -1,6 +1,7 @@
-package com.lootfilters.rule;
+package com.lootfilters.ast.leaf;
 
 import com.lootfilters.LootFiltersPlugin;
+import com.lootfilters.ast.LeafCondition;
 import com.lootfilters.model.PluginTileItem;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -9,15 +10,15 @@ import lombok.ToString;
 @Getter
 @EqualsAndHashCode(callSuper = false)
 @ToString
-public class ItemOwnershipRule extends LeafRule {
-    private final Ownership ownership;
+public class ConstCondition extends LeafCondition {
+    private final boolean target;
 
-    public ItemOwnershipRule(int ownership) {
-        this.ownership = Ownership.fromOrdinal(ownership);
+    public ConstCondition(boolean target) {
+        this.target = target;
     }
 
     @Override
     public boolean test(LootFiltersPlugin plugin, PluginTileItem item) {
-        return item.getOwnership() == ownership.ordinal();
+        return target;
     }
 }

@@ -1,26 +1,17 @@
 package com.lootfilters;
 
 import com.lootfilters.model.NamedQuantity;
-import com.lootfilters.model.PluginTileItem;
 import com.lootfilters.model.SoundProvider;
-import com.lootfilters.rule.AndRule;
-import com.lootfilters.rule.Comparator;
-import com.lootfilters.rule.ItemNameRule;
-import com.lootfilters.rule.ItemQuantityRule;
-import com.lootfilters.rule.ItemTradeableRule;
-import com.lootfilters.rule.ItemValueRule;
-import com.lootfilters.rule.OrRule;
-import com.lootfilters.rule.Rule;
-import com.lootfilters.rule.ValueType;
+import com.lootfilters.ast.AndCondition;
+import com.lootfilters.ast.leaf.ItemNameCondition;
+import com.lootfilters.ast.leaf.ItemQuantityCondition;
+import com.lootfilters.ast.OrCondition;
+import com.lootfilters.ast.Condition;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
-import net.runelite.api.TileItem;
-import net.runelite.api.Varbits;
-import net.runelite.api.gameval.VarbitID;
 
-import java.awt.Color;
 import java.util.Arrays;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -29,24 +20,24 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @EqualsAndHashCode
 @ToString
-public class MatcherConfig {
-    private final Rule rule;
+public class FilterRule {
+    private final Condition cond;
     private final DisplayConfig display;
     private final boolean isTerminal;
     private final int sourceLine;
 
-    public MatcherConfig withDisplay(Consumer<DisplayConfig.DisplayConfigBuilder> consumer) {
+    public FilterRule withDisplay(Consumer<DisplayConfig.DisplayConfigBuilder> consumer) {
         var builder = display.toBuilder();
         consumer.accept(builder);
-        return new MatcherConfig(rule, builder.build(), isTerminal, sourceLine);
+        return new FilterRule(cond, builder.build(), isTerminal, sourceLine);
     }
 
-    public static MatcherConfig highlight(LootFiltersConfig config) {
+    public static FilterRule highlight(LootFiltersConfig config) {
         var rawNames = config.highlightedItems();
-        var rule = new OrRule(
+        var rule = new OrCondition(
                 Arrays.stream(rawNames.split(","))
                         .map(NamedQuantity::fromString)
-                        .map(it -> new AndRule(new ItemNameRule(it.getName()), new ItemQuantityRule(it.getQuantity(), it.getComparator())))
+                        .map(it -> new AndCondition(new ItemNameCondition(it.getName()), new ItemQuantityCondition(it.getQuantity(), it.getComparator())))
                         .collect(Collectors.toList())
         );
 
@@ -71,19 +62,19 @@ public class MatcherConfig {
                 .menuSort(config.highlightMenuSort())
                 .sound(sound)
                 .build();
-        return new MatcherConfig(rule, display, true, -3);
+        return new FilterRule(rule, display, true, -3);
     }
 
-    public static MatcherConfig hide(String rawNames) {
-        var rule = new OrRule(
+    public static FilterRule hide(String rawNames) {
+        var rule = new OrCondition(
                 Arrays.stream(rawNames.split(","))
                         .map(NamedQuantity::fromString)
-                        .map(it -> new AndRule(new ItemNameRule(it.getName()), new ItemQuantityRule(it.getQuantity(), it.getComparator())))
+                        .map(it -> new AndCondition(new ItemNameCondition(it.getName()), new ItemQuantityCondition(it.getQuantity(), it.getComparator())))
                         .collect(Collectors.toList())
         );
         var display = DisplayConfig.builder()
                 .hidden(true)
                 .build();
-        return new MatcherConfig(rule, display, true, -4);
+        return new FilterRule(rule, display, true, -4);
     }
 }

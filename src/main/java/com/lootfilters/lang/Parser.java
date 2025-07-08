@@ -2,29 +2,29 @@ package com.lootfilters.lang;
 
 import com.lootfilters.DisplayConfig;
 import com.lootfilters.LootFilter;
-import com.lootfilters.MatcherConfig;
+import com.lootfilters.FilterRule;
 import com.lootfilters.model.SoundProvider;
 import com.lootfilters.model.BufferedImageProvider;
-import com.lootfilters.rule.AccountTypeRule;
-import com.lootfilters.rule.AndRule;
-import com.lootfilters.rule.AreaRule;
-import com.lootfilters.rule.Comparator;
-import com.lootfilters.rule.ConstRule;
-import com.lootfilters.rule.FontType;
-import com.lootfilters.rule.ItemIdRule;
-import com.lootfilters.rule.ItemNameRule;
-import com.lootfilters.rule.ItemNotedRule;
-import com.lootfilters.rule.ItemOwnershipRule;
-import com.lootfilters.rule.ItemQuantityRule;
-import com.lootfilters.rule.ItemStackableRule;
-import com.lootfilters.rule.ItemTradeableRule;
-import com.lootfilters.rule.ItemValueRule;
-import com.lootfilters.rule.LeafRule;
-import com.lootfilters.rule.NotRule;
-import com.lootfilters.rule.OrRule;
-import com.lootfilters.rule.Rule;
-import com.lootfilters.rule.TextAccent;
-import com.lootfilters.rule.ValueType;
+import com.lootfilters.ast.leaf.AccountTypeCondition;
+import com.lootfilters.ast.AndCondition;
+import com.lootfilters.ast.leaf.AreaCondition;
+import com.lootfilters.model.Comparator;
+import com.lootfilters.ast.leaf.ConstCondition;
+import com.lootfilters.model.FontType;
+import com.lootfilters.ast.leaf.ItemIdCondition;
+import com.lootfilters.ast.leaf.ItemNameCondition;
+import com.lootfilters.ast.leaf.ItemNotedCondition;
+import com.lootfilters.ast.leaf.ItemOwnershipCondition;
+import com.lootfilters.ast.leaf.ItemQuantityCondition;
+import com.lootfilters.ast.leaf.ItemStackableCondition;
+import com.lootfilters.ast.leaf.ItemTradeableCondition;
+import com.lootfilters.ast.leaf.ItemValueCondition;
+import com.lootfilters.ast.LeafCondition;
+import com.lootfilters.ast.NotCondition;
+import com.lootfilters.ast.OrCondition;
+import com.lootfilters.ast.Condition;
+import com.lootfilters.model.TextAccent;
+import com.lootfilters.model.ValueType;
 import lombok.RequiredArgsConstructor;
 import net.runelite.api.coords.WorldPoint;
 
@@ -64,7 +64,7 @@ import static com.lootfilters.lang.Token.Type.TRUE;
 @RequiredArgsConstructor
 public class Parser {
     private final TokenStream tokens;
-    private final List<MatcherConfig> matchers = new ArrayList<>();
+    private final List<FilterRule> matchers = new ArrayList<>();
 
     private String name;
     private String description;
@@ -121,7 +121,7 @@ public class Parser {
 
     private void parseMatcher(boolean isTerminal, int sourceLine) {
         var operators = new Stack<Token>();
-        var rulesPostfix = new ArrayList<Rule>();
+        var rulesPostfix = new ArrayList<Condition>();
         tokens.walkExpression(EXPR_START, EXPR_END, it -> {
             if (it.is(EXPR_START)) {
                 operators.push(it);
@@ -129,9 +129,9 @@ public class Parser {
                 while (!operators.isEmpty() && !operators.peek().is(EXPR_START)) {
                     var op = operators.pop();
                     if (op.is(OP_AND)) {
-                        rulesPostfix.add(new AndRule(null));
+                        rulesPostfix.add(new AndCondition(null));
                     } else if (op.is(OP_OR)) {
-                        rulesPostfix.add(new OrRule(null));
+                        rulesPostfix.add(new OrCondition(null));
                     }
                 }
                 operators.pop(); // the (
@@ -141,13 +141,13 @@ public class Parser {
             } else if (it.is(OP_OR)) {
                 while (!operators.isEmpty() && operators.peek().is(OP_AND)) {
                     operators.pop();
-                    rulesPostfix.add(new AndRule(null));
+                    rulesPostfix.add(new AndCondition(null));
                 }
                 operators.push(it);
             } else if (it.is(OP_NOT)) {
                 operators.push(it);
             } else if (it.is(TRUE) || it.is(FALSE)) {
-                rulesPostfix.add(new ConstRule(it.expectBoolean()));
+                rulesPostfix.add(new ConstCondition(it.expectBoolean()));
                 unwindUnary(operators, rulesPostfix);
             } else if (it.is(IDENTIFIER)) {
                 rulesPostfix.add(parseRule(it));
@@ -160,11 +160,11 @@ public class Parser {
         while (!operators.isEmpty()) { // is this necessary? since parenthesis around overall expr are guaranteed
             var op = operators.pop();
             if (op.is(OP_AND)) {
-                rulesPostfix.add(new AndRule(null));
+                rulesPostfix.add(new AndCondition(null));
             } else if (op.is(OP_OR)) {
-                rulesPostfix.add(new OrRule(null));
+                rulesPostfix.add(new OrCondition(null));
             } else if (op.is(OP_NOT)) {
-                rulesPostfix.add(new NotRule(null));
+                rulesPostfix.add(new NotCondition(null));
             }
         }
 
@@ -227,17 +227,17 @@ public class Parser {
         }
         tokens.takeExpect(BLOCK_END);
 
-        matchers.add(new MatcherConfig(buildRule(rulesPostfix), builder.build(), isTerminal, sourceLine));
+        matchers.add(new FilterRule(buildRule(rulesPostfix), builder.build(), isTerminal, sourceLine));
     }
 
-    private void unwindUnary(Stack<Token> operators, ArrayList<Rule> postfix) {
+    private void unwindUnary(Stack<Token> operators, ArrayList<Condition> postfix) {
         while (!operators.isEmpty() && operators.peek().is(OP_NOT)) {
             operators.pop();
-            postfix.add(new NotRule(null));
+            postfix.add(new NotCondition(null));
         }
     }
 
-    private Rule parseRule(Token first) {
+    private Condition parseRule(Token first) {
         tokens.takeExpect(COLON); // grammar is always <id><colon><...>
         switch (first.getValue()) {
             case "id":
@@ -269,85 +269,85 @@ public class Parser {
         }
     }
 
-    private ItemIdRule parseItemIdRule() {
+    private ItemIdCondition parseItemIdRule() {
         if (tokens.peek().is(LITERAL_INT)) {
-            return new ItemIdRule(tokens.take().expectInt());
+            return new ItemIdCondition(tokens.take().expectInt());
         } else if (tokens.peek().is(LIST_START)) {
             var block = tokens.take(LIST_START, LIST_END, true);
-            return new ItemIdRule(block.expectIntList());
+            return new ItemIdCondition(block.expectIntList());
         } else {
             throw new ParseException("parse item id: unexpected argument token", tokens.peek());
         }
     }
 
-    private ItemOwnershipRule parseItemOwnershipRule() {
-        return new ItemOwnershipRule(tokens.takeExpect(LITERAL_INT).expectInt());
+    private ItemOwnershipCondition parseItemOwnershipRule() {
+        return new ItemOwnershipCondition(tokens.takeExpect(LITERAL_INT).expectInt());
     }
 
-    private Rule parseItemNameRule() {
+    private Condition parseItemNameRule() {
         if (tokens.peek().is(LITERAL_STRING)) {
-            return new ItemNameRule(tokens.take().expectString());
+            return new ItemNameCondition(tokens.take().expectString());
         } else if (tokens.peek().is(LIST_START)) {
             var block = tokens.take(LIST_START, LIST_END, true);
-            return new ItemNameRule(block.expectStringList());
+            return new ItemNameCondition(block.expectStringList());
         } else {
             throw new ParseException("parse item name: unexpected argument token", tokens.peek());
         }
     }
 
-    private ItemQuantityRule parseItemQuantityRule() {
+    private ItemQuantityCondition parseItemQuantityRule() {
         var op = tokens.take();
         var value = tokens.takeExpect(LITERAL_INT);
-        return new ItemQuantityRule(value.expectInt(), Comparator.fromToken(op));
+        return new ItemQuantityCondition(value.expectInt(), Comparator.fromToken(op));
     }
 
-    private ItemValueRule parseItemValueRule(ValueType valueType) {
+    private ItemValueCondition parseItemValueRule(ValueType valueType) {
         var op = tokens.take();
         var value = tokens.takeExpect(LITERAL_INT);
-        return new ItemValueRule(value.expectInt(), Comparator.fromToken(op), valueType);
+        return new ItemValueCondition(value.expectInt(), Comparator.fromToken(op), valueType);
     }
 
-    private ItemTradeableRule parseItemTradeableRule() {
+    private ItemTradeableCondition parseItemTradeableRule() {
         var op = tokens.take();
-        return new ItemTradeableRule((op.expectBoolean()));
+        return new ItemTradeableCondition((op.expectBoolean()));
     }
 
-    private ItemStackableRule parseItemStackableRule() {
+    private ItemStackableCondition parseItemStackableRule() {
         var op = tokens.take();
-        return new ItemStackableRule((op.expectBoolean()));
+        return new ItemStackableCondition((op.expectBoolean()));
     }
 
-    private ItemNotedRule parseItemNotedRule() {
+    private ItemNotedCondition parseItemNotedRule() {
         var op = tokens.take();
-        return new ItemNotedRule((op.expectBoolean()));
+        return new ItemNotedCondition((op.expectBoolean()));
     }
 
-    private AreaRule parseAreaRule() {
+    private AreaCondition parseAreaRule() {
         var start = tokens.peek();
         var coords = tokens.take(LIST_START, LIST_END, true).expectIntList();
         if (coords.size() != 6) {
             throw new ParseException("incorrect list size for area argument", start);
         }
-        return new AreaRule(new WorldPoint(coords.get(0), coords.get(1), coords.get(2)),
+        return new AreaCondition(new WorldPoint(coords.get(0), coords.get(1), coords.get(2)),
                 new WorldPoint(coords.get(3), coords.get(4), coords.get(5)));
     }
 
-    private AccountTypeRule parseAccountTypeRule() {
+    private AccountTypeCondition parseAccountTypeRule() {
         var type = tokens.takeExpect(LITERAL_INT).expectInt();
-        return new AccountTypeRule(type);
+        return new AccountTypeCondition(type);
     }
 
-    private Rule buildRule(List<Rule> postfix) {
-        var operands = new Stack<Rule>();
+    private Condition buildRule(List<Condition> postfix) {
+        var operands = new Stack<Condition>();
         for (var rule : postfix) {
-            if (rule instanceof LeafRule) {
+            if (rule instanceof LeafCondition) {
                 operands.push(rule);
-            } else if (rule instanceof AndRule) {
-                operands.push(new AndRule(operands.pop(), operands.pop()));
-            } else if (rule instanceof OrRule) {
-                operands.push(new OrRule(operands.pop(), operands.pop()));
-            } else if (rule instanceof NotRule) {
-                operands.push(new NotRule(operands.pop()));
+            } else if (rule instanceof AndCondition) {
+                operands.push(new AndCondition(operands.pop(), operands.pop()));
+            } else if (rule instanceof OrCondition) {
+                operands.push(new OrCondition(operands.pop(), operands.pop()));
+            } else if (rule instanceof NotCondition) {
+                operands.push(new NotCondition(operands.pop()));
             }
         }
 

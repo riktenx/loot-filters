@@ -2,8 +2,8 @@ package com.lootfilters.util;
 
 import com.lootfilters.LootFilter;
 import com.lootfilters.LootFiltersConfig;
-import com.lootfilters.MatcherConfig;
-import com.lootfilters.rule.TextAccent;
+import com.lootfilters.FilterRule;
+import com.lootfilters.model.TextAccent;
 
 import java.util.ArrayList;
 import java.util.stream.Collectors;
@@ -21,12 +21,12 @@ public class FilterUtil {
      * Wraps a user-defined loot filter with config defaults (highlight/hide, value tiers, etc.).
      */
     public static LootFilter withConfigRules(LootFilter filter, LootFiltersConfig config) {
-        var withConfig = new ArrayList<MatcherConfig>();
+        var withConfig = new ArrayList<FilterRule>();
 
-        withConfig.add(MatcherConfig.highlight(config));
-        withConfig.add(MatcherConfig.hide(config.hiddenItems()));
+        withConfig.add(FilterRule.highlight(config));
+        withConfig.add(FilterRule.hide(config.hiddenItems()));
 
-        withConfig.addAll(filter.getMatchers());
+        withConfig.addAll(filter.getRules());
 
         withConfig = withConfig.stream()
                 .map(it -> it.withDisplay(builder -> {

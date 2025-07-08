@@ -1,6 +1,5 @@
 package com.lootfilters;
 
-import com.google.gson.Gson;
 import com.lootfilters.lang.CompileException;
 import com.lootfilters.lang.Lexer;
 import com.lootfilters.lang.Parser;
@@ -8,16 +7,11 @@ import com.lootfilters.lang.Preprocessor;
 import com.lootfilters.lang.Sources;
 import com.lootfilters.lang.TokenStream;
 import com.lootfilters.model.PluginTileItem;
-import com.lootfilters.rule.Rule;
-import com.lootfilters.serde.ColorDeserializer;
-import com.lootfilters.serde.ColorSerializer;
-import com.lootfilters.serde.RuleDeserializer;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.ToString;
-import net.runelite.api.coords.WorldPoint;
 
 import java.awt.Color;
 import java.util.ArrayList;
@@ -40,16 +34,16 @@ public class LootFilter {
 
     private final String description;
     private final int[] activationArea;
-    private final List<MatcherConfig> matchers;
+    private final List<FilterRule> rules;
 
     @Setter
     private String filename;
 
-    public LootFilter(String name, String description, int[] activationArea, List<MatcherConfig> matchers) {
+    public LootFilter(String name, String description, int[] activationArea, List<FilterRule> rules) {
         this.name = name;
         this.description = description;
         this.activationArea = activationArea;
-        this.matchers = matchers;
+        this.rules = rules;
     }
 
     public static LootFilter fromSourcesWithPreamble(Map<String, String> sources) throws CompileException {
@@ -91,14 +85,14 @@ public class LootFilter {
         var display = new DisplayConfig(Color.WHITE).toBuilder()
                 .compact(plugin.getConfig().compactMode())
                 .build();
-        for (var matcher : matchers) {
-            if (!matcher.getRule().test(plugin, item)) {
+        for (var rule : rules) {
+            if (!rule.getCond().test(plugin, item)) {
                 continue;
             }
 
-            display = display.merge(matcher.getDisplay());
-            display.getEvalTrace().add(matcher.getSourceLine());
-            if (matcher.isTerminal()) {
+            display = display.merge(rule.getDisplay());
+            display.getEvalTrace().add(rule.getSourceLine());
+            if (rule.isTerminal()) {
                 return display;
             }
         }

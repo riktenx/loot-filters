@@ -1,6 +1,6 @@
 package com.lootfilters.util;
 
-import com.lootfilters.rule.TextAccent;
+import com.lootfilters.model.TextAccent;
 import lombok.Setter;
 import net.runelite.client.ui.overlay.RenderableEntity;
 

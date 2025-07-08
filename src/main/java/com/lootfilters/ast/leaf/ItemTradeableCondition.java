@@ -1,6 +1,7 @@
-package com.lootfilters.rule;
+package com.lootfilters.ast.leaf;
 
 import com.lootfilters.LootFiltersPlugin;
+import com.lootfilters.ast.LeafCondition;
 import com.lootfilters.model.PluginTileItem;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -8,10 +9,10 @@ import net.runelite.api.ItemID;
 
 @EqualsAndHashCode(callSuper = false)
 @ToString
-public class ItemTradeableRule extends LeafRule {
+public class ItemTradeableCondition extends LeafCondition {
     private final boolean target;
 
-    public ItemTradeableRule(boolean target) {
+    public ItemTradeableCondition(boolean target) {
         this.target = target;
     }
 
