@@ -8,7 +8,6 @@ public class AccountTypeRule extends LeafRule {
     private final int type;
 
     public AccountTypeRule(int type) {
-        super();
         this.type = type;
     }
 
