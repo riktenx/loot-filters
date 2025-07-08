@@ -132,6 +132,14 @@ public interface LootFiltersConfig extends Config {
     )
     @Units(Units.MILLISECONDS)
     default int hotkeyDoubleTapDelay() { return 250; }
+    @ConfigItem(
+            keyName = "overlayStateIndicator",
+            name = "Overlay state indicator",
+            description = "Show a status icon when the overlay is disabled via hotkey.",
+            section = hotkey,
+            position = 20
+    )
+    default boolean hotkeyStateIndicator() { return true; }
 
     @ConfigSection(
             name = "Display settings",
