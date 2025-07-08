@@ -9,7 +9,7 @@ import lombok.ToString;
 @Getter
 @EqualsAndHashCode(callSuper = false)
 @ToString
-public class ItemOwnershipRule extends Rule {
+public class ItemOwnershipRule extends LeafRule {
     private final Ownership ownership;
 
     public ItemOwnershipRule(int ownership) {

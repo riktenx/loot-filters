@@ -5,7 +5,7 @@ import com.lootfilters.model.PluginTileItem;
 import lombok.ToString;
 
 @ToString
-public abstract class ComparatorRule extends Rule {
+public abstract class ComparatorRule extends LeafRule {
     private final int rhs;
     private final Comparator cmp;
 

@@ -7,7 +7,7 @@ import lombok.ToString;
 
 @EqualsAndHashCode(callSuper = false)
 @ToString
-public class ItemStackableRule extends Rule {
+public class ItemStackableRule extends LeafRule {
     private final boolean target;
 
     public ItemStackableRule(boolean target) {

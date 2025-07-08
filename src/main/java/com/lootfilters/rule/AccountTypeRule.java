@@ -4,7 +4,7 @@ import com.lootfilters.LootFiltersPlugin;
 import com.lootfilters.model.PluginTileItem;
 import net.runelite.api.gameval.VarbitID;
 
-public class AccountTypeRule extends Rule {
+public class AccountTypeRule extends LeafRule {
     private final int type;
 
     public AccountTypeRule(int type) {

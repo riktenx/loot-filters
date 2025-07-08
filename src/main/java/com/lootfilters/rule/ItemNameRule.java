@@ -11,7 +11,7 @@ import static com.lootfilters.util.TextUtil.isInfixWildcard;
 
 @EqualsAndHashCode(callSuper = false)
 @ToString
-public class ItemNameRule extends Rule {
+public class ItemNameRule extends LeafRule {
     private final List<String> names;
 
     public ItemNameRule(List<String> names) {

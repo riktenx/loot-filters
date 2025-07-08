@@ -11,7 +11,7 @@ import java.util.List;
 @Getter
 @EqualsAndHashCode(callSuper = false)
 @ToString
-public class ItemIdRule extends Rule {
+public class ItemIdRule extends LeafRule {
     private final List<Integer> ids;
 
     public ItemIdRule(List<Integer> ids) {

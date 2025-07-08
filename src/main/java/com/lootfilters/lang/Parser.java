@@ -19,6 +19,7 @@ import com.lootfilters.rule.ItemQuantityRule;
 import com.lootfilters.rule.ItemStackableRule;
 import com.lootfilters.rule.ItemTradeableRule;
 import com.lootfilters.rule.ItemValueRule;
+import com.lootfilters.rule.LeafRule;
 import com.lootfilters.rule.NotRule;
 import com.lootfilters.rule.OrRule;
 import com.lootfilters.rule.Rule;
@@ -339,18 +340,7 @@ public class Parser {
     private Rule buildRule(List<Rule> postfix) {
         var operands = new Stack<Rule>();
         for (var rule : postfix) {
-            if (rule instanceof ItemIdRule
-                    || rule instanceof ItemOwnershipRule
-                    || rule instanceof ConstRule
-                    || rule instanceof ItemNameRule
-                    || rule instanceof ItemQuantityRule
-                    || rule instanceof ItemValueRule
-                    || rule instanceof ItemTradeableRule
-                    || rule instanceof ItemStackableRule
-                    || rule instanceof ItemNotedRule
-                    || rule instanceof AreaRule
-                    || rule instanceof AccountTypeRule
-            ) {
+            if (rule instanceof LeafRule) {
                 operands.push(rule);
             } else if (rule instanceof AndRule) {
                 operands.push(new AndRule(operands.pop(), operands.pop()));
@@ -362,7 +352,7 @@ public class Parser {
         }
 
         if (operands.size() != 1) {
-            throw new ParseException("invalid rule postfix"); // did you add a new rule but not handle it above?
+            throw new ParseException("invalid rule postfix"); // did you add a new leaf rule that doesn't extend LeafRule?
         }
         return operands.pop();
     }
