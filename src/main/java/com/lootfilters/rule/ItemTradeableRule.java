@@ -12,7 +12,6 @@ public class ItemTradeableRule extends LeafRule {
     private final boolean target;
 
     public ItemTradeableRule(boolean target) {
-        super("item_tradeable");
         this.target = target;
     }
 

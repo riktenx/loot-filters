@@ -9,8 +9,7 @@ public abstract class ComparatorRule extends LeafRule {
     private final int rhs;
     private final Comparator cmp;
 
-    protected ComparatorRule(String discriminator, int rhs, Comparator cmp) {
-        super(discriminator);
+    protected ComparatorRule(int rhs, Comparator cmp) {
         this.rhs = rhs;
         this.cmp = cmp;
     }

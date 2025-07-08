@@ -13,7 +13,6 @@ public class ItemOwnershipRule extends LeafRule {
     private final Ownership ownership;
 
     public ItemOwnershipRule(int ownership) {
-        super("item_ownership");
         this.ownership = Ownership.fromOrdinal(ownership);
     }
 

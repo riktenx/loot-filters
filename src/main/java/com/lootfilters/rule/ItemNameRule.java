@@ -15,12 +15,10 @@ public class ItemNameRule extends LeafRule {
     private final List<String> names;
 
     public ItemNameRule(List<String> names) {
-        super("item_name");
         this.names = names;
     }
 
     public ItemNameRule(String name) {
-        super("item_name");
         this.names = List.of(name);
     }
 

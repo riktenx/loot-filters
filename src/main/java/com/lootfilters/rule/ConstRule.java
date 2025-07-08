@@ -13,7 +13,6 @@ public class ConstRule extends LeafRule {
     private final boolean target;
 
     public ConstRule(boolean target) {
-        super("const");
         this.target = target;
     }
 

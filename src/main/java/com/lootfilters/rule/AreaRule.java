@@ -8,7 +8,6 @@ public class AreaRule extends LeafRule {
     private final WorldPoint p0, p1;
 
     public AreaRule(WorldPoint p0, WorldPoint p1) {
-        super("area");
         this.p0 = p0;
         this.p1 = p1;
     }

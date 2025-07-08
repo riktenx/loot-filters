@@ -9,7 +9,7 @@ import lombok.ToString;
 @ToString(callSuper = true)
 public class ItemQuantityRule extends ComparatorRule {
     public ItemQuantityRule(int value, Comparator cmp) {
-        super("item_quantity", value, cmp);
+        super(value, cmp);
     }
 
     @Override

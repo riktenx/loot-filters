@@ -11,7 +11,6 @@ public class ItemStackableRule extends LeafRule {
     private final boolean target;
 
     public ItemStackableRule(boolean target) {
-        super("item_stackable");
         this.target = target;
     }
 

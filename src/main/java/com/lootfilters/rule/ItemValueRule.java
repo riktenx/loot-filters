@@ -11,7 +11,7 @@ public class ItemValueRule extends ComparatorRule {
     private final ValueType valueType;
 
     public ItemValueRule(int value, Comparator cmp, ValueType valueType) {
-       super("item_value", value, cmp);
+       super(value, cmp);
        this.valueType = valueType;
     }
 
