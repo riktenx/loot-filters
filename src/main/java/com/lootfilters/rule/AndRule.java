@@ -13,12 +13,10 @@ public class AndRule extends Rule {
     private final List<Rule> rules;
 
     public AndRule(List<Rule> rules) {
-        super("and");
         this.rules = rules;
     }
 
     public AndRule(Rule left, Rule right) {
-        super("and");
         this.rules = List.of(left, right);
     }
 

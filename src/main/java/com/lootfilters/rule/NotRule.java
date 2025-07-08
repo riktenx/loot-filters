@@ -11,8 +11,6 @@ public class NotRule extends Rule {
     private final Rule inner;
 
     public NotRule(Rule inner) {
-        super("not");
-
         this.inner = inner;
     }
 

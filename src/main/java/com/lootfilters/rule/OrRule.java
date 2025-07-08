@@ -13,12 +13,10 @@ public class OrRule extends Rule {
     private final List<Rule> rules;
 
     public OrRule(List<Rule> rules) {
-        super("or");
         this.rules = rules;
     }
 
     public OrRule(Rule left, Rule right) {
-        super("or");
         this.rules = List.of(left, right);
     }
 
