@@ -1,4 +1,4 @@
-package com.lootfilters.rule;
+package com.lootfilters.ast;
 
 import com.lootfilters.lang.ParseException;
 import lombok.AllArgsConstructor;

@@ -1,6 +1,7 @@
-package com.lootfilters.rule;
+package com.lootfilters.ast.leaf;
 
 import com.lootfilters.LootFiltersPlugin;
+import com.lootfilters.ast.LeafCondition;
 import com.lootfilters.model.PluginTileItem;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -11,14 +12,14 @@ import java.util.List;
 @Getter
 @EqualsAndHashCode(callSuper = false)
 @ToString
-public class ItemIdRule extends LeafRule {
+public class ItemIdCondition extends LeafCondition {
     private final List<Integer> ids;
 
-    public ItemIdRule(List<Integer> ids) {
+    public ItemIdCondition(List<Integer> ids) {
         this.ids = ids;
     }
 
-    public ItemIdRule(int id) {
+    public ItemIdCondition(int id) {
         this.ids = List.of(id);
     }
 

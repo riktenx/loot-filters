@@ -1,16 +1,19 @@
-package com.lootfilters.rule;
+package com.lootfilters.ast.leaf;
 
 import com.lootfilters.LootFiltersPlugin;
+import com.lootfilters.ast.Comparator;
+import com.lootfilters.ast.ComparatorCondition;
+import com.lootfilters.ast.ValueType;
 import com.lootfilters.model.PluginTileItem;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 @EqualsAndHashCode(callSuper = false)
 @ToString(callSuper = true)
-public class ItemValueRule extends ComparatorRule {
+public class ItemValueCondition extends ComparatorCondition {
     private final ValueType valueType;
 
-    public ItemValueRule(int value, Comparator cmp, ValueType valueType) {
+    public ItemValueCondition(int value, Comparator cmp, ValueType valueType) {
        super(value, cmp);
        this.valueType = valueType;
     }

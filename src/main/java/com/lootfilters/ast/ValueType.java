@@ -1,4 +1,4 @@
-package com.lootfilters.rule;
+package com.lootfilters.ast;
 
 public enum ValueType {
     HIGHEST, GE, HA;

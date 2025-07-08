@@ -1,15 +1,15 @@
-package com.lootfilters.rule;
+package com.lootfilters.ast;
 
 import com.lootfilters.LootFiltersPlugin;
 import com.lootfilters.model.PluginTileItem;
 import lombok.ToString;
 
 @ToString
-public abstract class ComparatorRule extends LeafRule {
+public abstract class ComparatorCondition extends LeafCondition {
     private final int rhs;
     private final Comparator cmp;
 
-    protected ComparatorRule(int rhs, Comparator cmp) {
+    protected ComparatorCondition(int rhs, Comparator cmp) {
         this.rhs = rhs;
         this.cmp = cmp;
     }

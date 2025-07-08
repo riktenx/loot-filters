@@ -5,7 +5,7 @@ import com.lootfilters.model.DualValueDisplayType;
 import com.lootfilters.model.FontMode;
 import com.lootfilters.model.OverlayPriority;
 import com.lootfilters.model.ValueDisplayType;
-import com.lootfilters.rule.TextAccent;
+import com.lootfilters.ast.TextAccent;
 import net.runelite.client.config.Alpha;
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;

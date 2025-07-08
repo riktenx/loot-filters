@@ -1,13 +1,14 @@
-package com.lootfilters.rule;
+package com.lootfilters.ast.leaf;
 
 import com.lootfilters.LootFiltersPlugin;
+import com.lootfilters.ast.LeafCondition;
 import com.lootfilters.model.PluginTileItem;
 import net.runelite.api.gameval.VarbitID;
 
-public class AccountTypeRule extends LeafRule {
+public class AccountTypeCondition extends LeafCondition {
     private final int type;
 
-    public AccountTypeRule(int type) {
+    public AccountTypeCondition(int type) {
         this.type = type;
     }
 

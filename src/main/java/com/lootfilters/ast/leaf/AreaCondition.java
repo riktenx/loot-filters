@@ -1,13 +1,14 @@
-package com.lootfilters.rule;
+package com.lootfilters.ast.leaf;
 
 import com.lootfilters.LootFiltersPlugin;
+import com.lootfilters.ast.LeafCondition;
 import com.lootfilters.model.PluginTileItem;
 import net.runelite.api.coords.WorldPoint;
 
-public class AreaRule extends LeafRule {
+public class AreaCondition extends LeafCondition {
     private final WorldPoint p0, p1;
 
-    public AreaRule(WorldPoint p0, WorldPoint p1) {
+    public AreaCondition(WorldPoint p0, WorldPoint p1) {
         this.p0 = p0;
         this.p1 = p1;
     }

@@ -1,6 +1,5 @@
 package com.lootfilters;
 
-import com.google.gson.Gson;
 import com.lootfilters.lang.CompileException;
 import com.lootfilters.lang.Lexer;
 import com.lootfilters.lang.Parser;
@@ -8,16 +7,11 @@ import com.lootfilters.lang.Preprocessor;
 import com.lootfilters.lang.Sources;
 import com.lootfilters.lang.TokenStream;
 import com.lootfilters.model.PluginTileItem;
-import com.lootfilters.rule.Rule;
-import com.lootfilters.serde.ColorDeserializer;
-import com.lootfilters.serde.ColorSerializer;
-import com.lootfilters.serde.RuleDeserializer;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.ToString;
-import net.runelite.api.coords.WorldPoint;
 
 import java.awt.Color;
 import java.util.ArrayList;

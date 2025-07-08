@@ -1,6 +1,6 @@
 package com.lootfilters.model;
 
-import com.lootfilters.rule.Comparator;
+import com.lootfilters.ast.Comparator;
 import lombok.Value;
 
 import static java.lang.Integer.parseInt;

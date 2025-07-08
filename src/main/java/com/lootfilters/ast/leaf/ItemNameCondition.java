@@ -1,6 +1,7 @@
-package com.lootfilters.rule;
+package com.lootfilters.ast.leaf;
 
 import com.lootfilters.LootFiltersPlugin;
+import com.lootfilters.ast.LeafCondition;
 import com.lootfilters.model.PluginTileItem;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -11,14 +12,14 @@ import static com.lootfilters.util.TextUtil.isInfixWildcard;
 
 @EqualsAndHashCode(callSuper = false)
 @ToString
-public class ItemNameRule extends LeafRule {
+public class ItemNameCondition extends LeafCondition {
     private final List<String> names;
 
-    public ItemNameRule(List<String> names) {
+    public ItemNameCondition(List<String> names) {
         this.names = names;
     }
 
-    public ItemNameRule(String name) {
+    public ItemNameCondition(String name) {
         this.names = List.of(name);
     }
 

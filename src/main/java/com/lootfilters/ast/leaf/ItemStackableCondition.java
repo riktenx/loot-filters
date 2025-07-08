@@ -1,16 +1,17 @@
-package com.lootfilters.rule;
+package com.lootfilters.ast.leaf;
 
 import com.lootfilters.LootFiltersPlugin;
+import com.lootfilters.ast.LeafCondition;
 import com.lootfilters.model.PluginTileItem;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 @EqualsAndHashCode(callSuper = false)
 @ToString
-public class ItemNotedRule extends LeafRule {
+public class ItemStackableCondition extends LeafCondition {
     private final boolean target;
 
-    public ItemNotedRule(boolean target) {
+    public ItemStackableCondition(boolean target) {
         this.target = target;
     }
 
@@ -18,7 +19,6 @@ public class ItemNotedRule extends LeafRule {
     public boolean test(LootFiltersPlugin plugin, PluginTileItem item) {
         var comp = plugin.getItemManager().getItemComposition(item.getId());
 
-        boolean isNote = comp.getNote() != -1;
-        return target == isNote;
+        return target == comp.isStackable();
     }
 }

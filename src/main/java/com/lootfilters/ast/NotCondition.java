@@ -1,23 +1,21 @@
-package com.lootfilters.rule;
+package com.lootfilters.ast;
 
 import com.lootfilters.LootFiltersPlugin;
 import com.lootfilters.model.PluginTileItem;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import lombok.ToString;
 
-@Getter
 @EqualsAndHashCode(callSuper = false)
 @ToString
-public class ConstRule extends LeafRule {
-    private final boolean target;
+public class NotCondition extends Condition {
+    private final Condition inner;
 
-    public ConstRule(boolean target) {
-        this.target = target;
+    public NotCondition(Condition inner) {
+        this.inner = inner;
     }
 
     @Override
     public boolean test(LootFiltersPlugin plugin, PluginTileItem item) {
-        return target;
+        return !inner.test(plugin, item);
     }
 }
