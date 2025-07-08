@@ -34,16 +34,16 @@ public class LootFilter {
 
     private final String description;
     private final int[] activationArea;
-    private final List<FilterRule> matchers;
+    private final List<FilterRule> rules;
 
     @Setter
     private String filename;
 
-    public LootFilter(String name, String description, int[] activationArea, List<FilterRule> matchers) {
+    public LootFilter(String name, String description, int[] activationArea, List<FilterRule> rules) {
         this.name = name;
         this.description = description;
         this.activationArea = activationArea;
-        this.matchers = matchers;
+        this.rules = rules;
     }
 
     public static LootFilter fromSourcesWithPreamble(Map<String, String> sources) throws CompileException {
@@ -85,7 +85,7 @@ public class LootFilter {
         var display = new DisplayConfig(Color.WHITE).toBuilder()
                 .compact(plugin.getConfig().compactMode())
                 .build();
-        for (var matcher : matchers) {
+        for (var matcher : rules) {
             if (!matcher.getCond().test(plugin, item)) {
                 continue;
             }

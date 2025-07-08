@@ -26,7 +26,7 @@ public class FilterUtil {
         withConfig.add(FilterRule.highlight(config));
         withConfig.add(FilterRule.hide(config.hiddenItems()));
 
-        withConfig.addAll(filter.getMatchers());
+        withConfig.addAll(filter.getRules());
 
         withConfig = withConfig.stream()
                 .map(it -> it.withDisplay(builder -> {
