@@ -85,14 +85,14 @@ public class LootFilter {
         var display = new DisplayConfig(Color.WHITE).toBuilder()
                 .compact(plugin.getConfig().compactMode())
                 .build();
-        for (var matcher : rules) {
-            if (!matcher.getCond().test(plugin, item)) {
+        for (var rule : rules) {
+            if (!rule.getCond().test(plugin, item)) {
                 continue;
             }
 
-            display = display.merge(matcher.getDisplay());
-            display.getEvalTrace().add(matcher.getSourceLine());
-            if (matcher.isTerminal()) {
+            display = display.merge(rule.getDisplay());
+            display.getEvalTrace().add(rule.getSourceLine());
+            if (rule.isTerminal()) {
                 return display;
             }
         }
