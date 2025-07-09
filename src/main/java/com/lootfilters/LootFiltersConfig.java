@@ -3,6 +3,7 @@ package com.lootfilters;
 import com.lootfilters.model.DespawnTimerType;
 import com.lootfilters.model.DualValueDisplayType;
 import com.lootfilters.model.FontMode;
+import com.lootfilters.model.LootbeamHeight;
 import com.lootfilters.model.OverlayPriority;
 import com.lootfilters.model.ValueDisplayType;
 import com.lootfilters.model.TextAccent;
@@ -284,6 +285,16 @@ public interface LootFiltersConfig extends Config {
     )
     @Range(min = 1, max = 128)
     default int compactRenderRowLength() { return 4; }
+    @ConfigItem(
+            keyName = "lootbeamHeight",
+            name = "Lootbeam height",
+            description = "Control height of lootbeams.",
+            section = displayOverrides,
+            position = 200
+    )
+    default LootbeamHeight lootbeamHeight() {
+        return LootbeamHeight.NORMAL;
+    }
 
     @ConfigSection(
             name = "Item lists",
