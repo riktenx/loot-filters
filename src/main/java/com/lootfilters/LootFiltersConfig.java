@@ -4,6 +4,7 @@ import com.lootfilters.model.DespawnTimerType;
 import com.lootfilters.model.DualValueDisplayType;
 import com.lootfilters.model.FontMode;
 import com.lootfilters.model.IconPosition;
+import com.lootfilters.model.LootbeamHeight;
 import com.lootfilters.model.ValueDisplayType;
 import com.lootfilters.model.TextAccent;
 import net.runelite.client.config.Alpha;
@@ -15,7 +16,6 @@ import net.runelite.client.config.Keybind;
 import net.runelite.client.config.Range;
 import net.runelite.client.config.Units;
 
-import javax.swing.Icon;
 import java.awt.Color;
 
 @ConfigGroup("loot-filters")
@@ -312,6 +312,16 @@ public interface LootFiltersConfig extends Config {
     )
     @Range(min = 1, max = 128)
     default int compactRenderRowLength() { return 4; }
+    @ConfigItem(
+            keyName = "lootbeamHeight",
+            name = "Lootbeam height",
+            description = "Control height of lootbeams.",
+            section = displayOverrides,
+            position = 200
+    )
+    default LootbeamHeight lootbeamHeight() {
+        return LootbeamHeight.NORMAL;
+    }
 
     @ConfigSection(
             name = "Global hide/highlight",

@@ -27,6 +27,7 @@ public class LootbeamIndex {
 
         var beams = index.get(tile);
         beams.put(item, beam);
+        beam.setActive(true);
     }
 
     public void remove(Tile tile, PluginTileItem item) {
@@ -40,7 +41,7 @@ public class LootbeamIndex {
         }
 
         var beam = beams.get(item);
-        beam.remove();
+        beam.setActive(false);
         beams.remove(item);
         if (beams.isEmpty()) {
             index.remove(tile);
@@ -62,7 +63,7 @@ public class LootbeamIndex {
     public void clear() {
         for (var beams : index.values()) {
             for (var beam : beams.values()) {
-                beam.remove();
+                beam.setActive(false);
             }
         }
         index.clear();
@@ -74,9 +75,9 @@ public class LootbeamIndex {
             var tile = entry.getKey();
             for (var item : entry.getValue()) {
                 var match = plugin.getActiveFilter().findMatch(plugin, item);
-                if (match != null && match.isShowLootbeam()) {
-                    put(tile, item, new Lootbeam(plugin.getClient(), plugin.getClientThread(), tile.getWorldLocation(),
-                            match.getLootbeamColor(), Lootbeam.Style.MODERN));
+                if (match.isShowLootbeam()) {
+                    put(tile, item, new Lootbeam(plugin.getConfig(), plugin.getClient(), plugin.getClientThread(), tile.getLocalLocation(),
+                            match.getLootbeamColor()));
                 }
             }
         }
