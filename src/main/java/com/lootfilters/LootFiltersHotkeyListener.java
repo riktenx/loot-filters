@@ -25,8 +25,10 @@ public class LootFiltersHotkeyListener extends HotkeyListener {
         var now = Instant.now();
         if (shouldToggleOverlay(now)) {
             plugin.setOverlayEnabled(!plugin.isOverlayEnabled());
+            lastPressed = Instant.EPOCH;
+        } else {
+            lastPressed = now;
         }
-        lastPressed = now;
     }
 
     @Override
