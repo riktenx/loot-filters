@@ -21,12 +21,15 @@ public class PluginTileItem implements TileItem {
     @Getter private final int spawnTime;
     @Getter private final Instant despawnInstant;
     @Getter private final boolean isStackable;
+    @Getter private final boolean isNoted;
+    @Getter private final boolean isTradeable;
 
     @Setter
     private int quantityOverride = -1;
 
     public PluginTileItem(LootFiltersPlugin plugin, Tile tile, TileItem item) {
         var composition = plugin.getItemManager().getItemComposition(item.getId());
+        var linkedNoteComposition = plugin.getItemManager().getItemComposition(composition.getLinkedNoteId());
 
         this.item = item;
         this.name = composition.getName();
@@ -36,6 +39,8 @@ public class PluginTileItem implements TileItem {
         this.spawnTime = plugin.getClient().getTickCount();
         this.despawnInstant = Instant.now().plusMillis((getDespawnTime() - spawnTime) * 600L);
         this.isStackable = composition.isStackable();
+        this.isNoted = composition.getNote() != -1;
+        this.isTradeable = composition.isTradeable() || linkedNoteComposition.isTradeable();
     }
 
     public int getGePrice() {
@@ -47,6 +52,10 @@ public class PluginTileItem implements TileItem {
             default:
                 return gePrice;
         }
+    }
+
+    public boolean isMoney() {
+        return getId() == ItemID.COINS || getId() == ItemID.PLATINUM;
     }
 
     @Override

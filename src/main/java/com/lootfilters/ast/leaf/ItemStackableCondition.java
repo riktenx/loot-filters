@@ -17,8 +17,6 @@ public class ItemStackableCondition extends LeafCondition {
 
     @Override
     public boolean test(LootFiltersPlugin plugin, PluginTileItem item) {
-        var comp = plugin.getItemManager().getItemComposition(item.getId());
-
-        return target == comp.isStackable();
+        return item.isStackable() == target;
     }
 }
