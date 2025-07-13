@@ -5,7 +5,6 @@ import com.lootfilters.ast.LeafCondition;
 import com.lootfilters.model.PluginTileItem;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import net.runelite.api.ItemID;
 
 @EqualsAndHashCode(callSuper = false)
 @ToString
@@ -18,14 +17,6 @@ public class ItemTradeableCondition extends LeafCondition {
 
     @Override
     public boolean test(LootFiltersPlugin plugin, PluginTileItem item) {
-        if (item.getId() == ItemID.COINS_995 || item.getId() == ItemID.PLATINUM_TOKEN) {
-            return target;
-        }
-
-        var comp = plugin.getItemManager().getItemComposition(item.getId());
-        var linkedComp = plugin.getItemManager().getItemComposition(comp.getLinkedNoteId());
-        return target
-                ? comp.isTradeable() || linkedComp.isTradeable()
-                : !comp.isTradeable() && !linkedComp.isTradeable();
+        return item.isMoney() ? target : item.isTradeable() == target;
     }
 }

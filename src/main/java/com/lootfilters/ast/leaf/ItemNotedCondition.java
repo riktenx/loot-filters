@@ -17,9 +17,6 @@ public class ItemNotedCondition extends LeafCondition {
 
     @Override
     public boolean test(LootFiltersPlugin plugin, PluginTileItem item) {
-        var comp = plugin.getItemManager().getItemComposition(item.getId());
-
-        boolean isNote = comp.getNote() != -1;
-        return target == isNote;
+        return item.isNoted() == target;
     }
 }
