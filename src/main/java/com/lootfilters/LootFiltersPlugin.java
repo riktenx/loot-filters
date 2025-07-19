@@ -227,11 +227,6 @@ public class LootFiltersPlugin extends Plugin {
 			}
 		}
 
-		if (event.getKey().equals(LootFiltersConfig.CONFIG_KEY_OVERLAY_PRIORITY)) {
-			overlay.setPriority(config.overlayPriority().getValue());
-			overlayManager.resetOverlay(overlay);
-		}
-
 		if (event.getKey().equals(LootFiltersConfig.CONFIG_KEY_FETCH_DEFAULT_FILTERS)) {
 			if (config.fetchDefaultFilters()) {
 				filterManager.fetchDefaultFilters(this::onFetchDefaultFilters);

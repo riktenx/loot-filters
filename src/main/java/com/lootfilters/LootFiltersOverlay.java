@@ -19,6 +19,7 @@ import net.runelite.api.coords.LocalPoint;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPosition;
+import net.runelite.client.ui.overlay.OverlayPriority;
 import net.runelite.client.ui.overlay.components.ProgressPieComponent;
 
 import javax.inject.Inject;
@@ -59,7 +60,10 @@ public class LootFiltersOverlay extends Overlay {
     public LootFiltersOverlay(Client client, LootFiltersPlugin plugin, LootFiltersConfig config) {
         setPosition(OverlayPosition.DYNAMIC);
         setLayer(OverlayLayer.ABOVE_SCENE);
-        setPriority(config.overlayPriority().getValue());
+        // we want to explicitly draw above overlays of plugins on the ABOVE_SCENE layer that do the "clipping" logic
+        //   - Improved Tile Indicators is explicitly set to 0.6f
+        //   - Better NPC Highlight is defaulted at 0.25f
+        setPriority(PRIORITY_HIGH);
         this.client = client;
         this.plugin = plugin;
         this.config = config;
