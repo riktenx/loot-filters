@@ -3,7 +3,6 @@ package com.lootfilters;
 import com.lootfilters.model.DespawnTimerType;
 import com.lootfilters.model.DualValueDisplayType;
 import com.lootfilters.model.FontMode;
-import com.lootfilters.model.OverlayPriority;
 import com.lootfilters.model.ValueDisplayType;
 import com.lootfilters.model.TextAccent;
 import net.runelite.client.config.Alpha;
@@ -245,16 +244,6 @@ public interface LootFiltersConfig extends Config {
     )
     default Color hiddenColor() { return Color.GRAY; }
 
-    String CONFIG_KEY_OVERLAY_PRIORITY = "overlayPriority";
-    @ConfigItem(
-            keyName = CONFIG_KEY_OVERLAY_PRIORITY,
-            name = "Overlay priority",
-            description = "Changes the draw priority of the overlay." +
-            "<br>Only relative to overlays with the same order as this one.",
-            section = displayOverrides,
-            position = 94
-    )
-    default OverlayPriority overlayPriority() { return OverlayPriority.DEFAULT; }
     @ConfigItem(
             keyName = "overlayZOffset",
             name = "Overlay z-offset",
