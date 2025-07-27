@@ -337,13 +337,6 @@ public class LootFiltersPlugin extends Plugin {
 		}
 	}
 
-	@Subscribe
-	public void onCommandExecuted(CommandExecuted event) {
-		if (developerMode && event.getCommand().equals("lfDebug")) {
-			debugEnabled = !debugEnabled;
-		}
-	}
-
 	private void flushAudio() {
 		for (var provider : queuedAudio) {
 			audioDispatcher.execute(() -> provider.play(this));
