@@ -19,7 +19,6 @@ import net.runelite.api.coords.LocalPoint;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPosition;
-import net.runelite.client.ui.overlay.OverlayPriority;
 import net.runelite.client.ui.overlay.components.ProgressPieComponent;
 
 import javax.inject.Inject;
@@ -51,6 +50,7 @@ public class LootFiltersOverlay extends Overlay {
     private static final int DEFAULT_IMAGE_HEIGHT = 32;
     private static final int DEFAULT_IMAGE_WIDTH = 36;
     private static final int MAX_DISTANCE = 24 * 128; // in LocalPoint units
+    private static final Color DEBUG_BG = new Color(0, 0, 0, 0x80);
 
     private final Client client;
     private final LootFiltersPlugin plugin;
@@ -71,7 +71,7 @@ public class LootFiltersOverlay extends Overlay {
 
     @Override
     public Dimension render(Graphics2D g) {
-        if (plugin.isDebugEnabled()) {
+        if (plugin.isDeveloperMode()) {
             renderDebugOverlay(g);
         }
 
@@ -367,7 +367,6 @@ public class LootFiltersOverlay extends Overlay {
     }
 
     private void renderDebugOverlay(Graphics2D g) {
-        g.drawString("debug", 0, g.getFontMetrics().getHeight());
         int itemCount = 0;
         int screenY = 96;
         for (var entry : plugin.getTileItemIndex().entrySet()) {
@@ -395,6 +394,8 @@ public class LootFiltersOverlay extends Overlay {
             itemCount += sz;
             screenY += 16;
         }
+        g.setColor(DEBUG_BG);
+        g.fillRect(0, 18, 96, 64);
         g.setColor(Color.WHITE);
         g.drawString("items: " + itemCount + "," + plugin.getTileItemIndex().pointIndexSize(), 0, 32);
         g.drawString("lootbeams: " + plugin.getLootbeamIndex().size(), 0, 48);
