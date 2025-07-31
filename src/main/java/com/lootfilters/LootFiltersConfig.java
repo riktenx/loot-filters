@@ -290,20 +290,13 @@ public interface LootFiltersConfig extends Config {
     String itemLists = "itemLists";
     @ConfigItem(
             keyName = "_",
-            name = "These lists take precedence over",
+            name = "<html>These lists take precedence over<br/>" +
+                    "your selected loot filter.</html>",
             description = "",
             section = itemLists,
             position = -3
     )
-    void itemListsDisclaimer0();
-    @ConfigItem(
-            keyName = "_",
-            name = "your selected loot filter.",
-            description = "",
-            section = itemLists,
-            position = -2
-    )
-    void itemListsDisclaimer1();
+    void itemListsReadme();
     @ConfigItem(
             keyName = "highlightedItems",
             name = "Highlighted items",
@@ -370,14 +363,25 @@ public interface LootFiltersConfig extends Config {
 
     @ConfigSection(
             name = "Item value rules",
-            description = "These have been removed. See the readme hover below.",
-            position = 99
+            description = "",
+            position = 99,
+            closedByDefault = true
     )
     String itemValueRules = "itemValueRules";
     @ConfigItem(
             keyName = "itemValueRulesReadme",
-            name = "README (hover)",
-            description = "Unlike the ground items plugin, item value rules are managed by your active loot filter.<br>Both of the default filters shipped with the plugin - FilterScape and Joe's filter - include item value tiers with thresholds similar to that of the ground items plugin.<br>You can configure both the value thresholds and display settings for these on https://filterscape.xyz/.",
+            name = "<html>Unlike the ground items plugin, item<br/>" +
+                    "value rules are managed by your<br/>" +
+                    "active loot filter.<br/><br/>" +
+
+                    "Both of the default filters include<br/>" +
+                    "item value tiers with thresholds<br/>" +
+                    "similar to that of ground items.<br/><br/>" +
+
+                    "You can configure both the value<br/>" +
+                    "thresholds and display settings for<br/>" +
+                    "these on filterscape.xyz.</html>",
+            description = "",
             section = itemValueRules,
             position = 0
     )
@@ -386,7 +390,8 @@ public interface LootFiltersConfig extends Config {
     @ConfigSection(
             name = "Advanced",
             description = "Don't use these unless you know what you're doing.",
-            position = 999
+            position = 999,
+            closedByDefault = true
     )
     String advanced = "advanced";
     @ConfigItem(
