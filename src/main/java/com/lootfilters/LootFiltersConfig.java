@@ -23,21 +23,40 @@ public interface LootFiltersConfig extends Config {
     @ConfigItem(keyName = "preferredDefaultFilter", hidden = true, name = "", description = "")
     void setPreferredDefault(String name);
 
-    @ConfigSection(name = "Plugin panel", description = "", position = -2)
-    String pluginPanel = "pluginPanel";
+    @ConfigSection(
+            name = "README",
+            description = "",
+            position = -100
+    )
+    String readme = "readme";
+    @ConfigItem(
+            keyName = "readme",
+            name = "<html>These config sections adjust general<br/>" +
+                    "plugin behavior.<br/><br/>" +
+
+                    "Loot filters, which control when and<br/>" +
+                    "how ground items are displayed, are<br/>" +
+                    "configured on https://filterscape.xyz</html>",
+            description = "",
+            section = readme
+    )
+    void readme();
+
     String SHOW_PLUGIN_PANEL = "showPluginPanel";
     @ConfigItem(
             keyName = SHOW_PLUGIN_PANEL,
-            name = "Enabled",
+            name = "Show plugin panel",
             description = "Show the plugin panel in the side nav. The entire plugin, including the active loot filter, will still operate if the panel is hidden.",
-            section = pluginPanel
+            section = general,
+            position = -10
     )
     default boolean showPluginPanel() { return true; }
 
     @ConfigSection(
             name = "General",
             description = "Configure general options.",
-            position = 0
+            position = 0,
+            closedByDefault = true
     )
     String general = "general";
     @ConfigItem(
@@ -79,7 +98,8 @@ public interface LootFiltersConfig extends Config {
     @ConfigSection(
             name = "Hotkey",
             description = "Configure hotkey options.",
-            position = 1
+            position = 30,
+            closedByDefault = true
     )
     String hotkey = "Hotkey";
     @ConfigItem(
@@ -143,7 +163,8 @@ public interface LootFiltersConfig extends Config {
     @ConfigSection(
             name = "Display settings",
             description = "Configure global display settings/overrides.",
-            position = 2
+            position = 20,
+            closedByDefault = true
     )
     String displayOverrides = "displayOverrides";
     @ConfigItem(
@@ -283,27 +304,21 @@ public interface LootFiltersConfig extends Config {
     default int compactRenderRowLength() { return 4; }
 
     @ConfigSection(
-            name = "Item lists",
+            name = "Global hide/highlight",
             description = "Configure default lists of highlighted and hidden items. Values are case-insensitive, separated by comma. These lists are checked BEFORE the active filter.",
-            position = 8
+            position = 10,
+            closedByDefault = true
     )
     String itemLists = "itemLists";
     @ConfigItem(
             keyName = "_",
-            name = "These lists take precedence over",
+            name = "<html>These lists take precedence over<br/>" +
+                    "your selected loot filter.</html>",
             description = "",
             section = itemLists,
             position = -3
     )
-    void itemListsDisclaimer0();
-    @ConfigItem(
-            keyName = "_",
-            name = "your selected loot filter.",
-            description = "",
-            section = itemLists,
-            position = -2
-    )
-    void itemListsDisclaimer1();
+    void itemListsReadme();
     @ConfigItem(
             keyName = "highlightedItems",
             name = "Highlighted items",
@@ -369,15 +384,36 @@ public interface LootFiltersConfig extends Config {
     default String highlightSound() { return ""; }
 
     @ConfigSection(
+            name = "Ownership filter",
+            description = "",
+            position = 40,
+            closedByDefault = true
+    )
+    String ownershipFilter = "ownershipFilter";
+    @ConfigItem(
+            keyName = "ownershipFilterReadme",
+            name = "<html>Ownership filtering is controlled by<br/>" +
+                    "your loot filter, which can be<br/>" +
+                    "configured on https://filterscape.xyz</html>",
+            description = "",
+            section = ownershipFilter,
+            position = 0
+    )
+    void ownershipFilterReadme();
+
+    @ConfigSection(
             name = "Item value rules",
-            description = "These have been removed. See the readme hover below.",
-            position = 99
+            description = "",
+            position = 50,
+            closedByDefault = true
     )
     String itemValueRules = "itemValueRules";
     @ConfigItem(
             keyName = "itemValueRulesReadme",
-            name = "README (hover)",
-            description = "Unlike the ground items plugin, item value rules are managed by your active loot filter.<br>Both of the default filters shipped with the plugin - FilterScape and Joe's filter - include item value tiers with thresholds similar to that of the ground items plugin.<br>You can configure both the value thresholds and display settings for these on https://filterscape.xyz/.",
+            name = "<html>Item value rules are controlled by<br/>" +
+                    "your loot filter, which can be<br/>" +
+                    "configured on https://filterscape.xyz</html>",
+            description = "",
             section = itemValueRules,
             position = 0
     )
@@ -386,7 +422,8 @@ public interface LootFiltersConfig extends Config {
     @ConfigSection(
             name = "Advanced",
             description = "Don't use these unless you know what you're doing.",
-            position = 999
+            position = 100,
+            closedByDefault = true
     )
     String advanced = "advanced";
     @ConfigItem(
