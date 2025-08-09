@@ -45,7 +45,9 @@ public class FilterUtil {
                 }))
                 .collect(Collectors.toCollection(ArrayList::new));
 
-        return new LootFilter(filter.getName(), filter.getDescription(), filter.getActivationArea(), withConfig);
+        return filter.toBuilder()
+                .setRules(withConfig)
+                .build();
     }
 
     /**

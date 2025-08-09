@@ -10,7 +10,6 @@ import com.lootfilters.model.PluginTileItem;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.Setter;
 import lombok.ToString;
 
 import java.awt.Color;
@@ -27,23 +26,18 @@ import static com.lootfilters.util.TextUtil.normalizeCrlf;
 @EqualsAndHashCode
 @ToString
 public class LootFilter {
-    public static final LootFilter Nop = new LootFilter("", "", null, new ArrayList<>());
+    public static final LootFilter Nop = LootFilter.builder().build();
 
-    @Setter
-    private String name; // anonymous filter can be imported, would need name
-
+    private final String name;
+    private final String filename;
     private final String description;
-    private final int[] activationArea;
     private final List<FilterRule> rules;
 
-    @Setter
-    private String filename;
-
-    public LootFilter(String name, String description, int[] activationArea, List<FilterRule> rules) {
-        this.name = name;
-        this.description = description;
-        this.activationArea = activationArea;
-        this.rules = rules;
+    private LootFilter(Builder builder) {
+        name = builder.name;
+        filename = builder.filename;
+        description = builder.description;
+        rules = builder.rules;
     }
 
     public static LootFilter fromSourcesWithPreamble(Map<String, String> sources) throws CompileException {
@@ -81,6 +75,15 @@ public class LootFilter {
         return fromSourcesWithPreamble(Map.of(UNKNOWN_SOURCE_NAME, source));
     }
 
+    public Builder toBuilder() {
+        var builder = new Builder();
+        builder.name = name;
+        builder.filename = filename;
+        builder.description = description;
+        builder.rules = new ArrayList<>(rules);
+        return builder;
+    }
+
     public @NonNull DisplayConfig findMatch(LootFiltersPlugin plugin, PluginTileItem item) {
         var display = new DisplayConfig(Color.WHITE).toBuilder()
                 .compact(plugin.getConfig().compactMode())
@@ -97,5 +100,48 @@ public class LootFilter {
             }
         }
         return display;
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static class Builder {
+        private String name;
+        private String filename;
+        private String description;
+        private List<FilterRule> rules = new ArrayList<>();
+
+        private Builder() {
+        }
+
+        public Builder setName(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public Builder setFilename(String filename) {
+            this.filename = filename;
+            return this;
+        }
+
+        public Builder setDescription(String description) {
+            this.description = description;
+            return this;
+        }
+
+        public Builder setRules(List<FilterRule> rules) {
+            this.rules = rules;
+            return this;
+        }
+
+        public Builder addRule(FilterRule rule) {
+            rules.add(rule);
+            return this;
+        }
+
+        public LootFilter build() {
+            return new LootFilter(this);
+        }
     }
 }
