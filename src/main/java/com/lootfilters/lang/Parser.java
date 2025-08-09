@@ -64,11 +64,8 @@ import static com.lootfilters.lang.Token.Type.TRUE;
 @RequiredArgsConstructor
 public class Parser {
     private final TokenStream tokens;
-    private final List<FilterRule> matchers = new ArrayList<>();
 
-    private String name;
-    private String description;
-    private int[] activationArea = null;
+    private final LootFilter.Builder builder = LootFilter.builder();
 
     public LootFilter parse() throws ParseException {
         while (tokens.isNotEmpty()) {
@@ -76,14 +73,14 @@ public class Parser {
             if (tok.is(META)) {
                 parseMeta();
             } else if (tok.is(IF) || tok.is(RULE)) {
-                parseMatcher(true, tok.getLocation().getLineNumber());
+                parseRule(true, tok.getLocation().getLineNumber());
             } else if (tok.is(APPLY)) {
-                parseMatcher(false, tok.getLocation().getLineNumber());
+                parseRule(false, tok.getLocation().getLineNumber());
             } else {
                 throw new ParseException("unexpected token", tok);
             }
         }
-        return new LootFilter(name, description, activationArea, matchers);
+        return builder.build();
     }
 
     private void parseMeta() {
@@ -93,11 +90,11 @@ public class Parser {
             block.takeExpect(ASSIGN);
             switch (tok.getValue()) {
                 case "name":
-                    name = block.takeExpectLiteral().expectString();
+                    builder.setName(block.takeExpectLiteral().expectString());
                     block.takeExpect(STMT_END);
                     break;
                 case "description":
-                    description = block.takeExpectLiteral().expectString();
+                    builder.setDescription(block.takeExpectLiteral().expectString());
                     block.takeExpect(STMT_END);
                     break;
                 case "area":
@@ -110,8 +107,6 @@ public class Parser {
                     int z1 = block.takeExpectLiteral().expectInt(); block.takeOptional(COMMA);
                     block.takeExpect(LIST_END);
                     block.takeExpect(STMT_END);
-
-                    activationArea = new int[]{x0,y0,z0,x1,y1,z1};
                     break;
                 default:
                     throw new ParseException("unrecognized metavalue", tok);
@@ -119,7 +114,7 @@ public class Parser {
         }
     }
 
-    private void parseMatcher(boolean isTerminal, int sourceLine) {
+    private void parseRule(boolean isTerminal, int sourceLine) {
         var operators = new Stack<Token>();
         var rulesPostfix = new ArrayList<Condition>();
         tokens.walkExpression(EXPR_START, EXPR_END, it -> {
@@ -227,7 +222,7 @@ public class Parser {
         }
         tokens.takeExpect(BLOCK_END);
 
-        matchers.add(new FilterRule(buildRule(rulesPostfix), builder.build(), isTerminal, sourceLine));
+        this.builder.addRule(new FilterRule(buildRule(rulesPostfix), builder.build(), isTerminal, sourceLine));
     }
 
     private void unwindUnary(Stack<Token> operators, ArrayList<Condition> postfix) {

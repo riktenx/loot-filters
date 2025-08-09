@@ -56,16 +56,23 @@ public class LootFilterManager {
 
             LootFilter filter;
             try {
-                filter = LootFilter.fromSourcesWithPreamble(Map.of(file.getName(), src));
-                filter.setFilename(file.getName());
-                if (filter.getName() == null || filter.getName().isBlank()) {
-                    filter.setName(file.getName());
+                var parsed = LootFilter.fromSourcesWithPreamble(Map.of(file.getName(), src))
+                        .toBuilder()
+                        .setFilename(file.getName())
+                        .build();
+                if (parsed.getName() == null || parsed.getName().isBlank()) {
+                    parsed = parsed.toBuilder()
+                            .setName(file.getName())
+                            .build();
                 }
+
+                filter = parsed;
             } catch (Exception e) {
                 plugin.addChatMessage("Failed to load filter from " + file.getName() + ": " + e.getMessage());
                 log.warn("parse file {}", file.getName(), e);
                 continue;
             }
+
             if (filters.stream().anyMatch(it -> it.getName().equals(filter.getName()))) {
                 log.warn("Duplicate filters found with name {}. Only the first one was loaded.", quote(filter.getName()));
                 continue;
