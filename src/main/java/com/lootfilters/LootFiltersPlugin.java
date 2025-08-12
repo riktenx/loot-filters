@@ -120,6 +120,10 @@ public class LootFiltersPlugin extends Plugin {
 
 	@Getter private boolean debugEnabled = false;
 
+	public boolean isDeveloperMode() {
+		return developerMode && debugEnabled;
+	}
+
 	public String getSelectedFilterName() {
 		return configManager.getConfiguration(CONFIG_GROUP, SELECTED_FILTER_KEY);
 	}
@@ -162,6 +166,8 @@ public class LootFiltersPlugin extends Plugin {
 
 	@Override
 	protected void startUp() {
+		debugEnabled = !System.getProperty("com.lootfilters.debug", "").isBlank();
+
 		initPluginDirectory();
 		overlayManager.add(overlay);
 		infoBoxManager.addInfoBox(overlayStateIndicator);
