@@ -409,7 +409,7 @@ public class LootFiltersOverlay extends Overlay {
         if (ticksRemaining < 0) { // doesn't despawn
             return;
         }
-        if (config.despawnThreshold() > 0 && ticksRemaining > config.despawnThreshold()) {
+        if (!plugin.isHotkeyActive() && config.despawnThreshold() > 0 && ticksRemaining > config.despawnThreshold()) {
             return;
         }
 
