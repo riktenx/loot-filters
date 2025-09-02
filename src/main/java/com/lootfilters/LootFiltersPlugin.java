@@ -2,6 +2,7 @@ package com.lootfilters;
 
 import com.google.gson.Gson;
 import com.google.inject.Provides;
+import com.lootfilters.migration.Migrate_1105_1106;
 import com.lootfilters.migration.Migrate_133_140;
 import com.lootfilters.model.DisplayConfigIndex;
 import com.lootfilters.model.IconIndex;
@@ -15,7 +16,6 @@ import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.api.Tile;
 import net.runelite.api.events.ClientTick;
-import net.runelite.api.events.CommandExecuted;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.ItemDespawned;
 import net.runelite.api.events.ItemQuantityChanged;
@@ -52,7 +52,6 @@ import java.util.concurrent.Executors;
 import static com.lootfilters.util.FilterUtil.withConfigRules;
 import static net.runelite.client.RuneLite.RUNELITE_DIR;
 import static net.runelite.client.util.ColorUtil.colorToHexCode;
-import static net.runelite.client.util.ImageUtil.loadImageResource;
 
 @Slf4j
 @PluginDescriptor(
@@ -187,11 +186,12 @@ public class LootFiltersPlugin extends Plugin {
 		keyManager.registerKeyListener(hotkeyListener);
 		mouseManager.registerMouseListener(mouseAdapter);
 
+		Migrate_133_140.run(this);
+		Migrate_1105_1106.run(this);
+
 		if (config.fetchDefaultFilters()) {
 			filterManager.fetchDefaultFilters(this::onFetchDefaultFilters);
 		}
-
-		Migrate_133_140.run(this);
 	}
 
 	@Override

@@ -9,8 +9,8 @@ public class DefaultFilter {
     String name, url;
 
     public static final DefaultFilter FILTERSCAPE = new DefaultFilter(
-            "[default: FilterScape]",
-            "https://raw.githubusercontent.com/riktenx/filterscape/refs/heads/main/filterscape.rs2f"
+            "[default: Rikten's filter]",
+            "https://raw.githubusercontent.com/riktenx/filterscape/refs/heads/main/default.rs2f"
     );
     public static final DefaultFilter JOESFILTER = new DefaultFilter(
             "[default: Joe's filter]",
