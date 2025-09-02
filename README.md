@@ -11,7 +11,7 @@ the builtin, and adds support for scriptable "loot filters".
 * In-depth user guide: [click here](https://github.com/riktenx/loot-filters/blob/userguide/README.md)
 
 ## Get started
-By default the plugin downloads and selects the "FilterScape" filter, which is meant to be useful by default
+On install, the plugin downloads and selects "Rikten's filter", which is meant to be useful by default
 and supports intelligent filtering for a variety of PvM scenarios. You can visit https://filterscape.xyz/ to customize it.
 
 ## Loot filters
