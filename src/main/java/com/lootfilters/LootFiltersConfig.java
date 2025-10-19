@@ -3,6 +3,7 @@ package com.lootfilters;
 import com.lootfilters.model.DespawnTimerType;
 import com.lootfilters.model.DualValueDisplayType;
 import com.lootfilters.model.FontMode;
+import com.lootfilters.model.IconPosition;
 import com.lootfilters.model.ValueDisplayType;
 import com.lootfilters.model.TextAccent;
 import net.runelite.client.config.Alpha;
@@ -14,6 +15,7 @@ import net.runelite.client.config.Keybind;
 import net.runelite.client.config.Range;
 import net.runelite.client.config.Units;
 
+import javax.swing.Icon;
 import java.awt.Color;
 
 @ConfigGroup("loot-filters")
@@ -224,6 +226,14 @@ public interface LootFiltersConfig extends Config {
             position = 23
     )
     default TextAccent textAccent() { return TextAccent.USE_FILTER; }
+    @ConfigItem(
+            keyName = "iconPosition",
+            name = "Icon position",
+            description = "Where to place the overlay's icon relative to its item text.",
+            section = displayOverrides,
+            position = 24
+    )
+    default IconPosition iconPosition() { return IconPosition.OUTSIDE; }
     @ConfigItem(
             keyName = "highlightTiles",
             name = "Highlight tiles",

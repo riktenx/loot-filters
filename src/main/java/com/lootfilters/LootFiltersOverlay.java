@@ -4,6 +4,7 @@ import com.lootfilters.model.BufferedImageProvider;
 import com.lootfilters.model.DespawnTimerType;
 import com.lootfilters.model.DualValueDisplayType;
 import com.lootfilters.model.FontMode;
+import com.lootfilters.model.IconPosition;
 import com.lootfilters.model.PluginTileItem;
 import com.lootfilters.model.ValueDisplayType;
 import com.lootfilters.util.TextComponent;
@@ -29,6 +30,7 @@ import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
@@ -140,6 +142,17 @@ public class LootFiltersOverlay extends Overlay {
                     continue;
                 }
 
+                // we look ahead at the icon width (if there is one) because it will affect text offset further down
+                // depending on the configured icon position
+                var iconWidth = 0;
+                if (match.getIcon() != null) {
+                    var key = match.getIcon().getCacheKey(item.getFirstItem());
+                    var icon = plugin.getIconIndex().get(key);
+                    if (icon != null) {
+                        iconWidth = icon.getWidth();
+                    }
+                }
+
                 var loc = LocalPoint.fromWorld(client.getTopLevelWorldView(), tile.getWorldLocation());
                 if (loc == null) {
                     continue;
@@ -156,6 +169,11 @@ public class LootFiltersOverlay extends Overlay {
                 var textPoint = getCanvasTextLocation(client, g, loc, displayText, tile.getItemLayer().getHeight() + config.overlayZOffset());
                 if (textPoint == null) {
                     continue;
+                }
+
+                // move the text HALF of the image width to the right
+                if (config.iconPosition() == IconPosition.INSIDE) {
+                    textPoint = new net.runelite.api.Point(textPoint.getX() + iconWidth / 2, textPoint.getY());
                 }
 
                 var fm = g.getFontMetrics(g.getFont());
@@ -177,6 +195,11 @@ public class LootFiltersOverlay extends Overlay {
                         textPoint.getX() - BOX_PAD, textPoint.getY() - currentOffset - textHeight - BOX_PAD,
                         textWidth + 2 * BOX_PAD, textHeight + 2 * BOX_PAD
                 );
+
+                if (config.iconPosition() == IconPosition.INSIDE) { // correct for previous image offset
+                    boundingBox.x -= iconWidth;
+                    boundingBox.width += iconWidth;
+                }
 
                 if (match.getBackgroundColor() != null) {
                     g.setColor(match.getBackgroundColor());
@@ -508,11 +531,12 @@ public class LootFiltersOverlay extends Overlay {
             return new Dimension(0, 0);
         }
 
+        var xpad = config.iconPosition() == IconPosition.OUTSIDE ? BOX_PAD : 0;
         var fontHeight = g.getFontMetrics().getHeight();
-        var x = textPoint.getX() - image.getWidth() - BOX_PAD - 1;
+        var x = textPoint.getX() - image.getWidth() - xpad - 1;
         var y = textPoint.getY() - fontHeight - yOffset + (fontHeight - image.getHeight()) / 2;
         g.drawImage(image, x, y, null);
-        return new Dimension(image.getWidth() + BOX_PAD, image.getHeight());
+        return new Dimension(image.getWidth() + xpad, image.getHeight());
     }
 
     private Map<Boolean, Deque<RenderItem>> createItemCollection(List<PluginTileItem> items) {
