@@ -12,6 +12,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.Value;
 import net.runelite.api.Client;
+import net.runelite.api.Perspective;
 import net.runelite.api.gameval.ItemID;
 import net.runelite.api.Player;
 import net.runelite.api.Tile;
@@ -22,6 +23,8 @@ import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.components.ProgressPieComponent;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
@@ -40,8 +43,6 @@ import java.util.function.Consumer;
 import static com.lootfilters.util.TextUtil.abbreviate;
 import static com.lootfilters.util.TextUtil.abbreviateValue;
 import static com.lootfilters.util.TextUtil.withParentheses;
-import static net.runelite.api.Perspective.getCanvasImageLocation;
-import static net.runelite.api.Perspective.getCanvasTextLocation;
 import static net.runelite.api.Perspective.getCanvasTilePoly;
 import static net.runelite.client.ui.FontManager.getRunescapeSmallFont;
 
@@ -173,7 +174,7 @@ public class LootFiltersOverlay extends Overlay {
 
                 // move the text HALF of the image width to the right
                 if (config.iconPosition() == IconPosition.INSIDE) {
-                    textPoint = new net.runelite.api.Point(textPoint.getX() + iconWidth / 2, textPoint.getY());
+                    textPoint.x += iconWidth / 2;
                 }
 
                 var fm = g.getFontMetrics(g.getFont());
@@ -183,7 +184,7 @@ public class LootFiltersOverlay extends Overlay {
                 var text = new TextComponent();
                 text.setText(displayText);
                 text.setColor(match.isHidden() ? config.hiddenColor() : match.getTextColor());
-                text.setPosition(new Point(textPoint.getX(), textPoint.getY() - currentOffset));
+                text.setPosition(new Point(textPoint.x, textPoint.y - currentOffset));
                 if (match.getTextAccentColor() != null) {
                     text.setAccentColor(match.getTextAccentColor());
                 }
@@ -192,7 +193,7 @@ public class LootFiltersOverlay extends Overlay {
                 }
 
                 var boundingBox = new Rectangle(
-                        textPoint.getX() - BOX_PAD, textPoint.getY() - currentOffset - textHeight - BOX_PAD,
+                        textPoint.x - BOX_PAD, textPoint.y - currentOffset - textHeight - BOX_PAD,
                         textWidth + 2 * BOX_PAD, textHeight + 2 * BOX_PAD
                 );
 
@@ -276,7 +277,7 @@ public class LootFiltersOverlay extends Overlay {
         }
         // item square size- 1 px padding outside the bounding box, 1 px inside, item width, 1 px, 1 px.
         var boundingBox = new Rectangle(
-                imagePoint.getX() + (fullBoxWidth) * rowOffset - Math.round(fullBoxWidth * ((rowSize - 1) / 2f)), imagePoint.getY() - currentOffset - boxHeight,
+                imagePoint.x + (fullBoxWidth) * rowOffset - Math.round(fullBoxWidth * ((rowSize - 1) / 2f)), imagePoint.y - currentOffset - boxHeight,
                 boxWidth + 2, boxHeight + 2
         );
 
@@ -309,7 +310,7 @@ public class LootFiltersOverlay extends Overlay {
         g.drawImage(image, boundingBox.x + BOX_PAD / 2, boundingBox.y + BOX_PAD / 2, null);
         if (display.isShowDespawn() || plugin.isHotkeyActive()) {
             var type = plugin.isHotkeyActive() ? DespawnTimerType.PIE : config.despawnTimerType();
-            renderDespawnTimer(g, type, item, new net.runelite.api.Point(boundingBox.x + BOX_PAD / 2, boundingBox.y + boundingBox.height), boxWidth + 2, 0, 0, true);
+            renderDespawnTimer(g, type, item, new Point(boundingBox.x + BOX_PAD / 2, boundingBox.y + boundingBox.height), boxWidth + 2, 0, 0, true);
         }
         g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1));
         if (count > 1) {
@@ -427,7 +428,7 @@ public class LootFiltersOverlay extends Overlay {
     }
 
     private void renderDespawnTimer(Graphics2D g, DespawnTimerType type, PluginTileItem
-            item, net.runelite.api.Point textPoint, int textWidth, int yOffset, int leftOffset, boolean compact) {
+            item, Point textPoint, int textWidth, int yOffset, int leftOffset, boolean compact) {
         var ticksRemaining = item.getDespawnTime() - client.getTickCount();
         if (ticksRemaining < 0) { // doesn't despawn
             return;
@@ -439,7 +440,7 @@ public class LootFiltersOverlay extends Overlay {
         if (compact) { // bar
             var total = item.getDespawnTime() - item.getSpawnTime();
             var remaining = item.getDespawnTime() - plugin.getClient().getTickCount();
-            var bar = new Rectangle(textPoint.getX(), textPoint.getY() - 3, textWidth * remaining / total, 3);
+            var bar = new Rectangle(textPoint.x, textPoint.y - 3, textWidth * remaining / total, 3);
             g.setColor(getDespawnTextColor(item));
             g.fillRect(bar.x, bar.y, bar.width, bar.height);
         } else if (type == DespawnTimerType.TICKS || type == DespawnTimerType.SECONDS) {
@@ -450,14 +451,14 @@ public class LootFiltersOverlay extends Overlay {
                     : String.format(timeRounding, (Duration.between(Instant.now(), item.getDespawnInstant())).toMillis() / 1000f);
             text.setText(displyString);
             text.setColor(getDespawnTextColor(item));
-            text.setPosition(new Point(textPoint.getX() + textWidth + 2 + 1, textPoint.getY() - yOffset));
+            text.setPosition(new Point(textPoint.x + textWidth + 2 + 1, textPoint.y - yOffset));
             text.render(g);
         } else { // pie
             var timer = new ProgressPieComponent();
             var total = item.getDespawnTime() - item.getSpawnTime();
             var remaining = item.getDespawnTime() - plugin.getClient().getTickCount();
-            timer.setPosition(new net.runelite.api.Point(textPoint.getX() - TIMER_RADIUS - BOX_PAD - 2 - leftOffset,
-                    textPoint.getY() - yOffset - TIMER_RADIUS));
+            timer.setPosition(new net.runelite.api.Point(textPoint.x - TIMER_RADIUS - BOX_PAD - 2 - leftOffset,
+                    textPoint.y - yOffset - TIMER_RADIUS));
             timer.setProgress(remaining / (double) total);
             timer.setDiameter(TIMER_RADIUS * 2);
             timer.setFill(getDespawnTextColor(item));
@@ -525,7 +526,7 @@ public class LootFiltersOverlay extends Overlay {
         g.setStroke(origStroke);
     }
 
-    private Dimension renderIcon(Graphics2D g, BufferedImageProvider.CacheKey cacheKey, net.runelite.api.Point textPoint, int yOffset) {
+    private Dimension renderIcon(Graphics2D g, BufferedImageProvider.CacheKey cacheKey, Point textPoint, int yOffset) {
         var image = plugin.getIconIndex().get(cacheKey);
         if (image == null) {
             return new Dimension(0, 0);
@@ -533,8 +534,8 @@ public class LootFiltersOverlay extends Overlay {
 
         var xpad = config.iconPosition() == IconPosition.OUTSIDE ? BOX_PAD : 0;
         var fontHeight = g.getFontMetrics().getHeight();
-        var x = textPoint.getX() - image.getWidth() - xpad - 1;
-        var y = textPoint.getY() - fontHeight - yOffset + (fontHeight - image.getHeight()) / 2;
+        var x = textPoint.x - image.getWidth() - xpad - 1;
+        var y = textPoint.y - fontHeight - yOffset + (fontHeight - image.getHeight()) / 2;
         g.drawImage(image, x, y, null);
         return new Dimension(image.getWidth() + xpad, image.getHeight());
     }
@@ -592,6 +593,16 @@ public class LootFiltersOverlay extends Overlay {
 
     private static boolean inRenderRange(Player player, Tile tile) {
         return player.getLocalLocation().distanceTo(tile.getLocalLocation()) <= MAX_DISTANCE;
+    }
+
+    private static Point getCanvasImageLocation(@Nonnull Client client, @Nonnull LocalPoint localLocation, @Nonnull BufferedImage image, int zOffset) {
+        var point = Perspective.getCanvasImageLocation(client, localLocation, image, zOffset);
+        return point != null ? new Point(point.getX(), point.getY()) : null;
+    }
+
+    private static Point getCanvasTextLocation(@Nonnull Client client, @Nonnull Graphics2D graphics, @Nonnull LocalPoint localLocation, @Nullable String text, int zOffset) {
+        var point = Perspective.getCanvasTextLocation(client, graphics, localLocation, text, zOffset);
+        return point != null ? new Point(point.getX(), point.getY()) : null;
     }
 }
 
