@@ -222,7 +222,7 @@ public class Parser {
         }
         tokens.takeExpect(BLOCK_END);
 
-        this.builder.addRule(new FilterRule(buildRule(rulesPostfix), builder.build(), isTerminal, sourceLine));
+        this.builder.addRule(new FilterRule(buildRule(rulesPostfix), builder, isTerminal, sourceLine));
     }
 
     private void unwindUnary(Stack<Token> operators, ArrayList<Condition> postfix) {
@@ -360,7 +360,7 @@ public class Parser {
         return new Token[]{ident, value};
     }
 
-    private void parseIcon(DisplayConfig.DisplayConfigBuilder builder) {
+    private void parseIcon(DisplayConfig.Builder builder) {
         tokens.takeExpect(IDENTIFIER);
         tokens.takeExpect(ASSIGN);
         var type = tokens.takeExpect(IDENTIFIER);
