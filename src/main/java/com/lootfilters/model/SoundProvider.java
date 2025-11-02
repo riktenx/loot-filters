@@ -17,6 +17,8 @@ public abstract class SoundProvider {
                 return new SoundEffect(token.expectInt());
             case LITERAL_STRING:
                 return new File(token.expectString());
+            case NIL:
+                return null;
             default:
                 throw new ParseException("sound: unexpected token", token);
         }

@@ -48,6 +48,7 @@ import static com.lootfilters.lang.Token.Type.LIST_START;
 import static com.lootfilters.lang.Token.Type.LITERAL_INT;
 import static com.lootfilters.lang.Token.Type.LITERAL_STRING;
 import static com.lootfilters.lang.Token.Type.META;
+import static com.lootfilters.lang.Token.Type.NIL;
 import static com.lootfilters.lang.Token.Type.OP_AND;
 import static com.lootfilters.lang.Token.Type.OP_NOT;
 import static com.lootfilters.lang.Token.Type.OP_OR;
@@ -179,9 +180,9 @@ public class Parser {
                 case "color":
                     builder.textColor(assign[1].expectColor()); break;
                 case "backgroundColor":
-                    builder.backgroundColor(assign[1].expectColor()); break;
+                    builder.backgroundColor(assign[1].expectColor(true)); break;
                 case "borderColor":
-                    builder.borderColor(assign[1].expectColor()); break;
+                    builder.borderColor(assign[1].expectColor(true)); break;
                 case "hidden":
                     builder.hidden(assign[1].expectBoolean()); break;
                 case "showLootbeam":
@@ -363,6 +364,13 @@ public class Parser {
     private void parseIcon(DisplayConfig.Builder builder) {
         tokens.takeExpect(IDENTIFIER);
         tokens.takeExpect(ASSIGN);
+        if (tokens.peek().is(NIL)) {
+            tokens.takeExpect(NIL);
+            tokens.takeExpect(STMT_END);
+            builder.icon(null);
+            return;
+        }
+
         var type = tokens.takeExpect(IDENTIFIER);
         var args = tokens.takeArgList();
         if (type.getValue().equals("Sprite")) {
