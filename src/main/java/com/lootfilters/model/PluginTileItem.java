@@ -4,15 +4,13 @@ import com.lootfilters.LootFiltersPlugin;
 import lombok.Getter;
 import lombok.Setter;
 import net.runelite.api.gameval.ItemID;
-import net.runelite.api.Model;
-import net.runelite.api.Node;
 import net.runelite.api.Tile;
 import net.runelite.api.TileItem;
 import net.runelite.api.coords.WorldPoint;
 
 import java.time.Instant;
 
-public class PluginTileItem implements TileItem {
+public class PluginTileItem {
     private final TileItem item;
     @Getter private final String name;
     private final int gePrice;
@@ -69,20 +67,13 @@ public class PluginTileItem implements TileItem {
         return item.hashCode();
     }
 
-    @Override
     public int getQuantity() {
         return quantityOverride > -1 ? quantityOverride : item.getQuantity();
     }
 
-    @Override public int getId() { return item.getId(); }
-    @Override public int getVisibleTime() { return item.getVisibleTime(); }
-    @Override public int getDespawnTime() { return item.getDespawnTime(); }
-    @Override public int getOwnership() { return item.getOwnership(); }
-    @Override public boolean isPrivate() { return item.isPrivate(); }
-    @Override public Model getModel() { return item.getModel(); }
-    @Override public int getModelHeight() { return item.getModelHeight(); }
-    @Override public void setModelHeight(int i) { item.setModelHeight(i); }
-    @Override public Node getNext() { return item.getNext(); }
-    @Override public Node getPrevious() { return item.getPrevious(); }
-    @Override public long getHash() { return item.getHash(); }
+    public int getId() { return item.getId(); }
+    public int getVisibleTime() { return item.getVisibleTime(); }
+    public int getDespawnTime() { return item.getDespawnTime(); }
+    public int getOwnership() { return item.getOwnership(); }
+    public boolean isPrivate() { return item.isPrivate(); }
 }
