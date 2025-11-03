@@ -180,9 +180,9 @@ public class Parser {
                 case "color":
                     builder.textColor(assign[1].expectColor()); break;
                 case "backgroundColor":
-                    builder.backgroundColor(assign[1].expectColor(true)); break;
+                    builder.backgroundColor(assign[1].expectColor()); break;
                 case "borderColor":
-                    builder.borderColor(assign[1].expectColor(true)); break;
+                    builder.borderColor(assign[1].expectColor()); break;
                 case "hidden":
                     builder.hidden(assign[1].expectBoolean()); break;
                 case "showLootbeam":

@@ -53,8 +53,8 @@ public class Token {
         return value;
     }
 
-    public Color expectColor(boolean allowNil) {
-        if (allowNil && type == Type.NIL) {
+    public Color expectColor() {
+        if (type == Type.NIL) {
             return null;
         }
 
@@ -67,10 +67,6 @@ public class Token {
             throw new ParseException("unexpected non-color string", this);
         }
         return color;
-    }
-
-    public Color expectColor() {
-        return expectColor(false);
     }
 
     public boolean expectBoolean() {
