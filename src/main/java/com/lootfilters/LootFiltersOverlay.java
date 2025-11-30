@@ -154,7 +154,7 @@ public class LootFiltersOverlay extends Overlay {
                     }
                 }
 
-                var loc = LocalPoint.fromWorld(client.getTopLevelWorldView(), tile.getWorldLocation());
+                var loc = LocalPoint.fromWorld(tile.getItemLayer().getWorldView(), tile.getWorldLocation());
                 if (loc == null) {
                     continue;
                 }
@@ -249,7 +249,7 @@ public class LootFiltersOverlay extends Overlay {
             return -1;
         }
 
-        var loc = LocalPoint.fromWorld(client.getTopLevelWorldView(), tile.getWorldLocation());
+        var loc = LocalPoint.fromWorld(tile.getItemLayer().getWorldView(), tile.getWorldLocation());
         if (loc == null) {
             return -1;
         }
@@ -399,7 +399,7 @@ public class LootFiltersOverlay extends Overlay {
 
             var errs = "";
             var errno = 0;
-            var loc = LocalPoint.fromWorld(client.getTopLevelWorldView(), tile.getWorldLocation());
+            var loc = tile.getLocalLocation();
             if (loc == null) {
                 ++errno;
                 errs += "[LOC]";
@@ -591,8 +591,27 @@ public class LootFiltersOverlay extends Overlay {
         }
     }
 
-    private static boolean inRenderRange(Player player, Tile tile) {
-        return player.getLocalLocation().distanceTo(tile.getLocalLocation()) <= MAX_DISTANCE;
+    private boolean inRenderRange(Player player, Tile tile) {
+        var pLoc = player.getLocalLocation();
+        var tLoc = tile.getLocalLocation();
+        if (pLoc.getWorldView() == tLoc.getWorldView()) { // avoid transforming unless we absolutely must
+            return pLoc.distanceTo(tLoc) <= MAX_DISTANCE;
+        }
+
+        if (pLoc.getWorldView() != -1) {
+            pLoc = toTopLevel(client, pLoc);
+        }
+        if (tLoc.getWorldView() != -1) {
+            tLoc = toTopLevel(client, tLoc);
+        }
+        return pLoc.distanceTo(tLoc) <= MAX_DISTANCE;
+    }
+
+    private static LocalPoint toTopLevel(Client client, LocalPoint loc) {
+        return client.getTopLevelWorldView()
+                .worldEntities()
+                .byIndex(loc.getWorldView())
+                .transformToMainWorld(loc);
     }
 
     private static Point getCanvasImageLocation(@Nonnull Client client, @Nonnull LocalPoint localLocation, @Nonnull BufferedImage image, int zOffset) {

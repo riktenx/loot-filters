@@ -4,6 +4,7 @@ import com.lootfilters.DisplayConfig;
 import com.lootfilters.LootFiltersPlugin;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import net.runelite.api.WorldView;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,6 +24,10 @@ public class DisplayConfigIndex {
 
     public void remove(PluginTileItem item) {
         index.remove(item);
+    }
+
+    public void remove(WorldView worldView) {
+        index.keySet().removeIf(it -> it.getTile().getItemLayer().getWorldView().getId() == worldView.getId());
     }
 
     public int size() {

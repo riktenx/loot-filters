@@ -3,6 +3,7 @@ package com.lootfilters;
 import com.lootfilters.model.PluginTileItem;
 import net.runelite.api.Tile;
 import net.runelite.api.TileItem;
+import net.runelite.api.WorldView;
 import net.runelite.api.coords.WorldPoint;
 
 import java.util.ArrayList;
@@ -66,6 +67,11 @@ public class TileItemIndex {
             itemIndex.remove(tile);
             pointIndex.remove(tile.getWorldLocation());
         }
+    }
+
+    public void remove(WorldView worldView) {
+        itemIndex.keySet().removeIf(it -> it.getItemLayer().getWorldView().getId() == worldView.getId());
+        pointIndex.values().removeIf(it -> it.getItemLayer().getWorldView().getId() == worldView.getId());
     }
 
     public int pointIndexSize() {

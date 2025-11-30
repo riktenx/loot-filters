@@ -21,6 +21,7 @@ import net.runelite.api.events.ItemDespawned;
 import net.runelite.api.events.ItemQuantityChanged;
 import net.runelite.api.events.ItemSpawned;
 import net.runelite.api.events.MenuEntryAdded;
+import net.runelite.api.events.WorldViewUnloaded;
 import net.runelite.client.Notifier;
 import net.runelite.client.audio.AudioPlayer;
 import net.runelite.client.callback.ClientThread;
@@ -320,10 +321,11 @@ public class LootFiltersPlugin extends Plugin {
 	}
 
 	@Subscribe
-	public void onGameStateChanged(GameStateChanged event) {
-		if (event.getGameState() == GameState.LOADING) {
-			clearIndices();
-		}
+	public void onWorldViewUnloaded(WorldViewUnloaded event) {
+		tileItemIndex.remove(event.getWorldView());
+		lootbeamIndex.remove(event.getWorldView());
+		displayIndex.remove(event.getWorldView());
+		iconIndex.remove(event.getWorldView());
 	}
 
 	@Subscribe

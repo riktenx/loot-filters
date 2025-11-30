@@ -2,6 +2,7 @@ package com.lootfilters;
 
 import com.lootfilters.model.PluginTileItem;
 import lombok.AllArgsConstructor;
+import net.runelite.api.Client;
 import net.runelite.api.MenuAction;
 import net.runelite.api.MenuEntry;
 import net.runelite.api.coords.WorldPoint;
@@ -150,7 +151,7 @@ public class MenuEntryComposer {
     }
 
     private List<PluginTileItem> getItemsForEntry(MenuEntry entry) {
-        var wv = plugin.getClient().getTopLevelWorldView();
+        var wv = plugin.getClient().getWorldView(entry.getWorldViewId());
         var point = WorldPoint.fromScene(wv, entry.getParam0(), entry.getParam1(), wv.getPlane());
         return plugin.getTileItemIndex().findItem(point, entry.getIdentifier());
     }
