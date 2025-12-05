@@ -3,6 +3,7 @@ package com.lootfilters;
 import com.lootfilters.model.PluginTileItem;
 import lombok.AllArgsConstructor;
 import net.runelite.api.Tile;
+import net.runelite.api.WorldView;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -44,6 +45,18 @@ public class LootbeamIndex {
         if (beams.isEmpty()) {
             index.remove(tile);
         }
+    }
+
+    public void remove(WorldView worldView) {
+        for (var tile : index.keySet()) {
+            if (tile.getItemLayer().getWorldView().getId() == worldView.getId()) {
+                var beams = index.get(tile);
+                for (var beam : beams.values()) {
+                    beam.remove();
+                }
+            }
+        }
+        index.keySet().removeIf(it -> it.getItemLayer().getWorldView().getId() == worldView.getId());
     }
 
     public void clear() {
