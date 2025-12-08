@@ -1,17 +1,15 @@
 package com.lootfilters;
 
 import com.lootfilters.model.PluginTileItem;
-import lombok.AllArgsConstructor;
 import net.runelite.api.Tile;
 import net.runelite.api.WorldView;
 
+import javax.inject.Singleton;
 import java.util.HashMap;
 import java.util.Map;
 
-@AllArgsConstructor
+@Singleton
 public class LootbeamIndex {
-    private final LootFiltersPlugin plugin;
-
     private final Map<Tile, Map<PluginTileItem, Lootbeam>> index = new HashMap<>();
 
     public int size() {
@@ -69,7 +67,7 @@ public class LootbeamIndex {
         index.clear();
     }
 
-    public void reset() {
+    public void reset(LootFiltersPlugin plugin) {
         clear();
         for (var entry : plugin.getTileItemIndex().entrySet()) {
             var tile = entry.getKey();

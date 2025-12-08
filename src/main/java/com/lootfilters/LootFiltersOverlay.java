@@ -16,7 +16,6 @@ import net.runelite.api.Perspective;
 import net.runelite.api.gameval.ItemID;
 import net.runelite.api.Player;
 import net.runelite.api.Tile;
-import net.runelite.api.TileItem;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
@@ -53,7 +52,6 @@ public class LootFiltersOverlay extends Overlay {
     private static final int DEFAULT_IMAGE_HEIGHT = 32;
     private static final int DEFAULT_IMAGE_WIDTH = 36;
     private static final int MAX_DISTANCE = 24 * 128; // in LocalPoint units
-    private static final Color DEBUG_BG = new Color(0, 0, 0, 0x80);
 
     private final Client client;
     private final LootFiltersPlugin plugin;
@@ -74,10 +72,6 @@ public class LootFiltersOverlay extends Overlay {
 
     @Override
     public Dimension render(Graphics2D g) {
-        if (plugin.isDeveloperMode()) {
-            renderDebugOverlay(g);
-        }
-
         if (!plugin.isOverlayEnabled()) {
             return null;
         }
@@ -388,43 +382,6 @@ public class LootFiltersOverlay extends Overlay {
         }
         var text = String.join(displayType == DualValueDisplayType.COMPACT ? "/" : " ", parts);
         return displayType == DualValueDisplayType.COMPACT ? withParentheses(text) : text;
-    }
-
-    private void renderDebugOverlay(Graphics2D g) {
-        int itemCount = 0;
-        int screenY = 96;
-        for (var entry : plugin.getTileItemIndex().entrySet()) {
-            var tile = entry.getKey();
-            var items = entry.getValue();
-
-            var errs = "";
-            var errno = 0;
-            var loc = tile.getLocalLocation();
-            if (loc == null) {
-                ++errno;
-                errs += "[LOC]";
-            }
-            if (tile.getItemLayer() == null) {
-                ++errno;
-                errs += "[IL]";
-            }
-
-            var coords = tile.getWorldLocation().getX() + ", " + tile.getWorldLocation().getY();
-            var sz = items.size();
-            g.setColor(errno > 0 ? Color.RED : Color.WHITE);
-            g.drawString(coords + " " + sz + " " + errs, 0, screenY);
-
-
-            itemCount += sz;
-            screenY += 16;
-        }
-        g.setColor(DEBUG_BG);
-        g.fillRect(0, 18, 96, 64);
-        g.setColor(Color.WHITE);
-        g.drawString("items: " + itemCount + "," + plugin.getTileItemIndex().pointIndexSize(), 0, 32);
-        g.drawString("lootbeams: " + plugin.getLootbeamIndex().size(), 0, 48);
-        g.drawString("displays: " + plugin.getDisplayIndex().size(), 0, 64);
-        g.drawString("audio: " + plugin.getQueuedAudio().size() + ", icon: " + plugin.getIconIndex().size(), 0, 80);
     }
 
     private void renderDespawnTimer(Graphics2D g, DespawnTimerType type, PluginTileItem

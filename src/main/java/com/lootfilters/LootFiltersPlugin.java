@@ -96,10 +96,10 @@ public class LootFiltersPlugin extends Plugin {
 	private LootFiltersPanel pluginPanel;
 	private NavigationButton pluginPanelNav;
 
-	private final TileItemIndex tileItemIndex = new TileItemIndex();
-	private final LootbeamIndex lootbeamIndex = new LootbeamIndex(this);
-	private final DisplayConfigIndex displayIndex = new DisplayConfigIndex(this);
-	private final IconIndex iconIndex = new IconIndex(this);
+	@Inject private TileItemIndex tileItemIndex;
+	@Inject private LootbeamIndex lootbeamIndex;
+	@Inject private DisplayConfigIndex displayIndex;
+	@Inject private IconIndex iconIndex;
 
 	private final MenuEntryComposer menuEntryComposer = new MenuEntryComposer(this);
 	private final LootFilterManager filterManager = new LootFilterManager(this);
@@ -115,14 +115,6 @@ public class LootFiltersPlugin extends Plugin {
 	@Setter private int hoveredHighlight = -1;
 	@Setter private boolean hotkeyActive = false;
 	@Setter private boolean isOverlayEnabled = true;
-
-	@Inject @Named("developerMode") boolean developerMode;
-
-	@Getter private boolean debugEnabled = false;
-
-	public boolean isDeveloperMode() {
-		return developerMode && debugEnabled;
-	}
 
 	public String getSelectedFilterName() {
 		return configManager.getConfiguration(CONFIG_GROUP, SELECTED_FILTER_KEY);
@@ -166,8 +158,6 @@ public class LootFiltersPlugin extends Plugin {
 
 	@Override
 	protected void startUp() {
-		debugEnabled = !System.getProperty("com.lootfilters.debug", "").isBlank();
-
 		initPluginDirectory();
 		overlayManager.add(overlay);
 		infoBoxManager.addInfoBox(overlayStateIndicator);
@@ -304,10 +294,10 @@ public class LootFiltersPlugin extends Plugin {
 			queuedAudio.add(match.getSound());
 		}
 		if (match.getIcon() != null && !match.isCompact()) {
-			iconIndex.inc(match.getIcon(), item);
+			iconIndex.inc(this, match.getIcon(), item);
 		}
 		if(match.isCompact()){
-			iconIndex.inc(match.getIcon(), item,config.compactRenderSize());
+			iconIndex.inc(this, match.getIcon(), item,config.compactRenderSize());
 		}
 	}
 
@@ -382,9 +372,9 @@ public class LootFiltersPlugin extends Plugin {
 
 	private void resetDisplay() {
 		clientThread.invoke(() -> {
-			displayIndex.reset();
-			lootbeamIndex.reset();
-			iconIndex.reset();
+			displayIndex.reset(this);
+			lootbeamIndex.reset(this);
+			iconIndex.reset(this);
 		});
 	}
 

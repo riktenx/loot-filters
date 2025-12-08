@@ -4,20 +4,20 @@ import com.lootfilters.LootFiltersPlugin;
 import lombok.RequiredArgsConstructor;
 import net.runelite.api.WorldView;
 
+import javax.inject.Singleton;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
 
-@RequiredArgsConstructor
+@Singleton
 public class IconIndex {
-    private final LootFiltersPlugin plugin;
     private final Map<BufferedImageProvider.CacheKey, CacheEntry> index = new HashMap<>();
 
     public BufferedImage get(BufferedImageProvider.CacheKey key) {
         return index.containsKey(key) ? index.get(key).image : null;
     }
 
-    public void inc(BufferedImageProvider provider, PluginTileItem item, int... height) {
+    public void inc(LootFiltersPlugin plugin, BufferedImageProvider provider, PluginTileItem item, int... height) {
         index.compute(provider.getCacheKey(item, height), (k, entry) -> {
             if (entry == null) {
                 var newEntry = new CacheEntry(provider.getImage(plugin, item, height));
@@ -56,13 +56,13 @@ public class IconIndex {
         index.clear();
     }
 
-    public void reset() {
+    public void reset(LootFiltersPlugin plugin) {
         clear();
         for (var entry : plugin.getTileItemIndex().entrySet()) {
             for (var item : entry.getValue()) {
                 var match = plugin.getActiveFilter().findMatch(plugin, item);
                 if (match != null && match.getIcon() != null) {
-                    inc(match.getIcon(), item, match.isCompact() ? plugin.getConfig().compactRenderSize() : 16);
+                    inc(plugin, match.getIcon(), item, match.isCompact() ? plugin.getConfig().compactRenderSize() : 16);
                 }
             }
         }

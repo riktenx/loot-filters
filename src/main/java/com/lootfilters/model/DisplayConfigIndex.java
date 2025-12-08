@@ -2,16 +2,15 @@ package com.lootfilters.model;
 
 import com.lootfilters.DisplayConfig;
 import com.lootfilters.LootFiltersPlugin;
-import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import net.runelite.api.WorldView;
 
+import javax.inject.Singleton;
 import java.util.HashMap;
 import java.util.Map;
 
-@AllArgsConstructor
+@Singleton
 public class DisplayConfigIndex {
-    private final LootFiltersPlugin plugin;
     private final Map<PluginTileItem, DisplayConfig> index = new HashMap<>();
 
     public @NonNull DisplayConfig get(PluginTileItem item) {
@@ -38,7 +37,7 @@ public class DisplayConfigIndex {
         index.clear();
     }
 
-    public void reset() {
+    public void reset(LootFiltersPlugin plugin) {
         clear();
         for (var entry : plugin.getTileItemIndex().entrySet()) {
             for (var item : entry.getValue()) {

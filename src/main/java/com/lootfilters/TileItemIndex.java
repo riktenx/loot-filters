@@ -6,6 +6,8 @@ import net.runelite.api.TileItem;
 import net.runelite.api.WorldView;
 import net.runelite.api.coords.WorldPoint;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,6 +15,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Singleton
 public class TileItemIndex {
     private final Map<Tile, List<PluginTileItem>> itemIndex = new HashMap<>();
     private final Map<WorldPoint, Tile> pointIndex = new HashMap<>();
