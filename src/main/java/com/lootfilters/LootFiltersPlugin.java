@@ -294,7 +294,7 @@ public class LootFiltersPlugin extends Plugin {
 
 		displayIndex.put(item, match);
 		if (match.isShowLootbeam()) {
-			var beam = new Lootbeam(client, clientThread, tile.getWorldLocation(), match.getLootbeamColor(), Lootbeam.Style.MODERN);
+			var beam = new Lootbeam(config, client, clientThread, tile.getLocalLocation(), match.getLootbeamColor());
 			lootbeamIndex.put(tile, item, beam);
 		}
 		if (match.isNotify()) {
