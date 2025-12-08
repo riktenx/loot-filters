@@ -53,7 +53,7 @@ public class LootbeamIndex {
             if (tile.getItemLayer().getWorldView().getId() == worldView.getId()) {
                 var beams = index.get(tile);
                 for (var beam : beams.values()) {
-                    beam.remove();
+                    beam.setActive(false);
                 }
             }
         }
