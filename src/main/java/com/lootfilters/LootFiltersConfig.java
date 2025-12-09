@@ -324,6 +324,25 @@ public interface LootFiltersConfig extends Config {
     }
 
     @ConfigSection(
+            name = "Global filters",
+            description = "Configure global item filters.",
+            position = 9,
+            closedByDefault = true
+    )
+    String globalFilters = "globalFilters";
+
+    @ConfigItem(
+            keyName = "hideOtherBoatItems",
+            name = "Hide items on other boats",
+            description = "Hide the text overlay for all items on any boat that the player isn't on.",
+            section = globalFilters,
+            position = 0
+    )
+    default boolean hideOtherBoatItems() {
+        return false;
+    }
+
+    @ConfigSection(
             name = "Global hide/highlight",
             description = "Configure default lists of highlighted and hidden items. Values are case-insensitive, separated by comma. These lists are checked BEFORE the active filter.",
             position = 10,

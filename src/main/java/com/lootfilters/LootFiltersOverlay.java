@@ -13,6 +13,7 @@ import lombok.Setter;
 import lombok.Value;
 import net.runelite.api.Client;
 import net.runelite.api.Perspective;
+import net.runelite.api.WorldView;
 import net.runelite.api.gameval.ItemID;
 import net.runelite.api.Player;
 import net.runelite.api.Tile;
@@ -91,6 +92,13 @@ public class LootFiltersOverlay extends Overlay {
         for (var entry : plugin.getTileItemIndex().entrySet()) {
             var tile = entry.getKey();
             if (!inRenderRange(player, tile)) {
+                continue;
+            }
+
+            var tileWvId = tile.getLocalLocation().getWorldView();
+            if (config.hideOtherBoatItems()
+                    && tileWvId != WorldView.TOPLEVEL
+                    && client.getLocalPlayer().getWorldView().getId() != tileWvId) {
                 continue;
             }
 
