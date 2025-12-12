@@ -85,12 +85,21 @@ public class LootFiltersOverlay extends Overlay {
         var player = client.getLocalPlayer();
 
         for (var entry : plugin.getTileItemIndex().entrySet()) { // all tile draws have to go first so text is on top
-            if (inRenderRange(player, entry.getKey())) {
-                highlightTiles(g, entry.getKey(), entry.getValue());
+            var tile = entry.getKey();
+            if (tile.getItemLayer() == null) {
+                continue;
             }
+            if (!inRenderRange(player, tile)) {
+                continue;
+            }
+
+            highlightTiles(g, tile, entry.getValue());
         }
         for (var entry : plugin.getTileItemIndex().entrySet()) {
             var tile = entry.getKey();
+            if (tile.getItemLayer() == null) {
+                continue;
+            }
             if (!inRenderRange(player, tile)) {
                 continue;
             }
@@ -156,20 +165,12 @@ public class LootFiltersOverlay extends Overlay {
                     }
                 }
 
-                var loc = LocalPoint.fromWorld(tile.getItemLayer().getWorldView(), tile.getWorldLocation());
-                if (loc == null) {
-                    continue;
-                }
-                if (tile.getItemLayer() == null) {
-                    continue;
-                }
-
                 if (config.fontMode() == FontMode.PLUGIN) {
                     g.setFont(match.getFont());
                 } // otherwise we don't have to do anything, the font is already set
 
                 var displayText = buildDisplayText(item.getFirstItem(), item.getCounts().getCount(), item.getCounts().getQuantity(), match);
-                var textPoint = getCanvasTextLocation(client, g, loc, displayText, tile.getItemLayer().getHeight() + config.overlayZOffset());
+                var textPoint = getCanvasTextLocation(client, g, tile.getLocalLocation(), displayText, tile.getItemLayer().getHeight() + config.overlayZOffset());
                 if (textPoint == null) {
                     continue;
                 }

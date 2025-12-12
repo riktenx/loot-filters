@@ -26,7 +26,7 @@ public class DisplayConfigIndex {
     }
 
     public void remove(WorldView worldView) {
-        index.keySet().removeIf(it -> it.getTile().getItemLayer().getWorldView().getId() == worldView.getId());
+        index.keySet().removeIf(it -> it.getWorldView() == worldView.getId());
     }
 
     public int size() {

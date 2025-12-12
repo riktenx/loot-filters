@@ -73,8 +73,8 @@ public class TileItemIndex {
     }
 
     public void remove(WorldView worldView) {
-        itemIndex.keySet().removeIf(it -> it.getItemLayer().getWorldView().getId() == worldView.getId());
-        pointIndex.values().removeIf(it -> it.getItemLayer().getWorldView().getId() == worldView.getId());
+        itemIndex.keySet().removeIf(it -> it.getLocalLocation().getWorldView() == worldView.getId());
+        pointIndex.values().removeIf(it -> it.getLocalLocation().getWorldView() == worldView.getId());
     }
 
     public int pointIndexSize() {

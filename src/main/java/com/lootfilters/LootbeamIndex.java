@@ -48,14 +48,14 @@ public class LootbeamIndex {
 
     public void remove(WorldView worldView) {
         for (var tile : index.keySet()) {
-            if (tile.getItemLayer().getWorldView().getId() == worldView.getId()) {
+            if (tile.getLocalLocation().getWorldView() == worldView.getId()) {
                 var beams = index.get(tile);
                 for (var beam : beams.values()) {
                     beam.setActive(false);
                 }
             }
         }
-        index.keySet().removeIf(it -> it.getItemLayer().getWorldView().getId() == worldView.getId());
+        index.keySet().removeIf(it -> it.getLocalLocation().getWorldView() == worldView.getId());
     }
 
     public void clear() {
