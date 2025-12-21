@@ -3,6 +3,7 @@ package com.lootfilters;
 import com.lootfilters.lang.CompileException;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.ui.PluginPanel;
+import net.runelite.client.util.LinkBrowser;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -14,7 +15,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import java.awt.Color;
-import java.awt.Desktop;
 import java.awt.FlowLayout;
 import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
@@ -22,14 +22,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
-import java.net.URI;
 import java.util.List;
 import java.util.Map;
 
 import static com.lootfilters.util.TextUtil.quote;
 import static javax.swing.JOptionPane.showConfirmDialog;
-import static javax.swing.JOptionPane.showInputDialog;
-import static javax.swing.JOptionPane.showMessageDialog;
 
 @Slf4j
 public class LootFiltersPanel extends PluginPanel {
@@ -79,11 +76,7 @@ public class LootFiltersPanel extends PluginPanel {
         openFiltersite.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                try {
-                    Desktop.getDesktop().browse(URI.create("https://filterscape.xyz"));
-                } catch (Exception ex) {
-                    log.warn("open filterscape.xyz", ex);
-                }
+                LinkBrowser.browse("https://filterscape.xyz");
             }
         });
 
@@ -118,11 +111,7 @@ public class LootFiltersPanel extends PluginPanel {
 
         if (newSrc.startsWith("https://filterscape.xyz/import")) {
             plugin.addChatMessage("This is a link to import a filter on filterscape.xyz, taking you there now...");
-            try {
-                Desktop.getDesktop().browse(URI.create(newSrc + "&pluginRedirect=true"));
-            } catch (Exception ex) {
-                log.warn("open filterscape.xyz", ex);
-            }
+            LinkBrowser.browse(newSrc + "&pluginRedirect=true");
             return;
         }
 
@@ -206,11 +195,7 @@ public class LootFiltersPanel extends PluginPanel {
     }
 
     private void onBrowseFolder() {
-        try {
-            Desktop.getDesktop().open(LootFiltersPlugin.PLUGIN_DIRECTORY);
-        } catch (Exception e) {
-            log.warn("browse filters", e);
-        }
+        LinkBrowser.open(LootFiltersPlugin.PLUGIN_DIRECTORY.getAbsolutePath());
     }
 
     public void reflowFilterSelect(List<LootFilter> filters, String selected) {
