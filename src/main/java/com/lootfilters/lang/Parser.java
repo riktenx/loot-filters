@@ -48,6 +48,7 @@ import static com.lootfilters.lang.Token.Type.LIST_START;
 import static com.lootfilters.lang.Token.Type.LITERAL_INT;
 import static com.lootfilters.lang.Token.Type.LITERAL_STRING;
 import static com.lootfilters.lang.Token.Type.META;
+import static com.lootfilters.lang.Token.Type.NIL;
 import static com.lootfilters.lang.Token.Type.OP_AND;
 import static com.lootfilters.lang.Token.Type.OP_NOT;
 import static com.lootfilters.lang.Token.Type.OP_OR;
@@ -222,7 +223,7 @@ public class Parser {
         }
         tokens.takeExpect(BLOCK_END);
 
-        this.builder.addRule(new FilterRule(buildRule(rulesPostfix), builder.build(), isTerminal, sourceLine));
+        this.builder.addRule(new FilterRule(buildRule(rulesPostfix), builder, isTerminal, sourceLine));
     }
 
     private void unwindUnary(Stack<Token> operators, ArrayList<Condition> postfix) {
@@ -360,9 +361,16 @@ public class Parser {
         return new Token[]{ident, value};
     }
 
-    private void parseIcon(DisplayConfig.DisplayConfigBuilder builder) {
+    private void parseIcon(DisplayConfig.Builder builder) {
         tokens.takeExpect(IDENTIFIER);
         tokens.takeExpect(ASSIGN);
+        if (tokens.peek().is(NIL)) {
+            tokens.takeExpect(NIL);
+            tokens.takeExpect(STMT_END);
+            builder.icon(null);
+            return;
+        }
+
         var type = tokens.takeExpect(IDENTIFIER);
         var args = tokens.takeArgList();
         if (type.getValue().equals("Sprite")) {
