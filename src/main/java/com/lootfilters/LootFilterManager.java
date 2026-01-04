@@ -66,7 +66,7 @@ public class LootFilterManager {
 
 	public CompletableFuture<LootFilter> loadFilter() {
 		return CompletableFuture.supplyAsync(() -> {
-			var selected = plugin.getSelectedFilterFilename();
+			var selected = plugin.getSelectedFilter();
 			if (selected == null) {
 				return saveLoaded(LootFilter.Nop);
 			}

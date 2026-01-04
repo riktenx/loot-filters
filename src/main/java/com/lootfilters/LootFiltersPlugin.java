@@ -1,7 +1,6 @@
 package com.lootfilters;
 
 import com.google.gson.Gson;
-import com.google.inject.Injector;
 import com.google.inject.Provides;
 import com.lootfilters.migration.Migrate_1105_1106;
 import com.lootfilters.migration.Migrate_110_111;
@@ -11,7 +10,6 @@ import com.lootfilters.model.IconIndex;
 import com.lootfilters.model.PluginTileItem;
 import com.lootfilters.model.SoundProvider;
 import com.lootfilters.util.FilterUtil;
-import javax.swing.JOptionPane;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +23,6 @@ import net.runelite.api.events.ItemSpawned;
 import net.runelite.api.events.MenuEntryAdded;
 import net.runelite.api.events.WorldViewUnloaded;
 import net.runelite.client.Notifier;
-import net.runelite.client.RuneLite;
 import net.runelite.client.audio.AudioPlayer;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
@@ -121,11 +118,11 @@ public class LootFiltersPlugin extends Plugin {
 	@Setter private boolean hotkeyActive = false;
 	@Setter private boolean isOverlayEnabled = true;
 
-	public String getSelectedFilterFilename() {
+	public String getSelectedFilter() {
 		return configManager.getConfiguration(CONFIG_GROUP, SELECTED_FILTER_KEY);
 	}
 
-	public void setSelectedFilterFilename(String name) {
+	public void setSelectedFilter(String name) {
 		if (name != null) {
 			configManager.setConfiguration(CONFIG_GROUP, SELECTED_FILTER_KEY, name);
 			if (DefaultFilter.isDefaultFilter(name)) {
@@ -169,10 +166,14 @@ public class LootFiltersPlugin extends Plugin {
 		Migrate_1105_1106.run(this);
 		Migrate_110_111.run(this);
 
+		if (config.showDefaultFilters() && getSelectedFilter() == null) {
+			setSelectedFilter(config.getPreferredDefault());
+		}
 		filterManager.startUp().thenAccept(filter -> {
 			activeFilter = FilterUtil.withConfigRules(filter, config);
 
-			pluginPanel.reflowFilterSelect(filterManager.getFilenames(), getSelectedFilterFilename());
+			pluginPanel.reflowFilterSelect(filterManager.getFilenames(), getSelectedFilter());
+
 		});
 	}
 
@@ -218,33 +219,35 @@ public class LootFiltersPlugin extends Plugin {
 		}
 
 		if (event.getKey().equals(LootFiltersConfig.CONFIG_KEY_SHOW_DEFAULT_FILTERS)) {
+			filterManager.loadFiles();
+			var selected = getSelectedFilter();
 			if (!config.showDefaultFilters()) {
-				var selected = getSelectedFilterFilename();
 				if (DefaultFilter.isDefaultFilter(selected)) {
 					selected = null;
-					setSelectedFilterFilename(null);
+					setSelectedFilter(null);
 				}
-				pluginPanel.reflowFilterSelect(filterManager.getFilenames(), selected);
 			}
+			pluginPanel.reflowFilterSelect(filterManager.getFilenames(), selected);
 		}
 
 		if (event.getKey().equals(SELECTED_FILTER_KEY)) {
-			filterManager.loadFilter().thenAccept(filter -> {
-				activeFilter = FilterUtil.withConfigRules(filter, config);
+			var selected = getSelectedFilter();
+			if (DefaultFilter.isDefaultFilter(selected)) {
+				config.setPreferredDefault(selected);
+			}
 
-				if (DefaultFilter.isDefaultFilter(filter.getName())) {
-					addChatMessage("Loaded " + filter.getName() + ". Visit filterscape.xyz to configure it.");
-				}
-
-				resetDisplay();
-				pluginPanel.reflowFilterDescription();
-			});
+			filterManager.loadFilter().thenAccept(this::onSelectedFilterReloaded);
 		} else {
-			activeFilter = FilterUtil.withConfigRules(filterManager.getLoadedFilter(), config);
-
-			resetDisplay();
-			pluginPanel.reflowFilterDescription();
+			onSelectedFilterReloaded(filterManager.getLoadedFilter());
 		}
+	}
+
+	public void onSelectedFilterReloaded(LootFilter filter) {
+		activeFilter = FilterUtil.withConfigRules(filter, config);
+		pluginPanel.reflowFilterSelect(filterManager.getFilenames(), getSelectedFilter());
+		pluginPanel.reflowFilterDescription();
+
+		resetDisplay();
 	}
 
 	@Subscribe

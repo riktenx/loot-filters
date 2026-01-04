@@ -12,7 +12,7 @@ public class DefaultFilter {
     }
 
 	public static boolean isDefaultFilter(String name) {
-		return defaultFilters().contains(name);
+		return name != null && defaultFilters().contains(name);
 	}
 
 	public static LootFilter loadDefaultFilter(String name) {
