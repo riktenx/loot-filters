@@ -11,6 +11,7 @@ import com.lootfilters.model.IconIndex;
 import com.lootfilters.model.PluginTileItem;
 import com.lootfilters.model.SoundProvider;
 import com.lootfilters.util.FilterUtil;
+import javax.swing.JOptionPane;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;

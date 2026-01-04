@@ -21,10 +21,12 @@ public class Migrate_110_111 {
 		try {
 			new Migrate_110_111(plugin).run();
 		} catch (Exception e) {
-			JOptionPane.showMessageDialog(null, "[Loot Filters]: Encountered a problem when performing the v1.11 migration. " +
-				"Your settings and filters were not affected and the plugin should continue to operate as normal. " +
-				"You may need to re-select your filter in the plugin panel. " +
-				"This message will not be shown again.");
+			JOptionPane.showMessageDialog(null, "<html>" +
+				"[Loot Filters]: Encountered a problem when performing the v1.11 migration.<br/><br/>" +
+				"Your settings and filters were not affected and the plugin should continue to operate as normal.<br/>" +
+				"You may need to re-select your filter in the plugin panel.<br/><br/>" +
+				"This message will not be shown again." +
+				"</html>");
 			log.error("migrate 1.10 -> 1.11: {}{}", e.getMessage(), Arrays.toString(e.getStackTrace()));
 		}
 	}
