@@ -56,6 +56,7 @@ public class Migrate_110_111 {
 			if (filter.getName().equals(selected)) {
 				log.info("migrate 1.10 -> 1.11: {} maps to {}", filter.getName(), filename);
 				plugin.getConfigManager().setConfiguration(LootFiltersPlugin.CONFIG_GROUP, LootFiltersPlugin.SELECTED_FILTER_KEY, filename);
+				return;
 			}
 		}
 	}
