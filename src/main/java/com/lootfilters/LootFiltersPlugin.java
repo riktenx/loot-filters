@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.inject.Injector;
 import com.google.inject.Provides;
 import com.lootfilters.migration.Migrate_1105_1106;
+import com.lootfilters.migration.Migrate_133_140;
 import com.lootfilters.model.DisplayConfigIndex;
 import com.lootfilters.model.IconIndex;
 import com.lootfilters.model.PluginTileItem;
@@ -162,6 +163,7 @@ public class LootFiltersPlugin extends Plugin {
 
 		initPluginDirectory();
 
+		Migrate_133_140.run(this);
 		Migrate_1105_1106.run(this);
 
 		filterManager.startUp().thenAccept(filter -> {
