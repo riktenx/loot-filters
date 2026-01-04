@@ -38,7 +38,6 @@ import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.ui.overlay.infobox.InfoBoxManager;
-import okhttp3.OkHttpClient;
 
 import javax.inject.Inject;
 import java.io.File;
@@ -87,7 +86,6 @@ public class LootFiltersPlugin extends Plugin {
 	@Inject private ItemManager itemManager;
 	@Inject private Notifier notifier;
 	@Inject private SpriteManager spriteManager;
-	@Inject private OkHttpClient okHttpClient;
 	@Inject private AudioPlayer audioPlayer;
 	@Inject private InfoBoxManager infoBoxManager;
 
