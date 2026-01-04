@@ -16,7 +16,7 @@ public class Migrate_1105_1106 {
 
 		var preferredDefault = plugin.getConfig().getPreferredDefault();
 		if (preferredDefault != null && preferredDefault.equals(OLD_DEFAULT_NAME)) {
-			plugin.getConfig().setPreferredDefault(DefaultFilter.FILTERSCAPE.getName());
+			plugin.getConfig().setPreferredDefault(DefaultFilter.RIKTENS);
 		}
 	}
 }

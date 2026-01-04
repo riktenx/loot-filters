@@ -7,6 +7,7 @@ import com.lootfilters.lang.Preprocessor;
 import com.lootfilters.lang.Sources;
 import com.lootfilters.lang.TokenStream;
 import com.lootfilters.model.PluginTileItem;
+import java.util.concurrent.CompletableFuture;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
