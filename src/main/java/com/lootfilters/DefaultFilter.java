@@ -19,7 +19,7 @@ public class DefaultFilter {
 		var resource = name.equals(RIKTENS) ? "riktensfilter.rs2f" : "joesfilter.rs2f";
 		try {
 			var src = Sources.loadScriptResource(DefaultFilter.class, resource);
-			return LootFilter.fromSource(src);
+			return LootFilter.fromSource(name, src);
 		} catch (Exception e) {
 			return LootFilter.Nop;
 		}
