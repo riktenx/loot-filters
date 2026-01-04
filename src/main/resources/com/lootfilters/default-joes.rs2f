@@ -7,7 +7,7 @@ name: header
 /* Commit: 0327296 */
 meta {
     name = "[default: Joe's filter]";
-    description = "Offers an original color scheme with extensive support for category-based styling/filtering.";
+    description = "Offers an original color scheme with extensive support for category-based styling/filtering.<br><br>Configure on filterscape.xyz.";
 }
 
 /*@ define:module:default_styling

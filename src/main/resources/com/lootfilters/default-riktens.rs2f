@@ -4,6 +4,7 @@ name: header
 */
 meta {
   name = "[default: Rikten's filter]";
+  description = "A basic filter for main accounts.<br><br>Highlights valuable/rare<br>untradeables, hides junk.<br><br>Configure on filterscape.xyz.";
 }
 
 
