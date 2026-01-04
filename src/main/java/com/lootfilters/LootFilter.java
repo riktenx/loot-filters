@@ -7,7 +7,6 @@ import com.lootfilters.lang.Preprocessor;
 import com.lootfilters.lang.Sources;
 import com.lootfilters.lang.TokenStream;
 import com.lootfilters.model.PluginTileItem;
-import java.util.concurrent.CompletableFuture;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
@@ -20,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.lootfilters.lang.Location.UNKNOWN_SOURCE_NAME;
 import static com.lootfilters.util.TextUtil.normalizeCrlf;
 
 @Getter
@@ -72,9 +70,9 @@ public class LootFilter {
         return new Parser(postproc).parse();
     }
 
-    public static LootFilter fromSource(String source) throws CompileException {
-        return fromSourcesWithPreamble(Map.of(UNKNOWN_SOURCE_NAME, source));
-    }
+	public static LootFilter fromSource(String name, String source) throws CompileException {
+		return fromSourcesWithPreamble(Map.of(name, source));
+	}
 
     public Builder toBuilder() {
         var builder = new Builder();
