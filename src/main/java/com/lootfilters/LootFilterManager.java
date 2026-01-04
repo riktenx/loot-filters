@@ -1,95 +1,106 @@
 package com.lootfilters;
 
-import com.lootfilters.lang.CompileException;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.GameState;
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.Request;
-import okhttp3.Response;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.charset.MalformedInputException;
-import java.nio.file.Files;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 import static com.lootfilters.util.TextUtil.quote;
 
 @Slf4j
-@RequiredArgsConstructor
+@Singleton
 public class LootFilterManager {
-    private final LootFiltersPlugin plugin;
+	@Inject
+	private LootFiltersPlugin plugin;
 
-    private final ExecutorService httpDispatcher = Executors.newSingleThreadExecutor();
+	@Inject
+	private LootFiltersConfig config;
 
-    @Getter
-    private final List<LootFilter> defaultFilters = new ArrayList<>();
+	@Getter
+	private final List<String> filenames = new ArrayList<>();
 
-    public List<LootFilter> loadFilters() {
-        var filters = new ArrayList<LootFilter>();
-        var files = Arrays.stream(LootFiltersPlugin.FILTER_DIRECTORY.listFiles())
+	@Getter
+	private LootFilter loadedFilter;
+
+	public static String toFilename(String filterName) {
+		return filterName.replaceAll("[^a-zA-Z0-9._-]", "_") + ".rs2f";
+	}
+
+	public CompletableFuture<LootFilter> startUp() {
+		return reload();
+	}
+
+	public void shutDown() {
+		filenames.clear();
+		loadedFilter = null;
+	}
+
+	public CompletableFuture<LootFilter> reload() {
+		loadFiles();
+		return loadFilter();
+	}
+
+    public void loadFiles() {
+        var next = Arrays.stream(LootFiltersPlugin.FILTER_DIRECTORY.listFiles())
                 .filter(it -> !it.getName().startsWith("."))
+				.map(it -> it.getName())
                 .collect(Collectors.toList());
-        for (var file : files) {
-            String src;
-            try {
-                src = Files.readString(file.toPath());
-            } catch (MalformedInputException e) {
-                plugin.addChatMessage("Failed to load filter from " + quote(file.getName()) + " because it is not a valid text file.");
-                log.warn("read file {}", file.getName(), e);
-                continue;
-            } catch (Exception e) {
-                plugin.addChatMessage("Failed to load filter from " + quote(file.getName()) + ": " + e.getMessage());
-                log.warn("read file {}", file.getName(), e);
-                continue;
-            }
 
-            LootFilter filter;
-            try {
-                var parsed = LootFilter.fromSourcesWithPreamble(Map.of(file.getName(), src))
-                        .toBuilder()
-                        .setFilename(file.getName())
-                        .build();
-                if (parsed.getName() == null || parsed.getName().isBlank()) {
-                    parsed = parsed.toBuilder()
-                            .setName(file.getName())
-                            .build();
-                }
-
-                filter = parsed;
-            } catch (Exception e) {
-                plugin.addChatMessage("Failed to load filter from " + file.getName() + ": " + e.getMessage());
-                log.warn("parse file {}", file.getName(), e);
-                continue;
-            }
-
-            if (filters.stream().anyMatch(it -> it.getName().equals(filter.getName()))) {
-                log.warn("Duplicate filters found with name {}. Only the first one was loaded.", quote(filter.getName()));
-                continue;
-            }
-
-            filters.add(filter);
-        }
-
-        var hadErrors = filters.size() != files.size();
-        if (plugin.getClient().getGameState() == GameState.LOGGED_IN || hadErrors) {
-            plugin.addChatMessage(String.format("Loaded <col=%s>%d/%d</col> loot filters.",
-                    hadErrors ? "FF0000" : "00FF00", filters.size(), files.size()));
-        }
-        return filters;
+		filenames.clear();
+		if (config.showDefaultFilters()) {
+			filenames.addAll(DefaultFilter.defaultFilters());
+		}
+		filenames.addAll(next);
     }
 
-    public void saveNewFilter(String name, String src) throws IOException {
+	public CompletableFuture<LootFilter> loadFilter() {
+		return CompletableFuture.supplyAsync(() -> {
+			var selected = plugin.getSelectedFilterFilename();
+			if (selected == null) {
+				return saveLoaded(LootFilter.Nop);
+			}
+			if (DefaultFilter.isDefaultFilter(selected)) {
+				return saveLoaded(DefaultFilter.loadDefaultFilter(selected));
+			}
+
+			var file = new File(LootFiltersPlugin.FILTER_DIRECTORY, selected);
+			if (!file.exists()) {
+				return saveLoaded(LootFilter.Nop);
+			}
+
+			String src;
+			try {
+				src = Files.readString(file.toPath());
+			} catch (Exception e) {
+				return saveLoaded(LootFilter.Nop);
+			}
+
+			var filter = LootFilter.fromSourcesWithPreamble(Map.of(file.getName(), src))
+				.toBuilder()
+				.setFilename(file.getName())
+				.build();
+			if (filter.getName() == null || filter.getName().isBlank()) {
+				filter = filter.toBuilder()
+					.setName(file.getName())
+					.build();
+			}
+
+			return saveLoaded(filter);
+		});
+	}
+
+	public void createFilter(String name, String src) throws IOException {
         var sanitized = toFilename(name);
         var newFile = new File(LootFiltersPlugin.FILTER_DIRECTORY, toFilename(name));
         if (!newFile.createNewFile()) {
@@ -112,31 +123,8 @@ public class LootFilterManager {
         }
     }
 
-    public void fetchDefaultFilters(Runnable onComplete) {
-        httpDispatcher.execute(() -> {
-            for (var filter : DefaultFilter.all()) {
-                fetchDefaultFilter(filter);
-            }
-            onComplete.run();
-        });
-    }
-
-    public void fetchDefaultFilter(DefaultFilter filter) {
-        var req = new Request.Builder()
-                .get()
-                .url(filter.getUrl())
-                .addHeader("User-Agent", "github.com/riktenx/loot-filters")
-                .build();
-        try (var resp = plugin.getOkHttpClient().newCall(req).execute()) {
-            var src = resp.body().string();
-            var parsed = LootFilter.fromSource(src);
-            defaultFilters.add(parsed);
-        } catch (Exception e) { // there could be an issue w/ a filter, but just keep going and let other fetches complete
-            log.warn("Failed to fetch default filter {}", filter.getName(), e);
-        }
-    }
-
-    private static String toFilename(String filterName) {
-        return filterName.replaceAll("[^a-zA-Z0-9._-]", "_") + ".rs2f";
-    }
+	private LootFilter saveLoaded(LootFilter filter) {
+		loadedFilter = filter;
+		return filter;
+	}
 }

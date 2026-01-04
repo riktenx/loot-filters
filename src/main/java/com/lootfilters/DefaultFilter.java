@@ -1,23 +1,27 @@
 package com.lootfilters;
 
-import lombok.Value;
-
+import com.lootfilters.lang.Sources;
 import java.util.List;
 
-@Value
 public class DefaultFilter {
-    String name, url;
+    public static final String RIKTENS = "[default: Rikten's filter]";
+    public static final String JOES = "[default: Joe's filter]";
 
-    public static final DefaultFilter FILTERSCAPE = new DefaultFilter(
-            "[default: Rikten's filter]",
-            "https://raw.githubusercontent.com/riktenx/filterscape/refs/heads/main/default.rs2f"
-    );
-    public static final DefaultFilter JOESFILTER = new DefaultFilter(
-            "[default: Joe's filter]",
-            "https://raw.githubusercontent.com/typical-whack/loot-filters-modules/refs/heads/main/default-filter.rs2f"
-    );
-
-    public static List<DefaultFilter> all() {
-        return List.of(FILTERSCAPE, JOESFILTER);
+    public static List<String> defaultFilters() {
+        return List.of(RIKTENS, JOES);
     }
+
+	public static boolean isDefaultFilter(String name) {
+		return defaultFilters().contains(name);
+	}
+
+	public static LootFilter loadDefaultFilter(String name) {
+		var resource = name.equals(RIKTENS) ? "riktensfilter.rs2f" : "joesfilter.rs2f";
+		try {
+			var src = Sources.loadScriptResource(DefaultFilter.class, resource);
+			return LootFilter.fromSource(src);
+		} catch (Exception e) {
+			return LootFilter.Nop;
+		}
+	}
 }

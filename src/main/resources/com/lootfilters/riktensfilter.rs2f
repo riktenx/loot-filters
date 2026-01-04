@@ -1,0 +1,5873 @@
+/*@ define:module:header
+hidden: true
+name: header
+*/
+meta {
+  name = "[default: Rikten's filter]";
+}
+
+
+/*@ define:module:general
+name: General options
+*/
+
+/*@ define:group
+---
+name: Ownership filter
+*/
+
+#define CONST_AREA_COX [3200, 5120, 0, 3391, 5759, 3]
+#define CONST_AREA_TOB [3136, 4224, 0, 3327, 4479, 3]
+#define CONST_AREA_TOA [3520, 5120, 0, 3967, 5439, 3]
+#define CONST_AREA_RAID(_) (area:CONST_AREA_COX || area:CONST_AREA_TOB || area:CONST_AREA_TOA)
+#define CONST_TAKEABLE(_) (accountType:0 || !ownership:2)
+
+/*@ define:input:ownership
+type: boolean
+group: Ownership filter
+label: 'Hide untakeable items (no effect if account is non-ironman)'
+*/
+#define VAR_OWNERSHIP_HIDEOTHER true
+
+/*@ define:input:ownership
+type: boolean
+group: Ownership filter
+label: 'Hide world spawns (ignores raids)'
+*/
+#define VAR_OWNERSHIP_HIDESPAWN false
+
+/*@ define:input:ownership
+type: stringlist
+group: Ownership filter
+label: Ignore ownership value for these items
+*/
+#define VAR_OWNERSHIP_IGNORE ["Dawnbringer"]
+
+rule (!CONST_TAKEABLE(0) && VAR_OWNERSHIP_HIDEOTHER && !name:VAR_OWNERSHIP_IGNORE) {
+  hidden = true;
+}
+
+rule (!CONST_AREA_RAID(0) && VAR_OWNERSHIP_HIDESPAWN && ownership:0 && !name:VAR_OWNERSHIP_IGNORE) {
+  hidden = true;
+}
+
+/*@ define:group
+---
+name: Default style
+description: |
+  Global style defaults for items that don't match any other rules.
+*/
+
+/*@ define:input:defaults
+type: style
+group: Default style
+label: Default style
+*/
+#define VAR_DEFAULTS_STYLE hidden = false;
+
+apply (true) { VAR_DEFAULTS_STYLE }
+
+/*@ define:group
+---
+name: Custom highlight groups
+description: |
+  These are free-form highlight groups that you can configure as desired. Items
+  in these groups ignore everything else in this filter.
+expanded: false
+*/
+
+/*@ define:input
+type: stringlist
+label: Custom group 1
+group: Custom highlight groups
+*/
+#define VAR_HHGROUP_STRINGLIST_HIGHLIGHT1_ITEMS []
+
+/*@ define:input
+type: stringlist
+label: Custom group 2
+group: Custom highlight groups
+*/
+#define VAR_HHGROUP_STRINGLIST_HIGHLIGHT2_ITEMS []
+
+/*@ define:input
+type: stringlist
+label: Custom group 3
+group: Custom highlight groups
+*/
+#define VAR_HHGROUP_STRINGLIST_HIGHLIGHT3_ITEMS []
+
+/*@ define:input
+type: stringlist
+label: Custom group 4
+group: Custom highlight groups
+*/
+#define VAR_HHGROUP_STRINGLIST_HIGHLIGHT4_ITEMS []
+
+/*@ define:input
+type: stringlist
+label: Custom group 5
+group: Custom highlight groups
+*/
+#define VAR_GENERAL_ITEMS5 []
+
+/*@ define:input
+type: stringlist
+label: Custom group 6
+group: Custom highlight groups
+*/
+#define VAR_GENERAL_ITEMS6 []
+
+/*@ define:input
+type: style
+label: Custom group 1
+group: Custom highlight groups
+*/
+#define VAR_HHGROUP_STYLE_HIGHLIGHT1_STYLE hidden = false; textColor = "#ff0000";
+
+/*@ define:input
+type: style
+label: Custom group 2
+group: Custom highlight groups
+*/
+#define VAR_HHGROUP_STYLE_HIGHLIGHT2_STYLE hidden = false; textColor = "#00ff00";
+
+/*@ define:input
+type: style
+label: Custom group 3
+group: Custom highlight groups
+*/
+#define VAR_HHGROUP_STYLE_HIGHLIGHT3_STYLE hidden = false; textColor = "#0000ff";
+
+/*@ define:input
+type: style
+label: Custom group 4
+group: Custom highlight groups
+*/
+#define VAR_HHGROUP_STYLE_HIGHLIGHT4_STYLE hidden = false; textColor = "#00ffff";
+
+/*@ define:input
+type: style
+label: Custom group 5
+group: Custom highlight groups
+*/
+#define VAR_GENERAL_STYLE5 hidden = false; textColor = "#ff00ff";
+
+/*@ define:input
+type: style
+label: Custom group 6
+group: Custom highlight groups
+*/
+#define VAR_GENERAL_STYLE6 hidden = false; textColor = "#ffff00";
+
+rule (name:VAR_HHGROUP_STRINGLIST_HIGHLIGHT1_ITEMS) { VAR_HHGROUP_STYLE_HIGHLIGHT1_STYLE }
+rule (name:VAR_HHGROUP_STRINGLIST_HIGHLIGHT2_ITEMS) { VAR_HHGROUP_STYLE_HIGHLIGHT2_STYLE }
+rule (name:VAR_HHGROUP_STRINGLIST_HIGHLIGHT3_ITEMS) { VAR_HHGROUP_STYLE_HIGHLIGHT3_STYLE }
+rule (name:VAR_HHGROUP_STRINGLIST_HIGHLIGHT4_ITEMS) { VAR_HHGROUP_STYLE_HIGHLIGHT4_STYLE }
+rule (name:VAR_GENERAL_ITEMS5) { VAR_GENERAL_STYLE5 }
+rule (name:VAR_GENERAL_ITEMS6) { VAR_GENERAL_STYLE6 }
+
+
+/*@ define:module:hidejunk
+name: Junk filtering
+description: |
+  Filters junk items. This should generally eliminate the need for a massive
+  hide list in your plugin config.
+
+  All of these rules hide BY DEFAULT unless otherwise stated. Value rules and
+  other things can override them.
+*/
+
+/*@ define:group
+name: Equipment
+description: Will not hide defenders, boots, axes, or spears.
+expanded: true
+*/
+/*@ define:input
+type: boolean
+group: 'Equipment'
+label: 'Hide bronze equipment'
+*/
+#define VAR_JUNK_HIDE_EQUIP_BRONZE true
+
+#define CONST_JUNK_EQUIP_BRONZE ["Bronze dagger","Bronze mace","Bronze sword","Bronze longsword","Bronze scimitar","Bronze hasta","Bronze warhammer","Bronze battleaxe","Bronze claws","Bronze 2h sword","Bronze halberd","Bronze crossbow","Bronze bolts","Bronze arrow","Bronze brutal","Bronze dart","Bronze javelin","Bronze knife","Bronze med helm","Bronze full helm","Bronze chainbody","Bronze platebody","Bronze platelegs","Bronze plateskirt","Bronze sq shield","Bronze kiteshield","Bronze gloves"]
+apply (VAR_JUNK_HIDE_EQUIP_BRONZE && name:CONST_JUNK_EQUIP_BRONZE) { hidden = true; }
+/*@ define:input
+type: boolean
+group: 'Equipment'
+label: 'Hide iron equipment'
+*/
+#define VAR_JUNK_HIDE_EQUIP_IRON true
+
+#define CONST_JUNK_EQUIP_IRON ["Iron dagger","Iron mace","Iron sword","Iron longsword","Iron scimitar","Iron hasta","Iron warhammer","Iron battleaxe","Iron claws","Iron 2h sword","Iron halberd","Iron crossbow","Iron bolts","Iron arrow","Iron brutal","Iron dart","Iron javelin","Iron knife","Iron med helm","Iron full helm","Iron chainbody","Iron platebody","Iron platelegs","Iron plateskirt","Iron sq shield","Iron kiteshield","Iron gloves"]
+apply (VAR_JUNK_HIDE_EQUIP_IRON && name:CONST_JUNK_EQUIP_IRON) { hidden = true; }
+/*@ define:input
+type: boolean
+group: 'Equipment'
+label: 'Hide steel equipment'
+*/
+#define VAR_JUNK_HIDE_EQUIP_STEEL true
+
+#define CONST_JUNK_EQUIP_STEEL ["Steel dagger","Steel mace","Steel sword","Steel longsword","Steel scimitar","Steel hasta","Steel warhammer","Steel battleaxe","Steel claws","Steel 2h sword","Steel halberd","Steel crossbow","Steel bolts","Steel arrow","Steel brutal","Steel dart","Steel javelin","Steel knife","Steel med helm","Steel full helm","Steel chainbody","Steel platebody","Steel platelegs","Steel plateskirt","Steel sq shield","Steel kiteshield","Steel gloves"]
+apply (VAR_JUNK_HIDE_EQUIP_STEEL && name:CONST_JUNK_EQUIP_STEEL) { hidden = true; }
+/*@ define:input
+type: boolean
+group: 'Equipment'
+label: 'Hide black equipment'
+*/
+#define VAR_JUNK_HIDE_EQUIP_BLACK true
+
+#define CONST_JUNK_EQUIP_BLACK ["Black dagger","Black mace","Black sword","Black longsword","Black scimitar","Black warhammer","Black battleaxe","Black claws","Black 2h sword","Black halberd","Black brutal","Black dart","Black knife","Black med helm","Black full helm","Black chainbody","Black platebody","Black platelegs","Black plateskirt","Black sq shield","Black kiteshield","Black gloves","Elite black full helm","Elite black platebody","Elite black platelegs"]
+apply (VAR_JUNK_HIDE_EQUIP_BLACK && name:CONST_JUNK_EQUIP_BLACK) { hidden = true; }
+/*@ define:input
+type: boolean
+group: 'Equipment'
+label: 'Hide mithril equipment'
+*/
+#define VAR_JUNK_HIDE_EQUIP_MITHRIL true
+
+#define CONST_JUNK_EQUIP_MITHRIL ["Mithril dagger","Mithril mace","Mithril sword","Mithril longsword","Mithril scimitar","Mithril hasta","Mithril warhammer","Mithril battleaxe","Mithril claws","Mithril 2h sword","Mithril halberd","Mithril crossbow","Mithril bolts","Mithril arrow","Mithril brutal","Mithril dart","Mithril javelin","Mithril knife","Mithril med helm","Mithril full helm","Mithril chainbody","Mithril platebody","Mithril platelegs","Mithril plateskirt","Mithril sq shield","Mithril kiteshield","Mithril gloves"]
+apply (VAR_JUNK_HIDE_EQUIP_MITHRIL && name:CONST_JUNK_EQUIP_MITHRIL) { hidden = true; }
+/*@ define:input
+type: boolean
+group: 'Equipment'
+label: 'Hide adamant equipment'
+*/
+#define VAR_JUNK_HIDE_EQUIP_ADAMANT false
+
+#define CONST_JUNK_EQUIP_ADAMANT ["Adamant dagger","Adamant mace","Adamant sword","Adamant longsword","Adamant scimitar","Adamant hasta","Adamant warhammer","Adamant battleaxe","Adamant cane","Adamant claws","Adamant 2h sword","Adamant halberd","Adamant crossbow","Adamant bolts","Adamant arrow","Adamant brutal","Adamant dart","Adamant javelin","Adamant knife","Adamant med helm","Adamant full helm","Adamant chainbody","Adamant platebody","Adamant platelegs","Adamant plateskirt","Adamant sq shield","Adamant kiteshield","Adamant gloves"]
+apply (VAR_JUNK_HIDE_EQUIP_ADAMANT && name:CONST_JUNK_EQUIP_ADAMANT) { hidden = true; }
+/*@ define:input
+type: boolean
+group: 'Equipment'
+label: 'Hide rune equipment'
+*/
+#define VAR_JUNK_HIDE_EQUIP_RUNE false
+
+#define CONST_JUNK_EQUIP_RUNE ["Rune dagger","Rune mace","Rune sword","Rune longsword","Rune scimitar","Rune hasta","Rune warhammer","Rune battleaxe","Rune claws","Rune 2h sword","Rune halberd","Rune crossbow","Runite bolts","Rune arrow","Rune brutal","Rune dart","Rune javelin","Rune knife","Rune med helm","Rune full helm","Rune chainbody","Rune platebody","Rune platelegs","Rune plateskirt","Rune sq shield","Rune kiteshield","Rune gloves"]
+apply (VAR_JUNK_HIDE_EQUIP_RUNE && name:CONST_JUNK_EQUIP_RUNE) { hidden = true; }
+
+/*@ define:group
+name: Seeds
+expanded: true
+*/
+/*@ define:input
+type: boolean
+group: 'Seeds'
+label: 'Hide allotment seeds'
+*/
+#define VAR_JUNK_HIDE_SEED_ALLOTMENT true
+
+#define CONST_JUNK_SEED_ALLOTMENT ["Potato seed","Onion seed","Cabbage seed","Tomato seed","Sweetcorn seed","Strawberry seed","Watermelon seed","Snape grass seed"]
+apply (VAR_JUNK_HIDE_SEED_ALLOTMENT && name:CONST_JUNK_SEED_ALLOTMENT) { hidden = true; }
+/*@ define:input
+type: boolean
+group: 'Seeds'
+label: 'Hide flower seeds'
+*/
+#define VAR_JUNK_HIDE_SEED_FLOWER true
+
+#define CONST_JUNK_SEED_FLOWER ["Marigold seed","Rosemary seed","Nasturtium seed","Woad seed","Limpwurt seed","White lily seed"]
+apply (VAR_JUNK_HIDE_SEED_FLOWER && name:CONST_JUNK_SEED_FLOWER) { hidden = true; }
+/*@ define:input
+type: boolean
+group: 'Seeds'
+label: 'Hide hops seeds'
+*/
+#define VAR_JUNK_HIDE_SEED_HOPS true
+
+#define CONST_JUNK_SEED_HOPS ["Barley seed","Hammerstone seed","Asgarnian seed","Jute seed","Yanillian seed","Krandorian seed","Wildblood seed"]
+apply (VAR_JUNK_HIDE_SEED_HOPS && name:CONST_JUNK_SEED_HOPS) { hidden = true; }
+/*@ define:input
+type: boolean
+group: 'Seeds'
+label: 'Hide bush seeds'
+*/
+#define VAR_JUNK_HIDE_SEED_BUSH true
+
+#define CONST_JUNK_SEED_BUSH ["Redberry seed","Cadavaberry seed","Dwellberry seed","Jangerberry seed","Whiteberry seed","Poison ivy seed"]
+apply (VAR_JUNK_HIDE_SEED_BUSH && name:CONST_JUNK_SEED_BUSH) { hidden = true; }
+
+/*@ define:group
+name: Clue uniques
+*/
+/*@ define:input
+type: boolean
+group: 'Clue uniques'
+label: 'Hide beginner uniques'
+*/
+#define VAR_JUNK_HIDE_UNIQUE_CLUE_BEGINNER true
+
+#define CONST_JUNK_UNIQUE_CLUE_BEGINNER ["Mole slippers","Frog slippers","Bear feet","Demon feet","Jester cape","Shoulder parrot","Monk's robe top (t)","Monk's robe (t)","Amulet of defence (t)","Sandwich lady hat","Sandwich lady top","Sandwich lady bottom","Rune scimitar ornament kit (guthix)","Rune scimitar ornament kit (saradomin)","Rune scimitar ornament kit (zamorak)"]
+apply (VAR_JUNK_HIDE_UNIQUE_CLUE_BEGINNER && name:CONST_JUNK_UNIQUE_CLUE_BEGINNER) { hidden = true; }
+/*@ define:input
+type: boolean
+group: 'Clue uniques'
+label: 'Hide easy uniques'
+*/
+#define VAR_JUNK_HIDE_UNIQUE_CLUE_EASY true
+
+#define CONST_JUNK_UNIQUE_CLUE_EASY ["Willow comp bow","Amulet of magic (t)","Team cape zero","Team cape i","Team cape x","Cape of skulls","Golden chef's hat","Golden apron","Wooden shield (g)","Black full helm (t)","Black platebody (t)","Black platelegs (t)","Black plateskirt (t)","Black kiteshield (t)","Black full helm (g)","Black platebody (g)","Black platelegs (g)","Black plateskirt (g)","Black kiteshield (g)","Black shield (h1)","Black shield (h2)","Black shield (h3)","Black shield (h4)","Black shield (h5)","Black helm (h1)","Black helm (h2)","Black helm (h3)","Black helm (h4)","Black helm (h5)","Black platebody (h1)","Black platebody (h2)","Black platebody (h3)","Black platebody (h4)","Black platebody (h5)","Steel full helm (t)","Steel platebody (t)","Steel platelegs (t)","Steel plateskirt (t)","Steel kiteshield (t)","Steel full helm (g)","Steel platebody (g)","Steel platelegs (g)","Steel plateskirt (g)","Steel kiteshield (g)","Iron full helm (t)","Iron platebody (t)","Iron platelegs (t)","Iron plateskirt (t)","Iron kiteshield (t)","Iron full helm (g)","Iron platebody (g)","Iron platelegs (g)","Iron plateskirt (g)","Iron kiteshield (g)","Bronze full helm (t)","Bronze platebody (t)","Bronze platelegs (t)","Bronze plateskirt (t)","Bronze kiteshield (t)","Bronze full helm (g)","Bronze platebody (g)","Bronze platelegs (g)","Bronze plateskirt (g)","Bronze kiteshield (g)","Studded body (g)","Studded chaps (g)","Studded body (t)","Studded chaps (t)","Leather body (g)","Leather chaps (g)","Blue wizard hat (g)","Blue wizard robe (g)","Blue skirt (g)","Blue wizard hat (t)","Blue wizard robe (t)","Blue skirt (t)","Black wizard hat (g)","Black wizard robe (g)","Black skirt (g)","Black wizard hat (t)","Black wizard robe (t)","Black skirt (t)","Monk's robe top (g)","Monk's robe (g)","Saradomin robe top","Saradomin robe legs","Guthix robe top","Guthix robe legs","Zamorak robe top","Zamorak robe legs","Ancient robe top","Ancient robe legs","Armadyl robe top","Armadyl robe legs","Bandos robe top","Bandos robe legs","Bob's red shirt","Bob's green shirt","Bob's blue shirt","Bob's black shirt","Bob's purple shirt","Highwayman mask","Blue beret","Black beret","Red beret","White beret","A powdered wig","Beanie","Imp mask","Goblin mask","Sleeping cap","Flared trousers","Pantaloons","Black cane","Staff of bob the cat","Red elegant shirt","Red elegant blouse","Red elegant legs","Red elegant skirt","Green elegant shirt","Green elegant blouse","Green elegant legs","Green elegant skirt","Blue elegant shirt","Blue elegant blouse","Blue elegant legs","Blue elegant skirt","Amulet of power (t)","Ham joint","Rain bow"]
+apply (VAR_JUNK_HIDE_UNIQUE_CLUE_EASY && name:CONST_JUNK_UNIQUE_CLUE_EASY) { hidden = true; }
+/*@ define:input
+type: boolean
+group: 'Clue uniques'
+label: 'Hide medium uniques'
+*/
+#define VAR_JUNK_HIDE_UNIQUE_CLUE_MEDIUM false
+
+#define CONST_JUNK_UNIQUE_CLUE_MEDIUM ["Gnomish firelighter","Yew comp bow","Strength amulet (t)","Holy sandals","Spiked manacles","Climbing boots (g)","Adamant full helm (t)","Adamant platebody (t)","Adamant platelegs (t)","Adamant plateskirt (t)","Adamant kiteshield (t)","Adamant full helm (g)","Adamant platebody (g)","Adamant platelegs (g)","Adamant plateskirt (g)","Adamant kiteshield (g)","Adamant shield (h1)","Adamant shield (h2)","Adamant shield (h3)","Adamant shield (h4)","Adamant shield (h5)","Adamant helm (h1)","Adamant helm (h2)","Adamant helm (h3)","Adamant helm (h4)","Adamant helm (h5)","Adamant platebody (h1)","Adamant platebody (h2)","Adamant platebody (h3)","Adamant platebody (h4)","Adamant platebody (h5)","Mithril full helm (g)","Mithril platebody (g)","Mithril platelegs (g)","Mithril plateskirt (g)","Mithril kiteshield (g)","Mithril full helm (t)","Mithril platebody (t)","Mithril platelegs (t)","Mithril plateskirt (t)","Mithril kiteshield (t)","Green d'hide body (g)","Green d'hide body (t)","Green d'hide chaps (g)","Green d'hide chaps (t)","Saradomin mitre","Saradomin cloak","Guthix mitre","Guthix cloak","Zamorak mitre","Zamorak cloak","Ancient mitre","Ancient cloak","Ancient stole","Ancient crozier","Armadyl mitre","Armadyl cloak","Armadyl stole","Armadyl crozier","Bandos mitre","Bandos cloak","Bandos stole","Bandos crozier","Red boater","Green boater","Orange boater","Black boater","Blue boater","Pink boater","Purple boater","White boater","Red headband","Black headband","Brown headband","White headband","Blue headband","Gold headband","Pink headband","Green headband","Crier hat","Crier coat","Crier bell","Adamant cane","Arceuus banner","Piscarilius banner","Hosidius banner","Shayzien banner","Lovakengj banner","Cabbage round shield","Black unicorn mask","White unicorn mask","Cat mask","Penguin mask","Leprechaun hat","Black leprechaun hat","Wolf mask","Wolf cloak","Purple elegant shirt","Purple elegant blouse","Purple elegant legs","Purple elegant skirt","Black elegant shirt","White elegant blouse","Black elegant legs","White elegant skirt","Pink elegant shirt","Pink elegant blouse","Pink elegant legs","Pink elegant skirt","Gold elegant shirt","Gold elegant blouse","Gold elegant legs","Gold elegant skirt","Gnomish firelighter"]
+apply (VAR_JUNK_HIDE_UNIQUE_CLUE_MEDIUM && name:CONST_JUNK_UNIQUE_CLUE_MEDIUM) { hidden = true; }
+/*@ define:input
+type: boolean
+group: 'Clue uniques'
+label: 'Hide hard uniques'
+*/
+#define VAR_JUNK_HIDE_UNIQUE_CLUE_HARD false
+
+#define CONST_JUNK_UNIQUE_CLUE_HARD ["Magic comp bow","Amulet of glory (t4)","Robin hood hat","Enchanted hat","Enchanted top","Enchanted robe","Dragon boots ornament kit","Rune full helm (t)","Rune platebody (t)","Rune platelegs (t)","Rune plateskirt (t)","Rune kiteshield (t)","Rune full helm (g)","Rune platebody (g)","Rune platelegs (g)","Rune plateskirt (g)","Rune kiteshield (g)","Rune shield (h1)","Rune shield (h2)","Rune shield (h3)","Rune shield (h4)","Rune shield (h5)","Rune helm (h1)","Rune helm (h2)","Rune helm (h3)","Rune helm (h4)","Rune helm (h5)","Rune platebody (h1)","Rune platebody (h2)","Rune platebody (h3)","Rune platebody (h4)","Rune platebody (h5)","Zamorak full helm","Zamorak platebody","Zamorak platelegs","Zamorak plateskirt","Zamorak kiteshield","Guthix full helm","Guthix platebody","Guthix platelegs","Guthix plateskirt","Guthix kiteshield","Saradomin full helm","Saradomin platebody","Saradomin platelegs","Saradomin plateskirt","Saradomin kiteshield","Ancient full helm","Ancient platebody","Ancient platelegs","Ancient plateskirt","Ancient kiteshield","Armadyl full helm","Armadyl platebody","Armadyl platelegs","Armadyl plateskirt","Armadyl kiteshield","Bandos full helm","Bandos platebody","Bandos platelegs","Bandos plateskirt","Bandos kiteshield","Red d'hide body (g)","Red d'hide body (t)","Red d'hide chaps (g)","Red d'hide chaps (t)","Blue d'hide body (g)","Blue d'hide body (t)","Blue d'hide chaps (g)","Blue d'hide chaps (t)","Saradomin coif","Saradomin d'hide body","Saradomin chaps","Saradomin bracers","Saradomin d'hide shield","Guthix coif","Guthix d'hide body","Guthix chaps","Guthix bracers","Guthix d'hide shield","Zamorak coif","Zamorak d'hide body","Zamorak chaps","Zamorak bracers","Zamorak d'hide shield","Bandos coif","Bandos d'hide body","Bandos chaps","Bandos bracers","Bandos d'hide shield","Armadyl coif","Armadyl d'hide body","Armadyl chaps","Armadyl bracers","Armadyl d'hide shield","Ancient coif","Ancient d'hide body","Ancient chaps","Ancient bracers","Ancient d'hide shield","Saradomin stole","Saradomin crozier","Guthix stole","Guthix crozier","Zamorak stole","Zamorak crozier","Zombie head (Treasure Trails)","Cyclops head","Pirate's hat","Red cavalier","White cavalier","Navy cavalier","Tan cavalier","Dark cavalier","Black cavalier","Pith helmet","Explorer backpack","Green dragon mask","Blue dragon mask","Red dragon mask","Black dragon mask","Nunchaku","Rune cane","Dual sai","Thieving bag","Rune defender ornament kit","Berserker necklace ornament kit","Tzhaar-ket-om ornament kit"]
+apply (VAR_JUNK_HIDE_UNIQUE_CLUE_HARD && name:CONST_JUNK_UNIQUE_CLUE_HARD) { hidden = true; }
+/*@ define:input
+type: boolean
+group: 'Clue uniques'
+label: 'Hide elite uniques'
+*/
+#define VAR_JUNK_HIDE_UNIQUE_CLUE_ELITE false
+
+#define CONST_JUNK_UNIQUE_CLUE_ELITE ["Dragon full helm ornament kit","Dragon chainbody ornament kit","Dragon legs/skirt ornament kit","Dragon sq shield ornament kit","Dragon scimitar ornament kit","Fury ornament kit","Light infinity colour kit","Dark infinity colour kit","Royal crown","Royal gown top","Royal gown bottom","Royal sceptre","Musketeer hat","Musketeer tabard","Musketeer pants","Black d'hide body (g)","Black d'hide body (t)","Black d'hide chaps (g)","Black d'hide chaps (t)","Rangers' tunic","Ranger gloves","Holy wraps","Bronze dragon mask","Iron dragon mask","Steel dragon mask","Mithril dragon mask","Adamant dragon mask","Rune dragon mask","Arceuus scarf","Hosidius scarf","Lovakengj scarf","Piscarilius scarf","Shayzien scarf","Katana","Dragon cane","Bucket helm","Blacksmith's helm","Deerstalker","Afro","Big pirate hat","Top hat","Monocle","Briefcase","Sagacious spectacles","Dark bow tie","Dark tuxedo jacket","Dark tuxedo cuffs","Dark trousers","Dark tuxedo shoes","Light bow tie","Light tuxedo jacket","Light tuxedo cuffs","Light trousers","Light tuxedo shoes","Rangers' tights","Uri's hat","Giant boot","Fremennik kilt"]
+apply (VAR_JUNK_HIDE_UNIQUE_CLUE_ELITE && name:CONST_JUNK_UNIQUE_CLUE_ELITE) { hidden = true; }
+/*@ define:input
+type: boolean
+group: 'Clue uniques'
+label: 'Hide master uniques'
+*/
+#define VAR_JUNK_HIDE_UNIQUE_CLUE_MASTER false
+
+#define CONST_JUNK_UNIQUE_CLUE_MASTER ["Occult ornament kit","Torture ornament kit","Anguish ornament kit","Tormented ornament kit","Dragon defender ornament kit","Dragon kiteshield ornament kit","Dragon platebody ornament kit","Hood of darkness","Robe top of darkness","Gloves of darkness","Robe bottom of darkness","Boots of darkness","Samurai kasa","Samurai shirt","Samurai gloves","Samurai greaves","Arceuus hood","Hosidius hood","Lovakengj hood","Piscarilius hood","Shayzien hood","Old demon mask","Lesser demon mask","Greater demon mask","Black demon mask","Jungle demon mask","Left eye patch","Bowl wig","Ale of the gods","Obsidian cape (r)","Fancy tiara","Half moon spectacles","Armadyl godsword ornament kit","Bandos godsword ornament kit","Saradomin godsword ornament kit","Zamorak godsword ornament kit","Ankou mask","Ankou top","Ankou gloves","Ankou's leggings","Ankou socks","Mummy's head","Mummy's body","Mummy's hands","Mummy's legs","Mummy's feet"]
+apply (VAR_JUNK_HIDE_UNIQUE_CLUE_MASTER && name:CONST_JUNK_UNIQUE_CLUE_MASTER) { hidden = true; }
+
+/*@ define:group
+name: Misc
+*/
+
+/*@ define:input
+type: stringlist
+group: Misc
+label: Hide these items
+*/
+#define VAR_HIDES_HIDEBYDEFAULT [  "Vial", "Bucket", "Jug", "Beer glass",  "Vial of water", "Bucket of water", "Jug of water",  "Bones", "Big bones", "Ashes",  "Seaweed", "Broken arrow",  "Empty plant pot", "Weeds",  ]
+apply (name:VAR_HIDES_HIDEBYDEFAULT) { hidden = true; }
+
+
+/*@ define:module:slayer
+name: 'PvM: slayer'
+description: |
+  Provides per-monster filtering for common slayer tasks. Defaults are being added over time.
+
+  Please contact Rikten X in the filterscape discord if:
+  * this section is missing a mob you'd like to see
+  * the filter isn't working for a specific mob
+*/
+
+
+/*@ define:group
+name: Bloodveld
+description: |
+  Includes Mutated bloodvelds.
+*/
+
+#define CONST_AREA_BLOODVELD0 [2845,5283,0,2935,5362,0] // [[God Wars Dungeon]]
+#define CONST_AREA_BLOODVELD1 [3588,9735,0,3600,9750,0] // [[Meiyerditch Laboratories]]
+#define CONST_AREA_BLOODVELD2 [3403,9929,3,3423,9949,3] // [[Slayer Tower]] (basement)
+#define CONST_AREA_BLOODVELD3 [2434,9817,0,2489,9834,0] // [[Stronghold Slayer Cave]]
+#define CONST_AREA_BLOODVELD4 [2950,10085,0,2968,10101,0] // [[Wilderness God Wars Dungeon]]
+#define CONST_AREA_BLOODVELD5 [3230,12414,0,3256,12443,0] // [[Iorwerth Dungeon]]
+#define CONST_AREA_BLOODVELD6 [3404,3556,1,3429,3579,1] // Slayer tower (upstairs)
+#define CONST_AREA_BLOODVELD7 [1685,10005,0,1698,10026,0] // kourend1
+#define CONST_AREA_BLOODVELD8 [1669,10069,0,1687,10080,0] // kourend2
+#define CONST_AREA_BLOODVELD9 [1622,10023,0,1641,10040,0] // kourend3
+#define CONST_BLOODVELD_RULE(_cond) rule ((area:CONST_AREA_BLOODVELD0 || \
+  area:CONST_AREA_BLOODVELD1 || \
+  area:CONST_AREA_BLOODVELD2 || \
+  area:CONST_AREA_BLOODVELD3 || \
+  area:CONST_AREA_BLOODVELD4 || \
+  area:CONST_AREA_BLOODVELD5 || \
+  area:CONST_AREA_BLOODVELD6 || \
+  area:CONST_AREA_BLOODVELD7 || \
+  area:CONST_AREA_BLOODVELD8 || \
+  area:CONST_AREA_BLOODVELD9) && (_cond))
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: 100%'
+group: Bloodveld
+enum: ["Vile ashes"]
+*/
+#define VAR_BLOODVELD_ENUMLIST_FILTER_100 []
+CONST_BLOODVELD_RULE (name:VAR_BLOODVELD_ENUMLIST_FILTER_100) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Weapons and armour'
+group: Bloodveld
+enum: ["Steel axe","Steel full helm","Steel scimitar","Black boots","Mithril sq shield","Mithril chainbody","Rune med helm","Mithril full helm","Mithril battleaxe","Black med helm","Mithril axe","Adamant knife","Adamant chainbody","Adamant scimitar","Mithril platebody","Adamant longsword","Rune dagger","Rune battleaxe"]
+*/
+#define VAR_BLOODVELD_ENUMLIST_FILTER_WEAPONSANDARMOUR ["Steel axe","Steel full helm","Steel scimitar","Mithril sq shield","Mithril chainbody"]
+CONST_BLOODVELD_RULE (name:VAR_BLOODVELD_ENUMLIST_FILTER_WEAPONSANDARMOUR) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Runes'
+group: Bloodveld
+enum: ["Fire rune","Blood rune","Air rune","Soul rune"]
+*/
+#define VAR_BLOODVELD_ENUMLIST_FILTER_RUNES []
+CONST_BLOODVELD_RULE (name:VAR_BLOODVELD_ENUMLIST_FILTER_RUNES) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Coins'
+group: Bloodveld
+enum: ["Coins"]
+*/
+#define VAR_BLOODVELD_ENUMLIST_FILTER_COINS []
+CONST_BLOODVELD_RULE (name:VAR_BLOODVELD_ENUMLIST_FILTER_COINS) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Other'
+group: Bloodveld
+enum: ["Bones","Big bones","Gold ore","Meat pizza","Coins","Bow string","Meat pie","Mithril bar","Ruby amulet"]
+*/
+#define VAR_BLOODVELD_ENUMLIST_FILTER_OTHER ["Bones","Meat pizza"]
+CONST_BLOODVELD_RULE (name:VAR_BLOODVELD_ENUMLIST_FILTER_OTHER) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Tertiary'
+group: Bloodveld
+enum: ["Clue scroll (elite)","Reward casket (elite)","Looting bag","Ensouled bloodveld head","Brimstone key","Crystal shard"]
+*/
+#define VAR_BLOODVELD_ENUMLIST_FILTER_TERTIARY []
+CONST_BLOODVELD_RULE (name:VAR_BLOODVELD_ENUMLIST_FILTER_TERTIARY) {
+  hidden = true;
+}
+
+
+/*@ define:input
+type: boolean
+group: Kurask
+label: Hide non-10k coin drops
+*/
+#define VAR_KURASK_BOOLEAN_HIDESMALLCOINS true
+CONST_KURASK_RULE (VAR_KURASK_BOOLEAN_HIDESMALLCOINS && name:"Coins" && value:<10_000) {
+  hidden = true;
+}
+
+
+#define CONST_AREA_KURASK0 [2694,9992,0,2701,10001,0] // [[Fremennik Slayer Dungeon]] {{Fairycode|AJR}}
+#define CONST_AREA_KURASK1 [2696,9959,0,2716,9977,0] // [[Fremennik Slayer Dungeon]] ([[Slayer task]] only)
+#define CONST_AREA_KURASK2 [3208,12357,0,3258,12389,0] // [[Iorwerth Dungeon]]
+#define CONST_KURASK_RULE(_cond) rule ((area:CONST_AREA_KURASK0 || \
+  area:CONST_AREA_KURASK1 || \
+  area:CONST_AREA_KURASK2) && (_cond))
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: 100%'
+group: Kurask
+enum: ["Bones"]
+*/
+#define VAR_KURASK_ENUMLIST_FILTER_100 ["Bones"]
+CONST_KURASK_RULE (name:VAR_KURASK_ENUMLIST_FILTER_100) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Weapons and armour'
+group: Kurask
+enum: ["Mithril kiteshield","Rune longsword","Adamant platebody","Rune axe","Leaf-bladed sword","Mystic robe top (light)","Leaf-bladed battleaxe"]
+*/
+#define VAR_KURASK_ENUMLIST_FILTER_WEAPONSANDARMOUR ["Mithril kiteshield"]
+CONST_KURASK_RULE (name:VAR_KURASK_ENUMLIST_FILTER_WEAPONSANDARMOUR) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Runes'
+group: Kurask
+enum: ["Nature rune"]
+*/
+#define VAR_KURASK_ENUMLIST_FILTER_RUNES []
+CONST_KURASK_RULE (name:VAR_KURASK_ENUMLIST_FILTER_RUNES) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Seeds'
+group: Kurask
+enum: ["Limpwurt seed"]
+*/
+#define VAR_KURASK_ENUMLIST_FILTER_SEEDS []
+CONST_KURASK_RULE (name:VAR_KURASK_ENUMLIST_FILTER_SEEDS) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Other'
+group: Kurask
+enum: ["Coins","Flax","White berries","Papaya fruit","Coconut","Big bones"]
+*/
+#define VAR_KURASK_ENUMLIST_FILTER_OTHER ["Flax"]
+CONST_KURASK_RULE (name:VAR_KURASK_ENUMLIST_FILTER_OTHER) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Tertiary'
+group: Kurask
+enum: ["Crystal shard","Brimstone key","Kurask head"]
+*/
+#define VAR_KURASK_ENUMLIST_FILTER_TERTIARY []
+CONST_KURASK_RULE (name:VAR_KURASK_ENUMLIST_FILTER_TERTIARY) {
+  hidden = true;
+}
+
+
+/*@ define:group
+name: Nechryael
+description: |
+  Includes Greater nechryaels.
+*/
+
+#define CONST_AREA_NECHRYAEL0 [3433,3560,2,3449,3574,2] // [[Slayer Tower]] Top Floor
+#define CONST_AREA_NECHRYAEL1 [3403,9954,3,3424,9971,3] // [[Slayer Tower]] Basement
+#define CONST_AREA_NECHRYAEL2 [1691,10078,0,1709,10085,0] // [[Catacombs of Kourend]]
+#define CONST_AREA_NECHRYAEL3 [3218,12417,0,3234,12461,0] // [[Iorwerth Dungeon]]
+#define CONST_AREA_NECHRYAEL4 [3332,10101,0,3341,10114,0] // [[Wilderness Slayer Cave]]
+#define CONST_NECHRYAEL_RULE(_cond) rule ((area:CONST_AREA_NECHRYAEL0 || \
+  area:CONST_AREA_NECHRYAEL1 || \
+  area:CONST_AREA_NECHRYAEL2 || \
+  area:CONST_AREA_NECHRYAEL3 || \
+  area:CONST_AREA_NECHRYAEL4) && (_cond))
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: 100%'
+group: Nechryael
+enum: ["Malicious ashes"]
+*/
+#define VAR_NECHRYAEL_ENUMLIST_FILTER_100 []
+CONST_NECHRYAEL_RULE (name:VAR_NECHRYAEL_ENUMLIST_FILTER_100) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Weapons and armour'
+group: Nechryael
+enum: ["Adamant platelegs","Rune 2h sword","Rune full helm","Adamant kiteshield","Rune boots","Rune axe","Rune sq shield","Adamant battleaxe","Rune med helm","Mystic air staff","Rune chainbody"]
+*/
+#define VAR_NECHRYAEL_ENUMLIST_FILTER_WEAPONSANDARMOUR []
+CONST_NECHRYAEL_RULE (name:VAR_NECHRYAEL_ENUMLIST_FILTER_WEAPONSANDARMOUR) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Runes'
+group: Nechryael
+enum: ["Chaos rune","Death rune","Law rune","Blood rune","Air rune","Soul rune"]
+*/
+#define VAR_NECHRYAEL_ENUMLIST_FILTER_RUNES []
+CONST_NECHRYAEL_RULE (name:VAR_NECHRYAEL_ENUMLIST_FILTER_RUNES) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Seeds'
+group: Nechryael
+enum: ["Limpwurt seed"]
+*/
+#define VAR_NECHRYAEL_ENUMLIST_FILTER_SEEDS []
+CONST_NECHRYAEL_RULE (name:VAR_NECHRYAEL_ENUMLIST_FILTER_SEEDS) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Coins'
+group: Nechryael
+enum: ["Coins"]
+*/
+#define VAR_NECHRYAEL_ENUMLIST_FILTER_COINS []
+CONST_NECHRYAEL_RULE (name:VAR_NECHRYAEL_ENUMLIST_FILTER_COINS) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Other'
+group: Nechryael
+enum: ["Soft clay","Tuna","Lobster","Coins","Gold bar","Wine of zamorak"]
+*/
+#define VAR_NECHRYAEL_ENUMLIST_FILTER_OTHER []
+CONST_NECHRYAEL_RULE (name:VAR_NECHRYAEL_ENUMLIST_FILTER_OTHER) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Tertiary'
+group: Nechryael
+enum: ["Brimstone key","Crystal shard","Looting bag"]
+*/
+#define VAR_NECHRYAEL_ENUMLIST_FILTER_TERTIARY []
+CONST_NECHRYAEL_RULE (name:VAR_NECHRYAEL_ENUMLIST_FILTER_TERTIARY) {
+  hidden = true;
+}
+
+
+#define CONST_AREA_VYRE0 [3592,3324,0,3648,3389,0] // [[Darkmeyer]]
+#define CONST_VYRE_RULE(_cond) rule ((area:CONST_AREA_VYRE0) && (_cond))
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: 100%'
+group: Vyre
+enum: ["Vampyre dust"]
+*/
+#define VAR_VYRE_ENUMLIST_FILTER_100 []
+CONST_VYRE_RULE (name:VAR_VYRE_ENUMLIST_FILTER_100) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Weapons and armour'
+group: Vyre
+enum: ["Rune dagger","Adamant platelegs","Adamant platebody","Rune full helm","Rune kiteshield"]
+*/
+#define VAR_VYRE_ENUMLIST_FILTER_WEAPONSANDARMOUR []
+CONST_VYRE_RULE (name:VAR_VYRE_ENUMLIST_FILTER_WEAPONSANDARMOUR) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Runes and ammunition'
+group: Vyre
+enum: ["Death rune","Blood rune","Nature rune","Rune arrow","Rune javelin"]
+*/
+#define VAR_VYRE_ENUMLIST_FILTER_RUNESANDAMMUNITION []
+CONST_VYRE_RULE (name:VAR_VYRE_ENUMLIST_FILTER_RUNESANDAMMUNITION) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Bolt tips'
+group: Vyre
+enum: ["Opal bolt tips","Jade bolt tips","Topaz bolt tips","Pearl bolt tips","Sapphire bolt tips","Emerald bolt tips","Ruby bolt tips","Diamond bolt tips","Dragonstone bolt tips","Onyx bolt tips"]
+*/
+#define VAR_VYRE_ENUMLIST_FILTER_BOLTTIPS []
+CONST_VYRE_RULE (name:VAR_VYRE_ENUMLIST_FILTER_BOLTTIPS) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Materials'
+group: Vyre
+enum: ["Bark","Coal","Runite bar","Yew logs","Runite ore"]
+*/
+#define VAR_VYRE_ENUMLIST_FILTER_MATERIALS []
+CONST_VYRE_RULE (name:VAR_VYRE_ENUMLIST_FILTER_MATERIALS) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Coins'
+group: Vyre
+enum: ["Coins"]
+*/
+#define VAR_VYRE_ENUMLIST_FILTER_COINS []
+CONST_VYRE_RULE (name:VAR_VYRE_ENUMLIST_FILTER_COINS) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Tertiary'
+group: Vyre
+enum: ["Brimstone key"]
+*/
+#define VAR_VYRE_ENUMLIST_FILTER_TERTIARY []
+CONST_VYRE_RULE (name:VAR_VYRE_ENUMLIST_FILTER_TERTIARY) {
+  hidden = true;
+}
+
+
+#define CONST_AREA_ABERRANTSPECTRE0 [3411,3534,1,3442,3551,1] // [[Slayer Tower]] ({{FloorNumber|uk
+#define CONST_AREA_ABERRANTSPECTRE1 [2441,9774,0,2471,9794,0] // [[Stronghold Slayer Cave]]
+#define CONST_ABERRANTSPECTRE_RULE(_cond) rule ((area:CONST_AREA_ABERRANTSPECTRE0 || \
+  area:CONST_AREA_ABERRANTSPECTRE1) && (_cond))
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Weapons and armour'
+group: Aberrant spectre
+enum: ["Steel axe","Mithril kiteshield","Lava battlestaff","Adamant platelegs","Rune full helm","Mystic robe bottom (dark)"]
+*/
+#define VAR_ABERRANTSPECTRE_ENUMLIST_FILTER_WEAPONSANDARMOUR ["Steel axe","Mithril kiteshield","Adamant platelegs"]
+CONST_ABERRANTSPECTRE_RULE (name:VAR_ABERRANTSPECTRE_ENUMLIST_FILTER_WEAPONSANDARMOUR) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Coins'
+group: Aberrant spectre
+enum: ["Coins"]
+*/
+#define VAR_ABERRANTSPECTRE_ENUMLIST_FILTER_COINS ["Coins"]
+CONST_ABERRANTSPECTRE_RULE (name:VAR_ABERRANTSPECTRE_ENUMLIST_FILTER_COINS) {
+  hidden = true;
+}
+
+
+#define CONST_AREA_DUSTDEVIL0 [3179,9347,0,3261,9402,0] // [[Smoke Dungeon]]
+#define CONST_AREA_DUSTDEVIL1 [3431,10117,0,3448,10127,0] // [[Wilderness Slayer Cave]]
+#define CONST_AREA_DUSTDEVIL2 [1708,10011,0,1718,10035,0] // [[Catacombs of Kourend]]
+#define CONST_DUSTDEVIL_RULE(_cond) rule ((area:CONST_AREA_DUSTDEVIL0 || \
+  area:CONST_AREA_DUSTDEVIL1 || \
+  area:CONST_AREA_DUSTDEVIL2) && (_cond))
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: 100%'
+group: Dust devil
+enum: ["Bones"]
+*/
+#define VAR_DUSTDEVIL_ENUMLIST_FILTER_100 ["Bones"]
+CONST_DUSTDEVIL_RULE (name:VAR_DUSTDEVIL_ENUMLIST_FILTER_100) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Weapons and armour'
+group: Dust devil
+enum: ["Adamant axe","Rune dagger","Red d'hide vambraces","Black d'hide vambraces","Air battlestaff","Earth battlestaff","Mystic air staff","Mystic earth staff","Dragon dagger","Dust battlestaff","Dragon chainbody"]
+*/
+#define VAR_DUSTDEVIL_ENUMLIST_FILTER_WEAPONSANDARMOUR ["Adamant axe","Rune dagger","Red d'hide vambraces","Black d'hide vambraces","Air battlestaff","Earth battlestaff"]
+CONST_DUSTDEVIL_RULE (name:VAR_DUSTDEVIL_ENUMLIST_FILTER_WEAPONSANDARMOUR) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Runes and ammunition'
+group: Dust devil
+enum: ["Dust rune","Earth rune","Fire rune","Chaos rune","Rune arrow","Soul rune"]
+*/
+#define VAR_DUSTDEVIL_ENUMLIST_FILTER_RUNESANDAMMUNITION ["Rune arrow"]
+CONST_DUSTDEVIL_RULE (name:VAR_DUSTDEVIL_ENUMLIST_FILTER_RUNESANDAMMUNITION) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Other'
+group: Dust devil
+enum: ["Nothing","Coins","Ugthanki kebab","Mithril bar","Adamantite bar"]
+*/
+#define VAR_DUSTDEVIL_ENUMLIST_FILTER_OTHER ["Ugthanki kebab"]
+CONST_DUSTDEVIL_RULE (name:VAR_DUSTDEVIL_ENUMLIST_FILTER_OTHER) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Tertiary'
+group: Dust devil
+enum: ["Brimstone key","Looting bag"]
+*/
+#define VAR_DUSTDEVIL_ENUMLIST_FILTER_TERTIARY []
+CONST_DUSTDEVIL_RULE (name:VAR_DUSTDEVIL_ENUMLIST_FILTER_TERTIARY) {
+  hidden = true;
+}
+
+
+#define CONST_AREA_SMOKEDEVIL0 [2377,9412,0,2427,9471,0] // [[Smoke Devil Dungeon]]
+#define CONST_SMOKEDEVIL_RULE(_cond) rule ((area:CONST_AREA_SMOKEDEVIL0) && (_cond))
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: 100%'
+group: Smoke devil
+enum: ["Ashes"]
+*/
+#define VAR_SMOKEDEVIL_ENUMLIST_FILTER_100 ["Ashes"]
+CONST_SMOKEDEVIL_RULE (name:VAR_SMOKEDEVIL_ENUMLIST_FILTER_100) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Weapons and armour'
+group: Smoke devil
+enum: ["Adamant battleaxe","Rune dagger","Air battlestaff","Black d'hide vambraces","Fire battlestaff","Mithril plateskirt","Rune full helm","Rune chainbody","Red d'hide body","Occult necklace","Dragon chainbody"]
+*/
+#define VAR_SMOKEDEVIL_ENUMLIST_FILTER_WEAPONSANDARMOUR ["Adamant battleaxe","Rune dagger","Air battlestaff","Black d'hide vambraces","Fire battlestaff","Mithril plateskirt","Red d'hide body"]
+CONST_SMOKEDEVIL_RULE (name:VAR_SMOKEDEVIL_ENUMLIST_FILTER_WEAPONSANDARMOUR) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Runes and ammunition'
+group: Smoke devil
+enum: ["Smoke rune","Runite bolts","Fire rune","Air rune","Soul rune","Rune arrow"]
+*/
+#define VAR_SMOKEDEVIL_ENUMLIST_FILTER_RUNESANDAMMUNITION ["Smoke rune","Runite bolts","Fire rune","Air rune","Soul rune","Rune arrow"]
+CONST_SMOKEDEVIL_RULE (name:VAR_SMOKEDEVIL_ENUMLIST_FILTER_RUNESANDAMMUNITION) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Coins'
+group: Smoke devil
+enum: ["Coins"]
+*/
+#define VAR_SMOKEDEVIL_ENUMLIST_FILTER_COINS ["Coins"]
+CONST_SMOKEDEVIL_RULE (name:VAR_SMOKEDEVIL_ENUMLIST_FILTER_COINS) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Other'
+group: Smoke devil
+enum: ["Shark","Steel bar","Magic logs","Coal","Adamantite bar","Crossbow string","Ugthanki kebab"]
+*/
+#define VAR_SMOKEDEVIL_ENUMLIST_FILTER_OTHER ["Shark","Steel bar","Magic logs","Coal","Adamantite bar","Crossbow string","Ugthanki kebab"]
+CONST_SMOKEDEVIL_RULE (name:VAR_SMOKEDEVIL_ENUMLIST_FILTER_OTHER) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Tertiary'
+group: Smoke devil
+enum: ["Brimstone key"]
+*/
+#define VAR_SMOKEDEVIL_ENUMLIST_FILTER_TERTIARY []
+CONST_SMOKEDEVIL_RULE (name:VAR_SMOKEDEVIL_ENUMLIST_FILTER_TERTIARY) {
+  hidden = true;
+}
+
+
+#define CONST_AREA_SKELETALWYVERN0 [3040,9554,-1,3078,9586,-1] // [[Asgarnian Ice Dungeon]] ({{Fairycode|AIQ}})
+#define CONST_SKELETALWYVERN_RULE(_cond) rule ((area:CONST_AREA_SKELETALWYVERN0) && (_cond))
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: 100%'
+group: Skeletal wyvern
+enum: ["Wyvern bones"]
+*/
+#define VAR_SKELETALWYVERN_ENUMLIST_FILTER_100 []
+CONST_SKELETALWYVERN_RULE (name:VAR_SKELETALWYVERN_ENUMLIST_FILTER_100) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Pre-roll'
+group: Skeletal wyvern
+enum: ["Granite legs","Dragon platelegs","Dragon plateskirt"]
+*/
+#define VAR_SKELETALWYVERN_ENUMLIST_FILTER_PREROLL []
+CONST_SKELETALWYVERN_RULE (name:VAR_SKELETALWYVERN_ENUMLIST_FILTER_PREROLL) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Weapons and armour'
+group: Skeletal wyvern
+enum: ["Earth battlestaff","Battlestaff","Rune axe","Rune battleaxe","Rune warhammer","Rune full helm","Rune kiteshield"]
+*/
+#define VAR_SKELETALWYVERN_ENUMLIST_FILTER_WEAPONSANDARMOUR []
+CONST_SKELETALWYVERN_RULE (name:VAR_SKELETALWYVERN_ENUMLIST_FILTER_WEAPONSANDARMOUR) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Runes and ammunition'
+group: Skeletal wyvern
+enum: ["Air rune","Rune arrow","Water rune","Chaos rune","Law rune","Death rune","Blood rune","Adamant bolts","Runite bolts","Soul rune"]
+*/
+#define VAR_SKELETALWYVERN_ENUMLIST_FILTER_RUNESANDAMMUNITION []
+CONST_SKELETALWYVERN_RULE (name:VAR_SKELETALWYVERN_ENUMLIST_FILTER_RUNESANDAMMUNITION) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Resources'
+group: Skeletal wyvern
+enum: ["Pure essence","Magic logs","Adamantite bar","Iron ore","Uncut ruby","Uncut diamond"]
+*/
+#define VAR_SKELETALWYVERN_ENUMLIST_FILTER_RESOURCES []
+CONST_SKELETALWYVERN_RULE (name:VAR_SKELETALWYVERN_ENUMLIST_FILTER_RESOURCES) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Other'
+group: Skeletal wyvern
+enum: ["Coins","Lobster","Prayer potion(4)","Unpowered orb","Runite crossbow (u)","Ranarr seed","Snapdragon seed"]
+*/
+#define VAR_SKELETALWYVERN_ENUMLIST_FILTER_OTHER []
+CONST_SKELETALWYVERN_RULE (name:VAR_SKELETALWYVERN_ENUMLIST_FILTER_OTHER) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Tertiary'
+group: Skeletal wyvern
+enum: ["Brimstone key","Draconic visage"]
+*/
+#define VAR_SKELETALWYVERN_ENUMLIST_FILTER_TERTIARY []
+CONST_SKELETALWYVERN_RULE (name:VAR_SKELETALWYVERN_ENUMLIST_FILTER_TERTIARY) {
+  hidden = true;
+}
+
+
+/*@ define:input
+type: boolean
+group: Gargoyle
+label: Hide non-10k coin drops
+*/
+#define VAR_GARGOYLE_BOOLEAN_HIDESMALLCOINS true
+CONST_GARGOYLE_RULE (VAR_GARGOYLE_BOOLEAN_HIDESMALLCOINS && name:"Coins" && value:<10_000) {
+  hidden = true;
+}
+
+
+#define CONST_AREA_GARGOYLE0 [3430,3554,2,3452,3531,2] // [[Slayer Tower]] top floor
+#define CONST_AREA_GARGOYLE1 [3427,9928,3,3444,9948,3] // [[Slayer Tower]] basement (Slayer task only)
+#define CONST_GARGOYLE_RULE(_cond) rule ((area:CONST_AREA_GARGOYLE0 || \
+  area:CONST_AREA_GARGOYLE1) && (_cond))
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Pre-roll'
+group: Gargoyle
+enum: ["Granite maul","Mystic robe top (dark)"]
+*/
+#define VAR_GARGOYLE_ENUMLIST_FILTER_PREROLL []
+CONST_GARGOYLE_RULE (name:VAR_GARGOYLE_ENUMLIST_FILTER_PREROLL) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Weapons and armour'
+group: Gargoyle
+enum: ["Adamant platelegs","Rune full helm","Rune 2h sword","Adamant boots","Rune battleaxe","Rune platelegs"]
+*/
+#define VAR_GARGOYLE_ENUMLIST_FILTER_WEAPONSANDARMOUR ["Adamant platelegs","Adamant boots"]
+CONST_GARGOYLE_RULE (name:VAR_GARGOYLE_ENUMLIST_FILTER_WEAPONSANDARMOUR) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Runes'
+group: Gargoyle
+enum: ["Fire rune","Chaos rune","Death rune"]
+*/
+#define VAR_GARGOYLE_ENUMLIST_FILTER_RUNES ["Fire rune"]
+CONST_GARGOYLE_RULE (name:VAR_GARGOYLE_ENUMLIST_FILTER_RUNES) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Materials'
+group: Gargoyle
+enum: ["Gold ore","Pure essence","Steel bar","Gold bar","Mithril bar","Runite ore"]
+*/
+#define VAR_GARGOYLE_ENUMLIST_FILTER_MATERIALS ["Gold ore","Pure essence","Gold bar"]
+CONST_GARGOYLE_RULE (name:VAR_GARGOYLE_ENUMLIST_FILTER_MATERIALS) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Coins'
+group: Gargoyle
+enum: ["Coins"]
+*/
+#define VAR_GARGOYLE_ENUMLIST_FILTER_COINS []
+CONST_GARGOYLE_RULE (name:VAR_GARGOYLE_ENUMLIST_FILTER_COINS) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Tertiary'
+group: Gargoyle
+enum: ["Brimstone key","Brittle key"]
+*/
+#define VAR_GARGOYLE_ENUMLIST_FILTER_TERTIARY []
+CONST_GARGOYLE_RULE (name:VAR_GARGOYLE_ENUMLIST_FILTER_TERTIARY) {
+  hidden = true;
+}
+
+
+#define CONST_AREA_ABYSSALDEMON0 [3016,4874,0,3061,4917,0] // [[Abyssal Area]] ({{Fairycode|alr}})
+#define CONST_AREA_ABYSSALDEMON1 [1669,10054,0,1678,10098,0] // [[Catacombs of Kourend]]
+#define CONST_AREA_ABYSSALDEMON2 [3408,3562,2,3427,3576,2] // [[Slayer Tower]] ({{FloorNumber|uk
+#define CONST_AREA_ABYSSALDEMON3 [3427,9954,3,3445,9974,3] // [[Slayer Tower|Slayer Tower (basement)]]
+#define CONST_AREA_ABYSSALDEMON4 [3335,10158,0,3347,10168,0] // [[Wilderness Slayer Cave]]
+#define CONST_ABYSSALDEMON_RULE(_cond) rule ((area:CONST_AREA_ABYSSALDEMON0 || \
+  area:CONST_AREA_ABYSSALDEMON1 || \
+  area:CONST_AREA_ABYSSALDEMON2 || \
+  area:CONST_AREA_ABYSSALDEMON3 || \
+  area:CONST_AREA_ABYSSALDEMON4) && (_cond))
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: 100%'
+group: Abyssal demon
+enum: ["Abyssal ashes"]
+*/
+#define VAR_ABYSSALDEMON_ENUMLIST_FILTER_100 []
+CONST_ABYSSALDEMON_RULE (name:VAR_ABYSSALDEMON_ENUMLIST_FILTER_100) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Weapons and armour'
+group: Abyssal demon
+enum: ["Black sword","Steel battleaxe","Black axe","Mithril kiteshield","Rune chainbody","Rune med helm","Abyssal whip","Abyssal dagger"]
+*/
+#define VAR_ABYSSALDEMON_ENUMLIST_FILTER_WEAPONSANDARMOUR ["Black sword","Steel battleaxe","Black axe","Mithril kiteshield"]
+CONST_ABYSSALDEMON_RULE (name:VAR_ABYSSALDEMON_ENUMLIST_FILTER_WEAPONSANDARMOUR) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Runes'
+group: Abyssal demon
+enum: ["Air rune","Chaos rune","Blood rune","Law rune"]
+*/
+#define VAR_ABYSSALDEMON_ENUMLIST_FILTER_RUNES ["Air rune","Chaos rune","Blood rune","Law rune"]
+CONST_ABYSSALDEMON_RULE (name:VAR_ABYSSALDEMON_ENUMLIST_FILTER_RUNES) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Materials'
+group: Abyssal demon
+enum: ["Pure essence","Adamantite bar"]
+*/
+#define VAR_ABYSSALDEMON_ENUMLIST_FILTER_MATERIALS ["Pure essence","Adamantite bar"]
+CONST_ABYSSALDEMON_RULE (name:VAR_ABYSSALDEMON_ENUMLIST_FILTER_MATERIALS) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Coins'
+group: Abyssal demon
+enum: ["Coins"]
+*/
+#define VAR_ABYSSALDEMON_ENUMLIST_FILTER_COINS ["Coins"]
+CONST_ABYSSALDEMON_RULE (name:VAR_ABYSSALDEMON_ENUMLIST_FILTER_COINS) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Other'
+group: Abyssal demon
+enum: ["Lobster","Cosmic talisman","Chaos talisman","Defence potion(3)"]
+*/
+#define VAR_ABYSSALDEMON_ENUMLIST_FILTER_OTHER []
+CONST_ABYSSALDEMON_RULE (name:VAR_ABYSSALDEMON_ENUMLIST_FILTER_OTHER) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Tertiary'
+group: Abyssal demon
+enum: ["Ensouled abyssal head","Brimstone key","Abyssal head","Looting bag"]
+*/
+#define VAR_ABYSSALDEMON_ENUMLIST_FILTER_TERTIARY []
+CONST_ABYSSALDEMON_RULE (name:VAR_ABYSSALDEMON_ENUMLIST_FILTER_TERTIARY) {
+  hidden = true;
+}
+
+
+#define CONST_AREA_ARAXYTE0 [3653,9793,0,3710,9868,0] // [[Morytania Spider Cave]]
+#define CONST_ARAXYTE_RULE(_cond) rule ((area:CONST_AREA_ARAXYTE0) && (_cond))
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: 100%'
+group: Araxyte
+enum: ["Araxyte venom sack"]
+*/
+#define VAR_ARAXYTE_ENUMLIST_FILTER_100 []
+CONST_ARAXYTE_RULE (name:VAR_ARAXYTE_ENUMLIST_FILTER_100) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Weapons and armour'
+group: Araxyte
+enum: ["Adamant longsword","Adamant battleaxe","Rune dagger","Rune med helm","Rune platelegs","Aranea boots"]
+*/
+#define VAR_ARAXYTE_ENUMLIST_FILTER_WEAPONSANDARMOUR ["Adamant longsword","Adamant battleaxe"]
+CONST_ARAXYTE_RULE (name:VAR_ARAXYTE_ENUMLIST_FILTER_WEAPONSANDARMOUR) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Runes'
+group: Araxyte
+enum: ["Air rune","Water rune","Earth rune","Fire rune","Cosmic rune","Chaos rune","Nature rune","Death rune","Law rune","Blood rune","Soul rune"]
+*/
+#define VAR_ARAXYTE_ENUMLIST_FILTER_RUNES []
+CONST_ARAXYTE_RULE (name:VAR_ARAXYTE_ENUMLIST_FILTER_RUNES) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Other'
+group: Araxyte
+enum: ["Coins","Araxyte head"]
+*/
+#define VAR_ARAXYTE_ENUMLIST_FILTER_OTHER []
+CONST_ARAXYTE_RULE (name:VAR_ARAXYTE_ENUMLIST_FILTER_OTHER) {
+  hidden = true;
+}
+
+
+#define CONST_AREA_BLACKDEMON0 [2700,9479,0,2715,9489,0] // [[Brimhaven Dungeon]]
+#define CONST_AREA_BLACKDEMON1 [1718,10079,0,1721,10090,0] // [[Catacombs of Kourend]]
+#define CONST_AREA_BLACKDEMON2 [1408,10048,0,1471,10111,0] // [[Chasm of Fire]] (Bottom Level)
+#define CONST_AREA_BLACKDEMON3 [3084,9957,0,3092,9961,0] // [[Edgeville Dungeon]] (Wilderness)
+#define CONST_AREA_BLACKDEMON4 [2826,9763,0,2875,9801,0] // [[Taverley Dungeon]]
+#define CONST_AREA_BLACKDEMON5 [3354,10114,0,3367,10125,0] // [[Wilderness Slayer Cave]]
+#define CONST_BLACKDEMON_RULE(_cond) rule ((area:CONST_AREA_BLACKDEMON0 || \
+  area:CONST_AREA_BLACKDEMON1 || \
+  area:CONST_AREA_BLACKDEMON2 || \
+  area:CONST_AREA_BLACKDEMON3 || \
+  area:CONST_AREA_BLACKDEMON4 || \
+  area:CONST_AREA_BLACKDEMON5) && (_cond))
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: 100%'
+group: Black demon
+enum: ["Malicious ashes"]
+*/
+#define VAR_BLACKDEMON_ENUMLIST_FILTER_100 ["Malicious ashes"]
+CONST_BLACKDEMON_RULE (name:VAR_BLACKDEMON_ENUMLIST_FILTER_100) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Weapons and armour'
+group: Black demon
+enum: ["Black sword","Steel battleaxe","Black axe","Mithril kiteshield","Rune med helm","Rune chainbody","Rune sword","Adamant dagger","Adamant battleaxe","Adamant platebody","Rune dagger","Rune full helm"]
+*/
+#define VAR_BLACKDEMON_ENUMLIST_FILTER_WEAPONSANDARMOUR ["Black sword","Steel battleaxe","Black axe","Mithril kiteshield","Adamant dagger","Adamant battleaxe","Adamant platebody"]
+CONST_BLACKDEMON_RULE (name:VAR_BLACKDEMON_ENUMLIST_FILTER_WEAPONSANDARMOUR) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Runes'
+group: Black demon
+enum: ["Air rune","Chaos rune","Blood rune","Fire rune","Law rune","Death rune"]
+*/
+#define VAR_BLACKDEMON_ENUMLIST_FILTER_RUNES []
+CONST_BLACKDEMON_RULE (name:VAR_BLACKDEMON_ENUMLIST_FILTER_RUNES) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Coins'
+group: Black demon
+enum: ["Coins"]
+*/
+#define VAR_BLACKDEMON_ENUMLIST_FILTER_COINS ["Coins"]
+CONST_BLACKDEMON_RULE (name:VAR_BLACKDEMON_ENUMLIST_FILTER_COINS) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Other'
+group: Black demon
+enum: ["Lobster","Defence potion(3)"]
+*/
+#define VAR_BLACKDEMON_ENUMLIST_FILTER_OTHER ["Lobster","Defence potion(3)"]
+CONST_BLACKDEMON_RULE (name:VAR_BLACKDEMON_ENUMLIST_FILTER_OTHER) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Tertiary'
+group: Black demon
+enum: ["Looting bag","Ensouled demon head","Brimstone key"]
+*/
+#define VAR_BLACKDEMON_ENUMLIST_FILTER_TERTIARY []
+CONST_BLACKDEMON_RULE (name:VAR_BLACKDEMON_ENUMLIST_FILTER_TERTIARY) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Materials'
+group: Black demon
+enum: ["Adamantite bar","Adamantite ore"]
+*/
+#define VAR_BLACKDEMON_ENUMLIST_FILTER_MATERIALS ["Adamantite bar","Adamantite ore"]
+CONST_BLACKDEMON_RULE (name:VAR_BLACKDEMON_ENUMLIST_FILTER_MATERIALS) {
+  hidden = true;
+}
+
+
+#define CONST_AREA_DEMONICGORILLA0 [2072,5641,0,2157,5681,0] // [[Crash Site Cavern]]
+#define CONST_DEMONICGORILLA_RULE(_cond) rule ((area:CONST_AREA_DEMONICGORILLA0) && (_cond))
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: 100%'
+group: Demonic gorilla
+enum: ["Malicious ashes"]
+*/
+#define VAR_DEMONICGORILLA_ENUMLIST_FILTER_100 []
+CONST_DEMONICGORILLA_RULE (name:VAR_DEMONICGORILLA_ENUMLIST_FILTER_100) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Uniques'
+group: Demonic gorilla
+enum: ["Zenyte shard","Ballista limbs","Ballista spring","Light frame","Heavy frame","Monkey tail"]
+*/
+#define VAR_DEMONICGORILLA_ENUMLIST_FILTER_UNIQUES []
+CONST_DEMONICGORILLA_RULE (name:VAR_DEMONICGORILLA_ENUMLIST_FILTER_UNIQUES) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Weapons and armour'
+group: Demonic gorilla
+enum: ["Rune platelegs","Rune plateskirt","Rune chainbody","Dragon scimitar"]
+*/
+#define VAR_DEMONICGORILLA_ENUMLIST_FILTER_WEAPONSANDARMOUR []
+CONST_DEMONICGORILLA_RULE (name:VAR_DEMONICGORILLA_ENUMLIST_FILTER_WEAPONSANDARMOUR) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Runes and ammunition'
+group: Demonic gorilla
+enum: ["Law rune","Death rune","Runite bolts"]
+*/
+#define VAR_DEMONICGORILLA_ENUMLIST_FILTER_RUNESANDAMMUNITION []
+CONST_DEMONICGORILLA_RULE (name:VAR_DEMONICGORILLA_ENUMLIST_FILTER_RUNESANDAMMUNITION) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Herbs'
+group: Demonic gorilla
+enum: ["Grimy kwuarm","Grimy cadantine","Grimy lantadyme","Grimy dwarf weed"]
+*/
+#define VAR_DEMONICGORILLA_ENUMLIST_FILTER_HERBS []
+CONST_DEMONICGORILLA_RULE (name:VAR_DEMONICGORILLA_ENUMLIST_FILTER_HERBS) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Other'
+group: Demonic gorilla
+enum: ["Prayer potion(3)","Shark","Coins","Saradomin brew(2)","Adamantite bar","Javelin shaft","Rune javelin tips","Dragon javelin tips","Diamond","Runite bar"]
+*/
+#define VAR_DEMONICGORILLA_ENUMLIST_FILTER_OTHER []
+CONST_DEMONICGORILLA_RULE (name:VAR_DEMONICGORILLA_ENUMLIST_FILTER_OTHER) {
+  hidden = true;
+}
+
+
+/*@ define:input
+type: style
+group: Tormented demon
+label: Smouldering pile of flesh
+*/
+#define VAR_TORMENTEDDEMON_FLESHSTYLE   textColor = "#000000";  backgroundColor = "#aaff0000";  textAccent = 3;
+rule (name:"Smouldering pile of flesh") { VAR_TORMENTEDDEMON_FLESHSTYLE }
+
+/*@ define:input
+type: style
+group: Tormented demon
+label: Smouldering gland
+*/
+#define VAR_TORMENTEDDEMON_GLANDSTYLE   textColor = "#000000";  backgroundColor = "#aa00ffff";  textAccent = 3;
+rule (name:"Smouldering gland") { VAR_TORMENTEDDEMON_GLANDSTYLE }
+
+/*@ define:input
+type: style
+group: Tormented demon
+label: Smouldering heart
+*/
+#define VAR_TORMENTEDDEMON_HEARTSTYLE   textColor = "#000000";  backgroundColor = "#aaff00ff";  textAccent = 3;
+rule (name:"Smouldering heart") { VAR_TORMENTEDDEMON_HEARTSTYLE }
+
+
+#define CONST_AREA_TORMENTEDDEMON0 [4032,4352,0,4159,4479,0] // [[Ancient Guthixian Temple]]
+#define CONST_TORMENTEDDEMON_RULE(_cond) rule ((area:CONST_AREA_TORMENTEDDEMON0) && (_cond))
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: 100%'
+group: Tormented demon
+enum: ["Infernal ashes"]
+*/
+#define VAR_TORMENTEDDEMON_ENUMLIST_FILTER_100 []
+CONST_TORMENTEDDEMON_RULE (name:VAR_TORMENTEDDEMON_ENUMLIST_FILTER_100) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Unique'
+group: Tormented demon
+enum: ["Burning claw","Tormented synapse"]
+*/
+#define VAR_TORMENTEDDEMON_ENUMLIST_FILTER_UNIQUE []
+CONST_TORMENTEDDEMON_RULE (name:VAR_TORMENTEDDEMON_ENUMLIST_FILTER_UNIQUE) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Weapons and armour'
+group: Tormented demon
+enum: ["Dragon dagger","Rune kiteshield","Battlestaff","Rune platebody"]
+*/
+#define VAR_TORMENTEDDEMON_ENUMLIST_FILTER_WEAPONSANDARMOUR []
+CONST_TORMENTEDDEMON_RULE (name:VAR_TORMENTEDDEMON_ENUMLIST_FILTER_WEAPONSANDARMOUR) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Runes and ammunition'
+group: Tormented demon
+enum: ["Chaos rune","Soul rune","Rune arrow"]
+*/
+#define VAR_TORMENTEDDEMON_ENUMLIST_FILTER_RUNESANDAMMUNITION []
+CONST_TORMENTEDDEMON_RULE (name:VAR_TORMENTEDDEMON_ENUMLIST_FILTER_RUNESANDAMMUNITION) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Herbs'
+group: Tormented demon
+enum: ["Grimy kwuarm","Grimy dwarf weed","Grimy cadantine","Grimy lantadyme","Grimy avantoe","Grimy ranarr weed","Grimy snapdragon","Grimy torstol"]
+*/
+#define VAR_TORMENTEDDEMON_ENUMLIST_FILTER_HERBS []
+CONST_TORMENTEDDEMON_RULE (name:VAR_TORMENTEDDEMON_ENUMLIST_FILTER_HERBS) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Consumables'
+group: Tormented demon
+enum: ["Smouldering gland","Smouldering pile of flesh","Smouldering heart","Manta ray","Prayer potion(4)","Prayer potion(2)"]
+*/
+#define VAR_TORMENTEDDEMON_ENUMLIST_FILTER_CONSUMABLES []
+CONST_TORMENTEDDEMON_RULE (name:VAR_TORMENTEDDEMON_ENUMLIST_FILTER_CONSUMABLES) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Other'
+group: Tormented demon
+enum: ["Guthixian temple teleport","Magic shortbow (u)","Magic longbow (u)","Malicious ashes","Fire orb","Dragon arrowtips"]
+*/
+#define VAR_TORMENTEDDEMON_ENUMLIST_FILTER_OTHER []
+CONST_TORMENTEDDEMON_RULE (name:VAR_TORMENTEDDEMON_ENUMLIST_FILTER_OTHER) {
+  hidden = true;
+}
+
+
+#define CONST_AREA_DAGANNOTH0 [2434,10430,0,2487,10461,0] // [[Jormungand's Prison]]
+#define CONST_AREA_DAGANNOTH1 [1656,9994,0,1674,10002,0] // [[Catacombs of Kourend]]
+#define CONST_AREA_DAGANNOTH2 [2511,10012,0,2535,10035,0] // [[Lighthouse]]
+#define CONST_DAGANNOTH_RULE(_cond) rule ((area:CONST_AREA_DAGANNOTH0 || \
+  area:CONST_AREA_DAGANNOTH1 || \
+  area:CONST_AREA_DAGANNOTH2) && (_cond))
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: 100%'
+group: Dagannoth
+enum: ["Bones"]
+*/
+#define VAR_DAGANNOTH_ENUMLIST_FILTER_100 []
+CONST_DAGANNOTH_RULE (name:VAR_DAGANNOTH_ENUMLIST_FILTER_100) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Weapons'
+group: Dagannoth
+enum: ["Iron spear","Bronze spear","Mithril spear"]
+*/
+#define VAR_DAGANNOTH_ENUMLIST_FILTER_WEAPONS []
+CONST_DAGANNOTH_RULE (name:VAR_DAGANNOTH_ENUMLIST_FILTER_WEAPONS) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Runes and ammunition'
+group: Dagannoth
+enum: ["Water rune","Steel arrow","Mithril javelin"]
+*/
+#define VAR_DAGANNOTH_ENUMLIST_FILTER_RUNESANDAMMUNITION []
+CONST_DAGANNOTH_RULE (name:VAR_DAGANNOTH_ENUMLIST_FILTER_RUNESANDAMMUNITION) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Fishing'
+group: Dagannoth
+enum: ["Lobster pot","Raw herring","Raw sardine","Harpoon","Feather","Fishing bait","Raw lobster","Raw tuna","Seaweed","Oyster pearls","Oyster pearl"]
+*/
+#define VAR_DAGANNOTH_ENUMLIST_FILTER_FISHING []
+CONST_DAGANNOTH_RULE (name:VAR_DAGANNOTH_ENUMLIST_FILTER_FISHING) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Coins'
+group: Dagannoth
+enum: ["Coins"]
+*/
+#define VAR_DAGANNOTH_ENUMLIST_FILTER_COINS []
+CONST_DAGANNOTH_RULE (name:VAR_DAGANNOTH_ENUMLIST_FILTER_COINS) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Other'
+group: Dagannoth
+enum: ["Casket","Opal bolt tips"]
+*/
+#define VAR_DAGANNOTH_ENUMLIST_FILTER_OTHER []
+CONST_DAGANNOTH_RULE (name:VAR_DAGANNOTH_ENUMLIST_FILTER_OTHER) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Tertiary'
+group: Dagannoth
+enum: ["Dagannoth ribs","Ensouled dagannoth head","Brimstone key"]
+*/
+#define VAR_DAGANNOTH_ENUMLIST_FILTER_TERTIARY []
+CONST_DAGANNOTH_RULE (name:VAR_DAGANNOTH_ENUMLIST_FILTER_TERTIARY) {
+  hidden = true;
+}
+
+
+
+/*@ define:module:boss
+name: 'PvM: boss'
+description: |
+  These sections allow you to filter out drops on a per-boss basis.
+
+  Not all of them have defaults yet, they're being added over time.
+*/
+
+
+#define CONST_AREA_YAMA [1472,10048,0,1535,10111,0]
+#define CONST_YAMA_RULE(_cond) rule (area:CONST_AREA_YAMA && (_cond))
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Unique'
+group: Yama
+enum: ["Soulflame horn","Oathplate helm","Oathplate chest","Oathplate legs","Dossier","Forgotten lockbox","Oathplate shards"]
+*/
+#define VAR_YAMA_ENUMLIST_FILTER_UNIQUE []
+CONST_YAMA_RULE (name:VAR_YAMA_ENUMLIST_FILTER_UNIQUE) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Supplies'
+group: Yama
+enum: ["Pineapple pizza","Wild pie","Prayer potion(3)","Super restore mix(2)","Super combat potion(1)","Zamorak mix(2)"]
+*/
+#define VAR_YAMA_ENUMLIST_FILTER_SUPPLIES []
+CONST_YAMA_RULE (name:VAR_YAMA_ENUMLIST_FILTER_SUPPLIES) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Weapons and armour'
+group: Yama
+enum: ["Rune chainbody","Battlestaff","Rune platebody","Dragon plateskirt","Dragon platelegs"]
+*/
+#define VAR_YAMA_ENUMLIST_FILTER_WEAPONSANDARMOUR []
+CONST_YAMA_RULE (name:VAR_YAMA_ENUMLIST_FILTER_WEAPONSANDARMOUR) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Runes'
+group: Yama
+enum: ["Blood rune","Law rune","Smoke rune","Soul rune","Fire rune","Wrath rune"]
+*/
+#define VAR_YAMA_ENUMLIST_FILTER_RUNES []
+CONST_YAMA_RULE (name:VAR_YAMA_ENUMLIST_FILTER_RUNES) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Other'
+group: Yama
+enum: ["Aether catalyst","Diabolic worms","Barrel of demonic tallow (full)","Chasm teleport scroll","Emerald","Ruby","Diamond","Onyx bolt tips"]
+*/
+#define VAR_YAMA_ENUMLIST_FILTER_OTHER []
+CONST_YAMA_RULE (name:VAR_YAMA_ENUMLIST_FILTER_OTHER) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Tertiary'
+group: Yama
+enum: ["Yami"]
+*/
+#define VAR_YAMA_ENUMLIST_FILTER_TERTIARY []
+CONST_YAMA_RULE (name:VAR_YAMA_ENUMLIST_FILTER_TERTIARY) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Contract'
+group: Yama
+enum: ["Aether catalyst","Diabolic worms","Oathplate shards","Oathplate helm","Oathplate chest","Oathplate legs","Soulflame horn","Contract of forfeit breath","Purifying sigil (top)","Contract of glyphic attenuation","Purifying sigil (bottom)","Contract of sensory clouding","Purifying sigil (left)","Contract of divine severance","Purifying sigil (right)","Contract of bloodied blows","Purifying sigil (middle)","Contract of familiar acquisition","Yami"]
+*/
+#define VAR_YAMA_ENUMLIST_FILTER_CONTRACT []
+CONST_YAMA_RULE (name:VAR_YAMA_ENUMLIST_FILTER_CONTRACT) {
+  hidden = true;
+}
+
+
+#define CONST_AREA_SCURRIUS [3285,9856,0,3310,9879,0]
+#define CONST_SCURRIUS_RULE(_cond) rule (area:CONST_AREA_SCURRIUS && (_cond))
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: 100%'
+group: Scurrius
+enum: ["Big bones","Raw rat meat"]
+*/
+#define VAR_SCURRIUS_ENUMLIST_FILTER_100 []
+CONST_SCURRIUS_RULE (name:VAR_SCURRIUS_ENUMLIST_FILTER_100) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Weapons and armour'
+group: Scurrius
+enum: ["Adamant platebody","Rune med helm","Rune full helm","Rune sq shield","Rune chainbody","Rune battleaxe"]
+*/
+#define VAR_SCURRIUS_ENUMLIST_FILTER_WEAPONSANDARMOUR []
+CONST_SCURRIUS_RULE (name:VAR_SCURRIUS_ENUMLIST_FILTER_WEAPONSANDARMOUR) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Runes and ammunition'
+group: Scurrius
+enum: ["Adamant arrow","Rune arrow","Chaos rune","Death rune","Law rune"]
+*/
+#define VAR_SCURRIUS_ENUMLIST_FILTER_RUNESANDAMMUNITION []
+CONST_SCURRIUS_RULE (name:VAR_SCURRIUS_ENUMLIST_FILTER_RUNESANDAMMUNITION) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Consumables'
+group: Scurrius
+enum: ["Trout","Tuna","Shark","Lobster","Ranging potion(1)","Super strength(1)","Cheese","Prayer potion(4)"]
+*/
+#define VAR_SCURRIUS_ENUMLIST_FILTER_CONSUMABLES []
+CONST_SCURRIUS_RULE (name:VAR_SCURRIUS_ENUMLIST_FILTER_CONSUMABLES) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Other'
+group: Scurrius
+enum: ["Coins"]
+*/
+#define VAR_SCURRIUS_ENUMLIST_FILTER_OTHER []
+CONST_SCURRIUS_RULE (name:VAR_SCURRIUS_ENUMLIST_FILTER_OTHER) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Tertiary'
+group: Scurrius
+enum: ["Scurrius' spine","Long bone","Curved bone","Scurry"]
+*/
+#define VAR_SCURRIUS_ENUMLIST_FILTER_TERTIARY []
+CONST_SCURRIUS_RULE (name:VAR_SCURRIUS_ENUMLIST_FILTER_TERTIARY) {
+  hidden = true;
+}
+
+
+#define CONST_AREA_GIANTMOLE [1728,5120,0,1791,5247,0]
+#define CONST_GIANTMOLE_RULE(_cond) rule (area:CONST_AREA_GIANTMOLE && (_cond))
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: 100%'
+group: Giant Mole
+enum: ["Big bones","Mole claw","Mole skin"]
+*/
+#define VAR_GIANTMOLE_ENUMLIST_FILTER_100 []
+CONST_GIANTMOLE_RULE (name:VAR_GIANTMOLE_ENUMLIST_FILTER_100) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Weapons and armour'
+group: Giant Mole
+enum: ["Adamant longsword","Mithril platebody","Amulet of strength","Mithril axe","Mithril battleaxe","Rune med helm"]
+*/
+#define VAR_GIANTMOLE_ENUMLIST_FILTER_WEAPONSANDARMOUR []
+CONST_GIANTMOLE_RULE (name:VAR_GIANTMOLE_ENUMLIST_FILTER_WEAPONSANDARMOUR) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Runes and ammunition'
+group: Giant Mole
+enum: ["Air rune","Blood rune","Fire rune","Iron arrow","Law rune","Death rune"]
+*/
+#define VAR_GIANTMOLE_ENUMLIST_FILTER_RUNESANDAMMUNITION []
+CONST_GIANTMOLE_RULE (name:VAR_GIANTMOLE_ENUMLIST_FILTER_RUNESANDAMMUNITION) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Other'
+group: Giant Mole
+enum: ["Yew logs","Shark","Mithril bar","Ranarr seed","Iron ore","Oyster pearls"]
+*/
+#define VAR_GIANTMOLE_ENUMLIST_FILTER_OTHER []
+CONST_GIANTMOLE_RULE (name:VAR_GIANTMOLE_ENUMLIST_FILTER_OTHER) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Tertiary'
+group: Giant Mole
+enum: ["Brimstone key","Long bone","Baby mole","Curved bone"]
+*/
+#define VAR_GIANTMOLE_ENUMLIST_FILTER_TERTIARY []
+CONST_GIANTMOLE_RULE (name:VAR_GIANTMOLE_ENUMLIST_FILTER_TERTIARY) {
+  hidden = true;
+}
+
+
+#define CONST_AREA_DERANGEDARCHAEOLOGIST [3669,3694,0,3698,3722,0]
+#define CONST_DERANGEDARCHAEOLOGIST_RULE(_cond) rule (area:CONST_AREA_DERANGEDARCHAEOLOGIST && (_cond))
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: 100%'
+group: Deranged archaeologist
+enum: ["Bones"]
+*/
+#define VAR_DERANGEDARCHAEOLOGIST_ENUMLIST_FILTER_100 []
+CONST_DERANGEDARCHAEOLOGIST_RULE (name:VAR_DERANGEDARCHAEOLOGIST_ENUMLIST_FILTER_100) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Unique'
+group: Deranged archaeologist
+enum: ["Steel ring"]
+*/
+#define VAR_DERANGEDARCHAEOLOGIST_ENUMLIST_FILTER_UNIQUE []
+CONST_DERANGEDARCHAEOLOGIST_RULE (name:VAR_DERANGEDARCHAEOLOGIST_ENUMLIST_FILTER_UNIQUE) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Weapons and armour'
+group: Deranged archaeologist
+enum: ["Black d'hide body","Rune 2h sword","Rune sword"]
+*/
+#define VAR_DERANGEDARCHAEOLOGIST_ENUMLIST_FILTER_WEAPONSANDARMOUR []
+CONST_DERANGEDARCHAEOLOGIST_RULE (name:VAR_DERANGEDARCHAEOLOGIST_ENUMLIST_FILTER_WEAPONSANDARMOUR) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Runes and ammunition'
+group: Deranged archaeologist
+enum: ["Water rune","Mud rune","Rune knife","Dragon arrow","Steel cannonball"]
+*/
+#define VAR_DERANGEDARCHAEOLOGIST_ENUMLIST_FILTER_RUNESANDAMMUNITION []
+CONST_DERANGEDARCHAEOLOGIST_RULE (name:VAR_DERANGEDARCHAEOLOGIST_ENUMLIST_FILTER_RUNESANDAMMUNITION) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Materials'
+group: Deranged archaeologist
+enum: ["Grimy dwarf weed","White berries","Runite limbs","Black dragonhide","Gold ore","Uncut diamond","Onyx bolt tips"]
+*/
+#define VAR_DERANGEDARCHAEOLOGIST_ENUMLIST_FILTER_MATERIALS []
+CONST_DERANGEDARCHAEOLOGIST_RULE (name:VAR_DERANGEDARCHAEOLOGIST_ENUMLIST_FILTER_MATERIALS) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Consumables'
+group: Deranged archaeologist
+enum: ["Anchovy pizza","Prayer potion(3)","Potato with cheese","Shark"]
+*/
+#define VAR_DERANGEDARCHAEOLOGIST_ENUMLIST_FILTER_CONSUMABLES []
+CONST_DERANGEDARCHAEOLOGIST_RULE (name:VAR_DERANGEDARCHAEOLOGIST_ENUMLIST_FILTER_CONSUMABLES) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Other'
+group: Deranged archaeologist
+enum: ["Crystal key","Long bone"]
+*/
+#define VAR_DERANGEDARCHAEOLOGIST_ENUMLIST_FILTER_OTHER []
+CONST_DERANGEDARCHAEOLOGIST_RULE (name:VAR_DERANGEDARCHAEOLOGIST_ENUMLIST_FILTER_OTHER) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Tertiary'
+group: Deranged archaeologist
+enum: ["Brimstone key"]
+*/
+#define VAR_DERANGEDARCHAEOLOGIST_ENUMLIST_FILTER_TERTIARY []
+CONST_DERANGEDARCHAEOLOGIST_RULE (name:VAR_DERANGEDARCHAEOLOGIST_ENUMLIST_FILTER_TERTIARY) {
+  hidden = true;
+}
+
+
+#define CONST_AREA_DAGANNOTHKINGS [2880,4353,0,2943,4478,0]
+#define CONST_DAGANNOTHKINGS_RULE(_cond) rule (area:CONST_AREA_DAGANNOTHKINGS && (_cond))
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: 100%'
+group: Dagannoth Kings
+enum: ["Dagannoth bones","Dagannoth hide"]
+*/
+#define VAR_DAGANNOTHKINGS_ENUMLIST_FILTER_100 ["Dagannoth hide"]
+CONST_DAGANNOTHKINGS_RULE (name:VAR_DAGANNOTHKINGS_ENUMLIST_FILTER_100) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Weapons and armour'
+group: Dagannoth Kings
+enum: ["Steel kiteshield","Mithril warhammer","Adamant axe","Steel platebody","Mithril pickaxe","Adamant platebody","Fremennik blade","Dragon axe","Rune axe","Fremennik shield","Fremennik helm","Mithril 2h sword","Ring of life","Rock-shell plate","Rock-shell legs","Berserker ring","Warrior ring","Earth battlestaff","Water battlestaff","Air battlestaff","Battlestaff","Mud battlestaff","Farseer helm","Skeletal top","Skeletal bottoms","Seers ring","Mithril knife","Red d'hide vambraces","Rune thrownaxe","Adamant dart","Iron knife","Steel knife","Seercull","Archer helm","Spined body","Spined chaps","Archers ring"]
+*/
+#define VAR_DAGANNOTHKINGS_ENUMLIST_FILTER_WEAPONSANDARMOUR ["Steel kiteshield","Mithril warhammer","Adamant axe","Steel platebody","Mithril pickaxe","Adamant platebody","Fremennik blade","Rune axe","Fremennik shield","Fremennik helm","Mithril 2h sword","Ring of life","Rock-shell plate","Rock-shell legs","Earth battlestaff","Water battlestaff","Air battlestaff","Skeletal top","Skeletal bottoms","Red d'hide vambraces","Rune thrownaxe","Adamant dart","Spined body","Spined chaps"]
+CONST_DAGANNOTHKINGS_RULE (name:VAR_DAGANNOTHKINGS_ENUMLIST_FILTER_WEAPONSANDARMOUR) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Potions'
+group: Dagannoth Kings
+enum: ["Antifire potion(2)","Prayer potion(2)","Restore potion(2)","Super attack(2)","Super strength(2)","Super defence(2)","Zamorak brew(2)"]
+*/
+#define VAR_DAGANNOTHKINGS_ENUMLIST_FILTER_POTIONS ["Antifire potion(2)","Prayer potion(2)","Restore potion(2)","Super attack(2)","Super strength(2)","Super defence(2)","Zamorak brew(2)"]
+CONST_DAGANNOTHKINGS_RULE (name:VAR_DAGANNOTHKINGS_ENUMLIST_FILTER_POTIONS) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Ores and bars'
+group: Dagannoth Kings
+enum: ["Mithril ore","Adamantite bar","Coal","Iron ore","Steel bar"]
+*/
+#define VAR_DAGANNOTHKINGS_ENUMLIST_FILTER_ORESANDBARS ["Mithril ore","Adamantite bar"]
+CONST_DAGANNOTHKINGS_RULE (name:VAR_DAGANNOTHKINGS_ENUMLIST_FILTER_ORESANDBARS) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Other'
+group: Dagannoth Kings
+enum: ["Coins","Grimy ranarr weed","Bass","Swordfish","Shark","Oyster pearls","Pure essence","Opal bolt tips","Yew logs","Maple logs","Runite limbs","Feather"]
+*/
+#define VAR_DAGANNOTHKINGS_ENUMLIST_FILTER_OTHER ["Coins","Grimy ranarr weed","Bass","Swordfish","Shark","Oyster pearls","Pure essence","Opal bolt tips","Yew logs","Maple logs","Runite limbs","Feather"]
+CONST_DAGANNOTHKINGS_RULE (name:VAR_DAGANNOTHKINGS_ENUMLIST_FILTER_OTHER) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Tertiary'
+group: Dagannoth Kings
+enum: ["Ensouled dagannoth head","Brimstone key"]
+*/
+#define VAR_DAGANNOTHKINGS_ENUMLIST_FILTER_TERTIARY []
+CONST_DAGANNOTHKINGS_RULE (name:VAR_DAGANNOTHKINGS_ENUMLIST_FILTER_TERTIARY) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Runes'
+group: Dagannoth Kings
+enum: ["Air rune","Earth rune","Blood rune","Law rune","Nature rune","Mud rune","Death rune"]
+*/
+#define VAR_DAGANNOTHKINGS_ENUMLIST_FILTER_RUNES ["Air rune","Earth rune","Blood rune","Law rune","Nature rune","Mud rune","Death rune"]
+CONST_DAGANNOTHKINGS_RULE (name:VAR_DAGANNOTHKINGS_ENUMLIST_FILTER_RUNES) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Talismans (noted)'
+group: Dagannoth Kings
+enum: ["Earth talisman","Air talisman","Water talisman"]
+*/
+#define VAR_DAGANNOTHKINGS_ENUMLIST_FILTER_TALISMANSNOTED []
+CONST_DAGANNOTHKINGS_RULE (name:VAR_DAGANNOTHKINGS_ENUMLIST_FILTER_TALISMANSNOTED) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Ammunition'
+group: Dagannoth Kings
+enum: ["Steel arrow","Runite bolts","Iron arrow"]
+*/
+#define VAR_DAGANNOTHKINGS_ENUMLIST_FILTER_AMMUNITION ["Steel arrow","Runite bolts","Iron arrow"]
+CONST_DAGANNOTHKINGS_RULE (name:VAR_DAGANNOTHKINGS_ENUMLIST_FILTER_AMMUNITION) {
+  hidden = true;
+}
+
+
+#define CONST_AREA_SARACHNIS [1829,9890,0,1855,9911,0]
+#define CONST_SARACHNIS_RULE(_cond) rule (area:CONST_AREA_SARACHNIS && (_cond))
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Pre-roll'
+group: Sarachnis
+enum: ["Dragon med helm","Sarachnis cudgel"]
+*/
+#define VAR_SARACHNIS_ENUMLIST_FILTER_PREROLL []
+CONST_SARACHNIS_RULE (name:VAR_SARACHNIS_ENUMLIST_FILTER_PREROLL) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Weapons and armour'
+group: Sarachnis
+enum: ["Battlestaff","Rune platebody","Rune med helm","Rune 2h sword"]
+*/
+#define VAR_SARACHNIS_ENUMLIST_FILTER_WEAPONSANDARMOUR []
+CONST_SARACHNIS_RULE (name:VAR_SARACHNIS_ENUMLIST_FILTER_WEAPONSANDARMOUR) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Runes and ammunition'
+group: Sarachnis
+enum: ["Blood rune","Chaos rune","Cosmic rune","Death rune","Soul rune","Mithril arrow","Mithril bolts"]
+*/
+#define VAR_SARACHNIS_ENUMLIST_FILTER_RUNESANDAMMUNITION []
+CONST_SARACHNIS_RULE (name:VAR_SARACHNIS_ENUMLIST_FILTER_RUNESANDAMMUNITION) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Seeds'
+group: Sarachnis
+enum: ["Maple seed","Papaya tree seed","Yew seed"]
+*/
+#define VAR_SARACHNIS_ENUMLIST_FILTER_SEEDS []
+CONST_SARACHNIS_RULE (name:VAR_SARACHNIS_ENUMLIST_FILTER_SEEDS) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Herbs'
+group: Sarachnis
+enum: ["Grimy kwuarm","Grimy dwarf weed","Grimy cadantine","Grimy avantoe","Grimy lantadyme","Grimy snapdragon","Grimy ranarr weed","Grimy torstol"]
+*/
+#define VAR_SARACHNIS_ENUMLIST_FILTER_HERBS []
+CONST_SARACHNIS_RULE (name:VAR_SARACHNIS_ENUMLIST_FILTER_HERBS) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Materials'
+group: Sarachnis
+enum: ["Mithril ore","Red dragonhide","Uncut sapphire","Adamantite ore","Uncut emerald","Onyx bolt tips","Uncut ruby","Runite ore","Uncut diamond"]
+*/
+#define VAR_SARACHNIS_ENUMLIST_FILTER_MATERIALS []
+CONST_SARACHNIS_RULE (name:VAR_SARACHNIS_ENUMLIST_FILTER_MATERIALS) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Other'
+group: Sarachnis
+enum: ["Coins","Dragon bones","Egg potato","Weapon poison(++)","Crystal key","Spider carcass"]
+*/
+#define VAR_SARACHNIS_ENUMLIST_FILTER_OTHER []
+CONST_SARACHNIS_RULE (name:VAR_SARACHNIS_ENUMLIST_FILTER_OTHER) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Tertiary'
+group: Sarachnis
+enum: ["Tattered moon page","Tattered sun page","Tattered temple page","Giant egg sac(full)","Grubby key","Brimstone key","Jar of eyes","Sraracha"]
+*/
+#define VAR_SARACHNIS_ENUMLIST_FILTER_TERTIARY []
+CONST_SARACHNIS_RULE (name:VAR_SARACHNIS_ENUMLIST_FILTER_TERTIARY) {
+  hidden = true;
+}
+
+
+#define CONST_AREA_KALPHITEQUEEN [3456,9472,0,3519,9535,0]
+#define CONST_KALPHITEQUEEN_RULE(_cond) rule (area:CONST_AREA_KALPHITEQUEEN && (_cond))
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Consumables'
+group: Kalphite Queen
+enum: ["Monkfish","Shark","Dark crab","Saradomin brew(4)","Prayer potion(4)","Super restore(4)","Super combat potion(2)","Ranging potion(3)","Superantipoison(2)"]
+*/
+#define VAR_KALPHITEQUEEN_ENUMLIST_FILTER_CONSUMABLES []
+CONST_KALPHITEQUEEN_RULE (name:VAR_KALPHITEQUEEN_ENUMLIST_FILTER_CONSUMABLES) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Weapons and armour'
+group: Kalphite Queen
+enum: ["Battlestaff","Rune chainbody","Red d'hide body","Rune knife(p++)","Lava battlestaff"]
+*/
+#define VAR_KALPHITEQUEEN_ENUMLIST_FILTER_WEAPONSANDARMOUR []
+CONST_KALPHITEQUEEN_RULE (name:VAR_KALPHITEQUEEN_ENUMLIST_FILTER_WEAPONSANDARMOUR) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Runes and ammunition'
+group: Kalphite Queen
+enum: ["Death rune","Blood rune","Mithril arrow","Rune arrow"]
+*/
+#define VAR_KALPHITEQUEEN_ENUMLIST_FILTER_RUNESANDAMMUNITION []
+CONST_KALPHITEQUEEN_RULE (name:VAR_KALPHITEQUEEN_ENUMLIST_FILTER_RUNESANDAMMUNITION) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Herbs'
+group: Kalphite Queen
+enum: ["Grimy toadflax","Grimy ranarr weed","Grimy snapdragon","Grimy torstol"]
+*/
+#define VAR_KALPHITEQUEEN_ENUMLIST_FILTER_HERBS []
+CONST_KALPHITEQUEEN_RULE (name:VAR_KALPHITEQUEEN_ENUMLIST_FILTER_HERBS) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Seeds'
+group: Kalphite Queen
+enum: ["Torstol seed","Watermelon seed","Papaya tree seed","Palm tree seed","Magic seed"]
+*/
+#define VAR_KALPHITEQUEEN_ENUMLIST_FILTER_SEEDS []
+CONST_KALPHITEQUEEN_RULE (name:VAR_KALPHITEQUEEN_ENUMLIST_FILTER_SEEDS) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Resources'
+group: Kalphite Queen
+enum: ["Runite bar","Bucket of sand","Gold ore","Magic logs","Uncut emerald","Uncut ruby","Uncut diamond"]
+*/
+#define VAR_KALPHITEQUEEN_ENUMLIST_FILTER_RESOURCES []
+CONST_KALPHITEQUEEN_RULE (name:VAR_KALPHITEQUEEN_ENUMLIST_FILTER_RESOURCES) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Other'
+group: Kalphite Queen
+enum: ["Wine of zamorak","Potato cactus","Coins","Grapes","Weapon poison(++)","Cactus spine"]
+*/
+#define VAR_KALPHITEQUEEN_ENUMLIST_FILTER_OTHER []
+CONST_KALPHITEQUEEN_RULE (name:VAR_KALPHITEQUEEN_ENUMLIST_FILTER_OTHER) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Tertiary'
+group: Kalphite Queen
+enum: ["Kq head (tattered)","Ensouled kalphite head","Brimstone key","Kq head","Dragon chainbody","Dragon 2h sword","Dragon pickaxe","Jar of sand","Kalphite princess"]
+*/
+#define VAR_KALPHITEQUEEN_ENUMLIST_FILTER_TERTIARY []
+CONST_KALPHITEQUEEN_RULE (name:VAR_KALPHITEQUEEN_ENUMLIST_FILTER_TERTIARY) {
+  hidden = true;
+}
+
+
+/*@ define:input
+type: boolean
+group: "Kree'arra"
+label: Hide coin drops from bodyguards
+*/
+#define VAR_KREEARRA_BGHIDECOINS true
+CONST_KREEARRA_RULE (VAR_KREEARRA_BGHIDECOINS && name:"coins" && quantity:<=3000) {
+  hidden = true;
+}
+
+
+/*@ define:input
+type: boolean
+group: "Kree'arra"
+label: Always show bones
+*/
+#define VAR_KREEARRA_B2P false
+CONST_KREEARRA_RULE (VAR_KREEARRA_B2P && name:"*bones") {
+  hidden = false;
+}
+
+
+#define CONST_AREA_KREEARRA [2823,5295,2,2843,5309,2]
+#define CONST_KREEARRA_RULE(_cond) rule (area:CONST_AREA_KREEARRA && (_cond))
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: 100%'
+group: Kree'arra
+enum: ["Big bones","Feather","Frozen key piece (armadyl)","Bones"]
+*/
+#define VAR_KREEARRA_ENUMLIST_FILTER_100 ["Big bones","Feather","Bones"]
+CONST_KREEARRA_RULE (name:VAR_KREEARRA_ENUMLIST_FILTER_100) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Weapons and armour'
+group: Kree'arra
+enum: ["Black d'hide body","Rune crossbow"]
+*/
+#define VAR_KREEARRA_ENUMLIST_FILTER_WEAPONSANDARMOUR []
+CONST_KREEARRA_RULE (name:VAR_KREEARRA_ENUMLIST_FILTER_WEAPONSANDARMOUR) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Runes and ammunition'
+group: Kree'arra
+enum: ["Mind rune","Rune arrow","Runite bolts","Dragonstone bolts (e)"]
+*/
+#define VAR_KREEARRA_ENUMLIST_FILTER_RUNESANDAMMUNITION []
+CONST_KREEARRA_RULE (name:VAR_KREEARRA_ENUMLIST_FILTER_RUNESANDAMMUNITION) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Other'
+group: Kree'arra
+enum: ["Coins","Ranging potion(3)","Super defence(3)","Grimy dwarf weed","Dwarf weed seed","Crystal key","Yew seed","Crushed nest","Grimy kwuarm"]
+*/
+#define VAR_KREEARRA_ENUMLIST_FILTER_OTHER []
+CONST_KREEARRA_RULE (name:VAR_KREEARRA_ENUMLIST_FILTER_OTHER) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Tertiary'
+group: Kree'arra
+enum: ["Brimstone key","Long bone","Pet kree'arra","Curved bone","Frozen key piece (armadyl)"]
+*/
+#define VAR_KREEARRA_ENUMLIST_FILTER_TERTIARY []
+CONST_KREEARRA_RULE (name:VAR_KREEARRA_ENUMLIST_FILTER_TERTIARY) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Food and ammunition'
+group: Kree'arra
+enum: ["Steel arrow","Steel dart","Smoke rune","Manta ray","Mushroom potato"]
+*/
+#define VAR_KREEARRA_ENUMLIST_FILTER_FOODANDAMMUNITION ["Steel arrow","Steel dart","Smoke rune"]
+CONST_KREEARRA_RULE (name:VAR_KREEARRA_ENUMLIST_FILTER_FOODANDAMMUNITION) {
+  hidden = true;
+}
+
+
+/*@ define:input
+type: boolean
+group: "Commander Zilyana"
+label: Hide coin drops from bodyguards
+*/
+#define VAR_COMMANDERZILYANA_BGHIDECOINS true
+CONST_COMMANDERZILYANA_RULE (VAR_COMMANDERZILYANA_BGHIDECOINS && name:"coins" && quantity:<=3000) {
+  hidden = true;
+}
+
+
+/*@ define:input
+type: boolean
+group: "Commander Zilyana"
+label: Always show bones
+*/
+#define VAR_COMMANDERZILYANA_B2P false
+CONST_COMMANDERZILYANA_RULE (VAR_COMMANDERZILYANA_B2P && name:"*bones") {
+  hidden = false;
+}
+
+
+#define CONST_AREA_COMMANDERZILYANA [2888,5257,0,2908,5276,0]
+#define CONST_COMMANDERZILYANA_RULE(_cond) rule (area:CONST_AREA_COMMANDERZILYANA && (_cond))
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: 100%'
+group: Commander Zilyana
+enum: ["Bones","Frozen key piece (saradomin)"]
+*/
+#define VAR_COMMANDERZILYANA_ENUMLIST_FILTER_100 []
+CONST_COMMANDERZILYANA_RULE (name:VAR_COMMANDERZILYANA_ENUMLIST_FILTER_100) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Weapons and armour'
+group: Commander Zilyana
+enum: ["Adamant platebody","Rune dart","Rune kiteshield","Rune plateskirt"]
+*/
+#define VAR_COMMANDERZILYANA_ENUMLIST_FILTER_WEAPONSANDARMOUR []
+CONST_COMMANDERZILYANA_RULE (name:VAR_COMMANDERZILYANA_ENUMLIST_FILTER_WEAPONSANDARMOUR) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Potions'
+group: Commander Zilyana
+enum: ["Prayer potion(4)","Saradomin brew(3)","Super restore(4)","Super defence(3)","Magic potion(3)"]
+*/
+#define VAR_COMMANDERZILYANA_ENUMLIST_FILTER_POTIONS []
+CONST_COMMANDERZILYANA_RULE (name:VAR_COMMANDERZILYANA_ENUMLIST_FILTER_POTIONS) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Other'
+group: Commander Zilyana
+enum: ["Coins","Diamond","Law rune","Grimy ranarr weed","Ranarr seed","Magic seed","Snape grass","Unicorn horn"]
+*/
+#define VAR_COMMANDERZILYANA_ENUMLIST_FILTER_OTHER []
+CONST_COMMANDERZILYANA_RULE (name:VAR_COMMANDERZILYANA_ENUMLIST_FILTER_OTHER) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Tertiary'
+group: Commander Zilyana
+enum: ["Brimstone key","Pet zilyana","Frozen key piece (saradomin)"]
+*/
+#define VAR_COMMANDERZILYANA_ENUMLIST_FILTER_TERTIARY []
+CONST_COMMANDERZILYANA_RULE (name:VAR_COMMANDERZILYANA_ENUMLIST_FILTER_TERTIARY) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Food and ammunition'
+group: Commander Zilyana
+enum: ["Steel arrow","Steel dart","Law rune","Monkfish","Summer pie"]
+*/
+#define VAR_COMMANDERZILYANA_ENUMLIST_FILTER_FOODANDAMMUNITION []
+CONST_COMMANDERZILYANA_RULE (name:VAR_COMMANDERZILYANA_ENUMLIST_FILTER_FOODANDAMMUNITION) {
+  hidden = true;
+}
+
+
+/*@ define:input
+type: boolean
+group: "General Graardor"
+label: Hide coin drops from bodyguards
+*/
+#define VAR_GENERALGRAARDOR_BGHIDECOINS true
+CONST_GENERALGRAARDOR_RULE (VAR_GENERALGRAARDOR_BGHIDECOINS && name:"coins" && quantity:<=3000) {
+  hidden = true;
+}
+
+
+/*@ define:input
+type: boolean
+group: "General Graardor"
+label: Always show bones
+*/
+#define VAR_GENERALGRAARDOR_B2P false
+CONST_GENERALGRAARDOR_RULE (VAR_GENERALGRAARDOR_B2P && name:"*bones") {
+  hidden = false;
+}
+
+
+#define CONST_AREA_GENERALGRAARDOR [2863,5350,2,2877,5370,2]
+#define CONST_GENERALGRAARDOR_RULE(_cond) rule (area:CONST_AREA_GENERALGRAARDOR && (_cond))
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: 100%'
+group: General Graardor
+enum: ["Big bones","Frozen key piece (bandos)","Bones"]
+*/
+#define VAR_GENERALGRAARDOR_ENUMLIST_FILTER_100 ["Big bones","Bones"]
+CONST_GENERALGRAARDOR_RULE (name:VAR_GENERALGRAARDOR_ENUMLIST_FILTER_100) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Weapons and armour'
+group: General Graardor
+enum: ["Rune longsword","Rune 2h sword","Rune platebody","Rune pickaxe"]
+*/
+#define VAR_GENERALGRAARDOR_ENUMLIST_FILTER_WEAPONSANDARMOUR []
+CONST_GENERALGRAARDOR_RULE (name:VAR_GENERALGRAARDOR_ENUMLIST_FILTER_WEAPONSANDARMOUR) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Other'
+group: General Graardor
+enum: ["Coins","Grimy snapdragon","Snapdragon seed","Super restore(4)","Adamantite ore","Coal","Magic logs","Nature rune","Limpwurt root","Combat potion(3)","Super strength(3)"]
+*/
+#define VAR_GENERALGRAARDOR_ENUMLIST_FILTER_OTHER ["Limpwurt root","Combat potion(3)","Super strength(3)"]
+CONST_GENERALGRAARDOR_RULE (name:VAR_GENERALGRAARDOR_ENUMLIST_FILTER_OTHER) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Tertiary'
+group: General Graardor
+enum: ["Brimstone key","Long bone","Pet general graardor","Curved bone","Kebab","Frozen key piece (bandos)","Goblin champion scroll","Beer","Right eye patch"]
+*/
+#define VAR_GENERALGRAARDOR_ENUMLIST_FILTER_TERTIARY ["Kebab","Beer","Right eye patch"]
+CONST_GENERALGRAARDOR_RULE (name:VAR_GENERALGRAARDOR_ENUMLIST_FILTER_TERTIARY) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Food and ammunition'
+group: General Graardor
+enum: ["Steel arrow","Steel dart","Nature rune","Cosmic rune","Shark","Chilli potato"]
+*/
+#define VAR_GENERALGRAARDOR_ENUMLIST_FILTER_FOODANDAMMUNITION ["Steel arrow","Steel dart","Chilli potato"]
+CONST_GENERALGRAARDOR_RULE (name:VAR_GENERALGRAARDOR_ENUMLIST_FILTER_FOODANDAMMUNITION) {
+  hidden = true;
+}
+
+
+/*@ define:input
+type: boolean
+group: "K'ril Tsutsaroth"
+label: Hide coin drops from bodyguards
+*/
+#define VAR_KRILTSUTSAROTH_BGHIDECOINS true
+CONST_KRILTSUTSAROTH_RULE (VAR_KRILTSUTSAROTH_BGHIDECOINS && name:"coins" && quantity:<=3000) {
+  hidden = true;
+}
+
+
+#define CONST_AREA_KRILTSUTSAROTH [2917,5317,2,2937,5332,2]
+#define CONST_KRILTSUTSAROTH_RULE(_cond) rule (area:CONST_AREA_KRILTSUTSAROTH && (_cond))
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: 100%'
+group: K'ril Tsutsaroth
+enum: ["Infernal ashes","Frozen key piece (zamorak)","Malicious ashes"]
+*/
+#define VAR_KRILTSUTSAROTH_ENUMLIST_FILTER_100 []
+CONST_KRILTSUTSAROTH_RULE (name:VAR_KRILTSUTSAROTH_ENUMLIST_FILTER_100) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Weapons and armour'
+group: K'ril Tsutsaroth
+enum: ["Adamant arrow(p++)","Rune scimitar","Adamant platebody","Rune platelegs","Dragon dagger(p++)"]
+*/
+#define VAR_KRILTSUTSAROTH_ENUMLIST_FILTER_WEAPONSANDARMOUR []
+CONST_KRILTSUTSAROTH_RULE (name:VAR_KRILTSUTSAROTH_ENUMLIST_FILTER_WEAPONSANDARMOUR) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Potions'
+group: K'ril Tsutsaroth
+enum: ["Super attack(3)","Super strength(3)","Super restore(3)","Zamorak brew(3)"]
+*/
+#define VAR_KRILTSUTSAROTH_ENUMLIST_FILTER_POTIONS []
+CONST_KRILTSUTSAROTH_RULE (name:VAR_KRILTSUTSAROTH_ENUMLIST_FILTER_POTIONS) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Other'
+group: K'ril Tsutsaroth
+enum: ["Coins","Grimy lantadyme","Lantadyme seed","Death rune","Blood rune","Shark","Tuna potato","Wine of zamorak","Super attack(3)","Super strength(3)"]
+*/
+#define VAR_KRILTSUTSAROTH_ENUMLIST_FILTER_OTHER []
+CONST_KRILTSUTSAROTH_RULE (name:VAR_KRILTSUTSAROTH_ENUMLIST_FILTER_OTHER) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Tertiary'
+group: K'ril Tsutsaroth
+enum: ["Brimstone key","Pet k'ril tsutsaroth","Frozen key piece (zamorak)","Lesser demon champion scroll"]
+*/
+#define VAR_KRILTSUTSAROTH_ENUMLIST_FILTER_TERTIARY []
+CONST_KRILTSUTSAROTH_RULE (name:VAR_KRILTSUTSAROTH_ENUMLIST_FILTER_TERTIARY) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Runes and ammunition'
+group: K'ril Tsutsaroth
+enum: ["Steel arrow","Steel dart","Death rune","Blood rune"]
+*/
+#define VAR_KRILTSUTSAROTH_ENUMLIST_FILTER_RUNESANDAMMUNITION []
+CONST_KRILTSUTSAROTH_RULE (name:VAR_KRILTSUTSAROTH_ENUMLIST_FILTER_RUNESANDAMMUNITION) {
+  hidden = true;
+}
+
+
+#define CONST_AREA_THEHUEYCOATL [1497,3271,0,1529,3301,0]
+#define CONST_THEHUEYCOATL_RULE(_cond) rule (area:CONST_AREA_THEHUEYCOATL && (_cond))
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: 100%'
+group: The Hueycoatl
+enum: ["Big bones"]
+*/
+#define VAR_THEHUEYCOATL_ENUMLIST_FILTER_100 []
+CONST_THEHUEYCOATL_RULE (name:VAR_THEHUEYCOATL_ENUMLIST_FILTER_100) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Unique'
+group: The Hueycoatl
+enum: ["Dragon hunter wand","Hueycoatl hide","Tome of earth (empty)"]
+*/
+#define VAR_THEHUEYCOATL_ENUMLIST_FILTER_UNIQUE []
+CONST_THEHUEYCOATL_RULE (name:VAR_THEHUEYCOATL_ENUMLIST_FILTER_UNIQUE) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Weapons and armour'
+group: The Hueycoatl
+enum: ["Rune mace","Rune scimitar","Rune plateskirt","Adamant platebody"]
+*/
+#define VAR_THEHUEYCOATL_ENUMLIST_FILTER_WEAPONSANDARMOUR []
+CONST_THEHUEYCOATL_RULE (name:VAR_THEHUEYCOATL_ENUMLIST_FILTER_WEAPONSANDARMOUR) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Runes and ammunition'
+group: The Hueycoatl
+enum: ["Death rune","Earth rune","Cosmic rune","Nature rune"]
+*/
+#define VAR_THEHUEYCOATL_ENUMLIST_FILTER_RUNESANDAMMUNITION []
+CONST_THEHUEYCOATL_RULE (name:VAR_THEHUEYCOATL_ENUMLIST_FILTER_RUNESANDAMMUNITION) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Seeds'
+group: The Hueycoatl
+enum: ["Lantadyme seed","Huasca seed","Toadflax seed","Torstol seed","Ranarr seed","Avantoe seed","Kwuarm seed"]
+*/
+#define VAR_THEHUEYCOATL_ENUMLIST_FILTER_SEEDS []
+CONST_THEHUEYCOATL_RULE (name:VAR_THEHUEYCOATL_ENUMLIST_FILTER_SEEDS) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Other'
+group: The Hueycoatl
+enum: ["Soiled page","Adamant bolts(unf)","Air orb","Raw shark","Sunfire splinters","Sun-kissed bones","Dragon bones","Adamantite ore","Steel cannonball","Rune dart tip","Limpwurt root"]
+*/
+#define VAR_THEHUEYCOATL_ENUMLIST_FILTER_OTHER []
+CONST_THEHUEYCOATL_RULE (name:VAR_THEHUEYCOATL_ENUMLIST_FILTER_OTHER) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Tertiary'
+group: The Hueycoatl
+enum: ["Tooth half of key (moon key)","Huberte"]
+*/
+#define VAR_THEHUEYCOATL_ENUMLIST_FILTER_TERTIARY []
+CONST_THEHUEYCOATL_RULE (name:VAR_THEHUEYCOATL_ENUMLIST_FILTER_TERTIARY) {
+  hidden = true;
+}
+
+
+#define CONST_AREA_CORPOREALBEAST [2961,4366,0,3001,4399,0]
+#define CONST_CORPOREALBEAST_RULE(_cond) rule (area:CONST_AREA_CORPOREALBEAST && (_cond))
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Weapons and armour'
+group: Corporeal Beast
+enum: ["Mystic robe top","Mystic robe bottom","Mystic air staff","Mystic water staff","Mystic earth staff","Mystic fire staff","Spirit shield"]
+*/
+#define VAR_CORPOREALBEAST_ENUMLIST_FILTER_WEAPONSANDARMOUR []
+CONST_CORPOREALBEAST_RULE (name:VAR_CORPOREALBEAST_ENUMLIST_FILTER_WEAPONSANDARMOUR) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Runes and ammunition'
+group: Corporeal Beast
+enum: ["Soul rune","Runite bolts","Death rune","Onyx bolts (e)","Steel cannonball","Adamant arrow","Law rune","Cosmic rune"]
+*/
+#define VAR_CORPOREALBEAST_ENUMLIST_FILTER_RUNESANDAMMUNITION []
+CONST_CORPOREALBEAST_RULE (name:VAR_CORPOREALBEAST_ENUMLIST_FILTER_RUNESANDAMMUNITION) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Resources'
+group: Corporeal Beast
+enum: ["Raw shark","Pure essence","Adamantite bar","Green dragonhide","Adamantite ore","Runite ore","Teak plank","Mahogany logs","Magic logs"]
+*/
+#define VAR_CORPOREALBEAST_ENUMLIST_FILTER_RESOURCES []
+CONST_CORPOREALBEAST_RULE (name:VAR_CORPOREALBEAST_ENUMLIST_FILTER_RESOURCES) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Other'
+group: Corporeal Beast
+enum: ["Tuna potato","White berries","Desert goat horn","Watermelon seed","Coins","Antidote++(4)","Ranarr seed","Holy elixir"]
+*/
+#define VAR_CORPOREALBEAST_ENUMLIST_FILTER_OTHER []
+CONST_CORPOREALBEAST_RULE (name:VAR_CORPOREALBEAST_ENUMLIST_FILTER_OTHER) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Tertiary'
+group: Corporeal Beast
+enum: ["Jar of spirits","Pet dark core"]
+*/
+#define VAR_CORPOREALBEAST_ENUMLIST_FILTER_TERTIARY []
+CONST_CORPOREALBEAST_RULE (name:VAR_CORPOREALBEAST_ENUMLIST_FILTER_TERTIARY) {
+  hidden = true;
+}
+
+
+#define CONST_AREA_NEX [2910,5188,0,2940,5218,0]
+#define CONST_NEX_RULE(_cond) rule (area:CONST_AREA_NEX && (_cond))
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: 100%'
+group: Nex
+enum: ["Big bones"]
+*/
+#define VAR_NEX_ENUMLIST_FILTER_100 []
+CONST_NEX_RULE (name:VAR_NEX_ENUMLIST_FILTER_100) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Uniques'
+group: Nex
+enum: ["Ancient hilt","Nihil horn","Torva full helm (damaged)","Torva platebody (damaged)","Torva platelegs (damaged)","Zaryte vambraces"]
+*/
+#define VAR_NEX_ENUMLIST_FILTER_UNIQUES []
+CONST_NEX_RULE (name:VAR_NEX_ENUMLIST_FILTER_UNIQUES) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Runes and ammunition'
+group: Nex
+enum: ["Air rune","Fire rune","Blood rune","Death rune","Water rune","Soul rune","Dragon bolts (unf)","Onyx bolts (e)","Steel cannonball"]
+*/
+#define VAR_NEX_ENUMLIST_FILTER_RUNESANDAMMUNITION []
+CONST_NEX_RULE (name:VAR_NEX_ENUMLIST_FILTER_RUNESANDAMMUNITION) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Resources'
+group: Nex
+enum: ["Air orb","Coal","Runite ore","Uncut ruby","Uncut diamond","Wine of zamorak"]
+*/
+#define VAR_NEX_ENUMLIST_FILTER_RESOURCES []
+CONST_NEX_RULE (name:VAR_NEX_ENUMLIST_FILTER_RESOURCES) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Consumables'
+group: Nex
+enum: ["Shark","Prayer potion(4)","Saradomin brew(4)","Super restore(4)"]
+*/
+#define VAR_NEX_ENUMLIST_FILTER_CONSUMABLES []
+CONST_NEX_RULE (name:VAR_NEX_ENUMLIST_FILTER_CONSUMABLES) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Other'
+group: Nex
+enum: ["Blood essence","Coins","Rune sword","Ecumenical key shard","Nihil shard"]
+*/
+#define VAR_NEX_ENUMLIST_FILTER_OTHER []
+CONST_NEX_RULE (name:VAR_NEX_ENUMLIST_FILTER_OTHER) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Tertiary'
+group: Nex
+enum: ["Nexling"]
+*/
+#define VAR_NEX_ENUMLIST_FILTER_TERTIARY []
+CONST_NEX_RULE (name:VAR_NEX_ENUMLIST_FILTER_TERTIARY) {
+  hidden = true;
+}
+
+
+#define CONST_AREA_CHAOSFANATIC [2973,3849,0,2988,3863,0]
+#define CONST_CHAOSFANATIC_RULE(_cond) rule (area:CONST_AREA_CHAOSFANATIC && (_cond))
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: 100%'
+group: Chaos Fanatic
+enum: ["Bones"]
+*/
+#define VAR_CHAOSFANATIC_ENUMLIST_FILTER_100 []
+CONST_CHAOSFANATIC_RULE (name:VAR_CHAOSFANATIC_ENUMLIST_FILTER_100) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Pre-roll'
+group: Chaos Fanatic
+enum: ["Odium shard 1","Malediction shard 1"]
+*/
+#define VAR_CHAOSFANATIC_ENUMLIST_FILTER_PREROLL []
+CONST_CHAOSFANATIC_RULE (name:VAR_CHAOSFANATIC_ENUMLIST_FILTER_PREROLL) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Weapons and armour'
+group: Chaos Fanatic
+enum: ["Battlestaff","Splitbark body","Splitbark legs","Zamorak monk top","Zamorak monk bottom","Ancient staff"]
+*/
+#define VAR_CHAOSFANATIC_ENUMLIST_FILTER_WEAPONSANDARMOUR []
+CONST_CHAOSFANATIC_RULE (name:VAR_CHAOSFANATIC_ENUMLIST_FILTER_WEAPONSANDARMOUR) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Runes'
+group: Chaos Fanatic
+enum: ["Fire rune","Smoke rune","Chaos rune","Blood rune"]
+*/
+#define VAR_CHAOSFANATIC_ENUMLIST_FILTER_RUNES []
+CONST_CHAOSFANATIC_RULE (name:VAR_CHAOSFANATIC_ENUMLIST_FILTER_RUNES) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Consumables'
+group: Chaos Fanatic
+enum: ["Monkfish","Shark","Prayer potion(4)","Anchovy pizza"]
+*/
+#define VAR_CHAOSFANATIC_ENUMLIST_FILTER_CONSUMABLES []
+CONST_CHAOSFANATIC_RULE (name:VAR_CHAOSFANATIC_ENUMLIST_FILTER_CONSUMABLES) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Other'
+group: Chaos Fanatic
+enum: ["Coins","Grimy lantadyme","Ring of life","Chaos talisman","Wine of zamorak","Uncut emerald","Uncut sapphire","Sinister key","Pure essence"]
+*/
+#define VAR_CHAOSFANATIC_ENUMLIST_FILTER_OTHER []
+CONST_CHAOSFANATIC_RULE (name:VAR_CHAOSFANATIC_ENUMLIST_FILTER_OTHER) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Tertiary'
+group: Chaos Fanatic
+enum: ["Looting bag","Brimstone key","Pet chaos elemental"]
+*/
+#define VAR_CHAOSFANATIC_ENUMLIST_FILTER_TERTIARY []
+CONST_CHAOSFANATIC_RULE (name:VAR_CHAOSFANATIC_ENUMLIST_FILTER_TERTIARY) {
+  hidden = true;
+}
+
+
+#define CONST_AREA_CRAZYARCHAEOLOGIST [2953,3679,0,2985,3708,0]
+#define CONST_CRAZYARCHAEOLOGIST_RULE(_cond) rule (area:CONST_AREA_CRAZYARCHAEOLOGIST && (_cond))
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: 100%'
+group: Crazy archaeologist
+enum: ["Bones"]
+*/
+#define VAR_CRAZYARCHAEOLOGIST_ENUMLIST_FILTER_100 []
+CONST_CRAZYARCHAEOLOGIST_RULE (name:VAR_CRAZYARCHAEOLOGIST_ENUMLIST_FILTER_100) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Pre-roll'
+group: Crazy archaeologist
+enum: ["Odium shard 2","Malediction shard 2"]
+*/
+#define VAR_CRAZYARCHAEOLOGIST_ENUMLIST_FILTER_PREROLL []
+CONST_CRAZYARCHAEOLOGIST_RULE (name:VAR_CRAZYARCHAEOLOGIST_ENUMLIST_FILTER_PREROLL) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Weapons and armour'
+group: Crazy archaeologist
+enum: ["Amulet of power","Rune crossbow","Red d'hide body","Rune knife"]
+*/
+#define VAR_CRAZYARCHAEOLOGIST_ENUMLIST_FILTER_WEAPONSANDARMOUR []
+CONST_CRAZYARCHAEOLOGIST_RULE (name:VAR_CRAZYARCHAEOLOGIST_ENUMLIST_FILTER_WEAPONSANDARMOUR) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Runes and ammunition'
+group: Crazy archaeologist
+enum: ["Mud rune","Steel cannonball","Dragon arrow"]
+*/
+#define VAR_CRAZYARCHAEOLOGIST_ENUMLIST_FILTER_RUNESANDAMMUNITION []
+CONST_CRAZYARCHAEOLOGIST_RULE (name:VAR_CRAZYARCHAEOLOGIST_ENUMLIST_FILTER_RUNESANDAMMUNITION) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Consumables'
+group: Crazy archaeologist
+enum: ["Shark","Potato with cheese","Prayer potion(4)","Anchovy pizza"]
+*/
+#define VAR_CRAZYARCHAEOLOGIST_ENUMLIST_FILTER_CONSUMABLES []
+CONST_CRAZYARCHAEOLOGIST_RULE (name:VAR_CRAZYARCHAEOLOGIST_ENUMLIST_FILTER_CONSUMABLES) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Other'
+group: Crazy archaeologist
+enum: ["Coins","Grimy dwarf weed","White berries","Silver ore","Uncut emerald","Uncut sapphire","Red dragonhide","Rusty sword","Muddy key","Onyx bolt tips","Long bone"]
+*/
+#define VAR_CRAZYARCHAEOLOGIST_ENUMLIST_FILTER_OTHER []
+CONST_CRAZYARCHAEOLOGIST_RULE (name:VAR_CRAZYARCHAEOLOGIST_ENUMLIST_FILTER_OTHER) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Tertiary'
+group: Crazy archaeologist
+enum: ["Looting bag","Brimstone key","Fedora"]
+*/
+#define VAR_CRAZYARCHAEOLOGIST_ENUMLIST_FILTER_TERTIARY []
+CONST_CRAZYARCHAEOLOGIST_RULE (name:VAR_CRAZYARCHAEOLOGIST_ENUMLIST_FILTER_TERTIARY) {
+  hidden = true;
+}
+
+
+#define CONST_AREA_SCORPIA [3214,10324,0,3252,10358,0]
+#define CONST_SCORPIA_RULE(_cond) rule (area:CONST_AREA_SCORPIA && (_cond))
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Pre-roll'
+group: Scorpia
+enum: ["Odium shard 3","Malediction shard 3"]
+*/
+#define VAR_SCORPIA_ENUMLIST_FILTER_PREROLL []
+CONST_SCORPIA_RULE (name:VAR_SCORPIA_ENUMLIST_FILTER_PREROLL) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Weapons and armour'
+group: Scorpia
+enum: ["Battlestaff","Rune 2h sword","Rune pickaxe","Rune kiteshield","Rune chainbody","Rune platelegs","Rune scimitar","Rune warhammer","Mystic earth staff","Mystic robe top","Mystic robe bottom","Dragon scimitar","Dragon 2h sword"]
+*/
+#define VAR_SCORPIA_ENUMLIST_FILTER_WEAPONSANDARMOUR []
+CONST_SCORPIA_RULE (name:VAR_SCORPIA_ENUMLIST_FILTER_WEAPONSANDARMOUR) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Runes'
+group: Scorpia
+enum: ["Death rune","Blood rune","Chaos rune"]
+*/
+#define VAR_SCORPIA_ENUMLIST_FILTER_RUNES []
+CONST_SCORPIA_RULE (name:VAR_SCORPIA_ENUMLIST_FILTER_RUNES) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Herbs'
+group: Scorpia
+enum: ["Grimy kwuarm","Grimy dwarf weed","Grimy torstol","Grimy snapdragon"]
+*/
+#define VAR_SCORPIA_ENUMLIST_FILTER_HERBS []
+CONST_SCORPIA_RULE (name:VAR_SCORPIA_ENUMLIST_FILTER_HERBS) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Materials'
+group: Scorpia
+enum: ["Uncut ruby","Uncut diamond","Runite ore","Dragon javelin tips","Onyx bolt tips"]
+*/
+#define VAR_SCORPIA_ENUMLIST_FILTER_MATERIALS []
+CONST_SCORPIA_RULE (name:VAR_SCORPIA_ENUMLIST_FILTER_MATERIALS) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Other'
+group: Scorpia
+enum: ["Coins","Blighted anglerfish","Blighted super restore(4)","Wilderness crabs teleport"]
+*/
+#define VAR_SCORPIA_ENUMLIST_FILTER_OTHER []
+CONST_SCORPIA_RULE (name:VAR_SCORPIA_ENUMLIST_FILTER_OTHER) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Tertiary'
+group: Scorpia
+enum: ["Looting bag","Ensouled scorpion head","Brimstone key","Scorpia's offspring"]
+*/
+#define VAR_SCORPIA_ENUMLIST_FILTER_TERTIARY []
+CONST_SCORPIA_RULE (name:VAR_SCORPIA_ENUMLIST_FILTER_TERTIARY) {
+  hidden = true;
+}
+
+
+#define CONST_AREA_KINGBLACKDRAGON [2240,4672,0,2303,4735,0]
+#define CONST_KINGBLACKDRAGON_RULE(_cond) rule (area:CONST_AREA_KINGBLACKDRAGON && (_cond))
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: 100%'
+group: King Black Dragon
+enum: ["Dragon bones","Black dragonhide"]
+*/
+#define VAR_KINGBLACKDRAGON_ENUMLIST_FILTER_100 []
+CONST_KINGBLACKDRAGON_RULE (name:VAR_KINGBLACKDRAGON_ENUMLIST_FILTER_100) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Pre-roll'
+group: King Black Dragon
+enum: ["Dragon pickaxe"]
+*/
+#define VAR_KINGBLACKDRAGON_ENUMLIST_FILTER_PREROLL []
+CONST_KINGBLACKDRAGON_RULE (name:VAR_KINGBLACKDRAGON_ENUMLIST_FILTER_PREROLL) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Weapons and armour'
+group: King Black Dragon
+enum: ["Rune longsword","Adamant platebody","Adamant kiteshield","Dragon med helm"]
+*/
+#define VAR_KINGBLACKDRAGON_ENUMLIST_FILTER_WEAPONSANDARMOUR []
+CONST_KINGBLACKDRAGON_RULE (name:VAR_KINGBLACKDRAGON_ENUMLIST_FILTER_WEAPONSANDARMOUR) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Runes and ammunition'
+group: King Black Dragon
+enum: ["Fire rune","Air rune","Iron arrow","Runite bolts","Law rune","Blood rune"]
+*/
+#define VAR_KINGBLACKDRAGON_ENUMLIST_FILTER_RUNESANDAMMUNITION []
+CONST_KINGBLACKDRAGON_RULE (name:VAR_KINGBLACKDRAGON_ENUMLIST_FILTER_RUNESANDAMMUNITION) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Resources'
+group: King Black Dragon
+enum: ["Yew logs","Adamantite bar","Runite bar","Gold ore"]
+*/
+#define VAR_KINGBLACKDRAGON_ENUMLIST_FILTER_RESOURCES []
+CONST_KINGBLACKDRAGON_RULE (name:VAR_KINGBLACKDRAGON_ENUMLIST_FILTER_RESOURCES) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Other'
+group: King Black Dragon
+enum: ["Amulet of power","Dragon arrowtips","Dragon dart tip","Dragon javelin tips","Runite limbs","Shark"]
+*/
+#define VAR_KINGBLACKDRAGON_ENUMLIST_FILTER_OTHER []
+CONST_KINGBLACKDRAGON_RULE (name:VAR_KINGBLACKDRAGON_ENUMLIST_FILTER_OTHER) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Tertiary'
+group: King Black Dragon
+enum: ["Key (elite)","Brimstone key","Kbd heads","Prince black dragon","Draconic visage"]
+*/
+#define VAR_KINGBLACKDRAGON_ENUMLIST_FILTER_TERTIARY []
+CONST_KINGBLACKDRAGON_RULE (name:VAR_KINGBLACKDRAGON_ENUMLIST_FILTER_TERTIARY) {
+  hidden = true;
+}
+
+
+#define CONST_AREA_CHAOSELEMENTAL [3200,3904,0,3327,3967,0]
+#define CONST_CHAOSELEMENTAL_RULE(_cond) rule (area:CONST_AREA_CHAOSELEMENTAL && (_cond))
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Minor drops'
+group: Chaos Elemental
+enum: ["Blighted anglerfish","Blighted karambwan","Blighted super restore(4)","Dragon bones","Super combat potion(1)"]
+*/
+#define VAR_CHAOSELEMENTAL_ENUMLIST_FILTER_MINORDROPS []
+CONST_CHAOSELEMENTAL_RULE (name:VAR_CHAOSELEMENTAL_ENUMLIST_FILTER_MINORDROPS) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Pre-roll'
+group: Chaos Elemental
+enum: ["Dragon pickaxe"]
+*/
+#define VAR_CHAOSELEMENTAL_ENUMLIST_FILTER_PREROLL []
+CONST_CHAOSELEMENTAL_RULE (name:VAR_CHAOSELEMENTAL_ENUMLIST_FILTER_PREROLL) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Weapons and armour'
+group: Chaos Elemental
+enum: ["Rune dart","Rune platelegs","Rune plateskirt","Rune 2h sword","Rune battleaxe","Rune full helm","Rune kiteshield","Mystic air staff","Mystic water staff","Mystic earth staff","Mystic fire staff","Dragon dagger","Dragon 2h sword","Dragon platelegs","Dragon plateskirt"]
+*/
+#define VAR_CHAOSELEMENTAL_ENUMLIST_FILTER_WEAPONSANDARMOUR []
+CONST_CHAOSELEMENTAL_RULE (name:VAR_CHAOSELEMENTAL_ENUMLIST_FILTER_WEAPONSANDARMOUR) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Runes and ammunition'
+group: Chaos Elemental
+enum: ["Chaos rune","Blood rune","Rune arrow"]
+*/
+#define VAR_CHAOSELEMENTAL_ENUMLIST_FILTER_RUNESANDAMMUNITION []
+CONST_CHAOSELEMENTAL_RULE (name:VAR_CHAOSELEMENTAL_ENUMLIST_FILTER_RUNESANDAMMUNITION) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Herbs'
+group: Chaos Elemental
+enum: ["Grimy ranarr weed","Grimy snapdragon","Grimy avantoe","Grimy kwuarm"]
+*/
+#define VAR_CHAOSELEMENTAL_ENUMLIST_FILTER_HERBS []
+CONST_CHAOSELEMENTAL_RULE (name:VAR_CHAOSELEMENTAL_ENUMLIST_FILTER_HERBS) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Resources'
+group: Chaos Elemental
+enum: ["Coal","Mahogany plank","Runite bar","Adamantite bar"]
+*/
+#define VAR_CHAOSELEMENTAL_ENUMLIST_FILTER_RESOURCES []
+CONST_CHAOSELEMENTAL_RULE (name:VAR_CHAOSELEMENTAL_ENUMLIST_FILTER_RESOURCES) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Materials'
+group: Chaos Elemental
+enum: ["Coins","Blighted ancient ice sack","Blighted karambwan","Blighted anglerfish","Wilderness crabs teleport"]
+*/
+#define VAR_CHAOSELEMENTAL_ENUMLIST_FILTER_MATERIALS []
+CONST_CHAOSELEMENTAL_RULE (name:VAR_CHAOSELEMENTAL_ENUMLIST_FILTER_MATERIALS) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Tertiary'
+group: Chaos Elemental
+enum: ["Weapon poison(++)","Looting bag","Brimstone key","Pet chaos elemental"]
+*/
+#define VAR_CHAOSELEMENTAL_ENUMLIST_FILTER_TERTIARY []
+CONST_CHAOSELEMENTAL_RULE (name:VAR_CHAOSELEMENTAL_ENUMLIST_FILTER_TERTIARY) {
+  hidden = true;
+}
+
+
+#define CONST_AREA_VETION [3282,10187,1,3307,10216,1]
+#define CONST_VETION_RULE(_cond) rule (area:CONST_AREA_VETION && (_cond))
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: 100%'
+group: Vet'ion
+enum: ["Big bones","Bones"]
+*/
+#define VAR_VETION_ENUMLIST_FILTER_100 []
+CONST_VETION_RULE (name:VAR_VETION_ENUMLIST_FILTER_100) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Unique'
+group: Vet'ion
+enum: ["Skull of vet'ion","Dragon 2h sword","Dragon pickaxe","Voidwaker blade","Ring of the gods"]
+*/
+#define VAR_VETION_ENUMLIST_FILTER_UNIQUE []
+CONST_VETION_RULE (name:VAR_VETION_ENUMLIST_FILTER_UNIQUE) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Weapons and armour'
+group: Vet'ion
+enum: ["Mystic fire staff","Mystic water staff","Mystic robe top","Mystic robe bottom","Rune full helm","Rune pickaxe","Rune dart","Rune knife"]
+*/
+#define VAR_VETION_ENUMLIST_FILTER_WEAPONSANDARMOUR []
+CONST_VETION_RULE (name:VAR_VETION_ENUMLIST_FILTER_WEAPONSANDARMOUR) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Runes and ammunition'
+group: Vet'ion
+enum: ["Chaos rune","Death rune","Blood rune","Steel cannonball"]
+*/
+#define VAR_VETION_ENUMLIST_FILTER_RUNESANDAMMUNITION []
+CONST_VETION_RULE (name:VAR_VETION_ENUMLIST_FILTER_RUNESANDAMMUNITION) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Materials'
+group: Vet'ion
+enum: ["Uncut ruby","Uncut diamond","Uncut dragonstone","Gold ore","Limpwurt root","Wine of zamorak","Magic logs","Oak plank","Dragon bones","Mort myre fungus","Grimy ranarr weed","Grimy dwarf weed","Grimy snapdragon","Grimy toadflax"]
+*/
+#define VAR_VETION_ENUMLIST_FILTER_MATERIALS []
+CONST_VETION_RULE (name:VAR_VETION_ENUMLIST_FILTER_MATERIALS) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Other'
+group: Vet'ion
+enum: ["Coins","Supercompost","Super restore(4)","Blighted anglerfish","Sanfew serum(4)","Dark crab","Wilderness crabs teleport"]
+*/
+#define VAR_VETION_ENUMLIST_FILTER_OTHER []
+CONST_VETION_RULE (name:VAR_VETION_ENUMLIST_FILTER_OTHER) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Secondary Supply roll'
+group: Vet'ion
+enum: ["Blighted anglerfish","Blighted karambwan","Blighted super restore(3)","Blighted super restore(4)","Ranging potion(2)","Super combat potion(2)"]
+*/
+#define VAR_VETION_ENUMLIST_FILTER_SECONDARYSUPPLYROLL []
+CONST_VETION_RULE (name:VAR_VETION_ENUMLIST_FILTER_SECONDARYSUPPLYROLL) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Tertiary'
+group: Vet'ion
+enum: ["Looting bag","Brimstone key","Long bone","Vet'ion jr.","Skeleton champion scroll","Curved bone"]
+*/
+#define VAR_VETION_ENUMLIST_FILTER_TERTIARY []
+CONST_VETION_RULE (name:VAR_VETION_ENUMLIST_FILTER_TERTIARY) {
+  hidden = true;
+}
+
+
+#define CONST_AREA_VENENATIS [3402,10181,2,3443,10225,2]
+#define CONST_VENENATIS_RULE(_cond) rule (area:CONST_AREA_VENENATIS && (_cond))
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: 100%'
+group: Venenatis
+enum: ["Big bones","Bones"]
+*/
+#define VAR_VENENATIS_ENUMLIST_FILTER_100 []
+CONST_VENENATIS_RULE (name:VAR_VENENATIS_ENUMLIST_FILTER_100) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Unique'
+group: Venenatis
+enum: ["Fangs of venenatis","Dragon 2h sword","Dragon pickaxe","Voidwaker gem","Treasonous ring"]
+*/
+#define VAR_VENENATIS_ENUMLIST_FILTER_UNIQUE []
+CONST_VENENATIS_RULE (name:VAR_VENENATIS_ENUMLIST_FILTER_UNIQUE) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Weapons and armour'
+group: Venenatis
+enum: ["Mystic air staff","Rune pickaxe","Rune dart","Rune knife","Rune platelegs","Rune sq shield","Dragon dagger"]
+*/
+#define VAR_VENENATIS_ENUMLIST_FILTER_WEAPONSANDARMOUR []
+CONST_VENENATIS_RULE (name:VAR_VENENATIS_ENUMLIST_FILTER_WEAPONSANDARMOUR) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Runes and ammunition'
+group: Venenatis
+enum: ["Chaos rune","Death rune","Blood rune","Diamond bolts (e)","Steel cannonball"]
+*/
+#define VAR_VENENATIS_ENUMLIST_FILTER_RUNESANDAMMUNITION []
+CONST_VENENATIS_RULE (name:VAR_VENENATIS_ENUMLIST_FILTER_RUNESANDAMMUNITION) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Materials'
+group: Venenatis
+enum: ["Uncut ruby","Uncut diamond","Gold ore","Onyx bolt tips","Magic logs","Limpwurt root","Red spiders' eggs","Unicorn horn","Uncut dragonstone","Grimy ranarr weed","Grimy snapdragon","Grimy toadflax","Battlestaff"]
+*/
+#define VAR_VENENATIS_ENUMLIST_FILTER_MATERIALS []
+CONST_VENENATIS_RULE (name:VAR_VENENATIS_ENUMLIST_FILTER_MATERIALS) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Other'
+group: Venenatis
+enum: ["Coins","Supercompost","Antidote++(4)","Super restore(4)","Dark crab","Blighted anglerfish","Wilderness crabs teleport"]
+*/
+#define VAR_VENENATIS_ENUMLIST_FILTER_OTHER []
+CONST_VENENATIS_RULE (name:VAR_VENENATIS_ENUMLIST_FILTER_OTHER) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Secondary Supply roll'
+group: Venenatis
+enum: ["Blighted anglerfish","Blighted karambwan","Blighted super restore(3)","Blighted super restore(4)","Ranging potion(2)","Super combat potion(2)"]
+*/
+#define VAR_VENENATIS_ENUMLIST_FILTER_SECONDARYSUPPLYROLL []
+CONST_VENENATIS_RULE (name:VAR_VENENATIS_ENUMLIST_FILTER_SECONDARYSUPPLYROLL) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Tertiary'
+group: Venenatis
+enum: ["Looting bag","Strange fruit","Brimstone key","Long bone","Venenatis spiderling","Curved bone"]
+*/
+#define VAR_VENENATIS_ENUMLIST_FILTER_TERTIARY []
+CONST_VENENATIS_RULE (name:VAR_VENENATIS_ENUMLIST_FILTER_TERTIARY) {
+  hidden = true;
+}
+
+
+#define CONST_AREA_CALLISTO [3342,10311,0,3374,10344,0]
+#define CONST_CALLISTO_RULE(_cond) rule (area:CONST_AREA_CALLISTO && (_cond))
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: 100%'
+group: Callisto
+enum: ["Big bones","Bones"]
+*/
+#define VAR_CALLISTO_ENUMLIST_FILTER_100 []
+CONST_CALLISTO_RULE (name:VAR_CALLISTO_ENUMLIST_FILTER_100) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Unique'
+group: Callisto
+enum: ["Claws of callisto","Dragon 2h sword","Dragon pickaxe","Voidwaker hilt","Tyrannical ring"]
+*/
+#define VAR_CALLISTO_ENUMLIST_FILTER_UNIQUE []
+CONST_CALLISTO_RULE (name:VAR_CALLISTO_ENUMLIST_FILTER_UNIQUE) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Weapons and armour'
+group: Callisto
+enum: ["Mystic earth staff","Mystic robe top","Mystic robe bottom","Rune pickaxe","Rune 2h sword","Rune kiteshield","Rune platebody"]
+*/
+#define VAR_CALLISTO_ENUMLIST_FILTER_WEAPONSANDARMOUR []
+CONST_CALLISTO_RULE (name:VAR_CALLISTO_ENUMLIST_FILTER_WEAPONSANDARMOUR) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Runes and ammunition'
+group: Callisto
+enum: ["Blood rune","Death rune","Chaos rune","Soul rune","Steel cannonball"]
+*/
+#define VAR_CALLISTO_ENUMLIST_FILTER_RUNESANDAMMUNITION []
+CONST_CALLISTO_RULE (name:VAR_CALLISTO_ENUMLIST_FILTER_RUNESANDAMMUNITION) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Materials'
+group: Callisto
+enum: ["Uncut ruby","Uncut diamond","Uncut dragonstone","Limpwurt root","Magic logs","Mahogany logs","Red dragonhide","Coconut","Grimy toadflax","Grimy dwarf weed","Grimy ranarr weed","Grimy snapdragon"]
+*/
+#define VAR_CALLISTO_ENUMLIST_FILTER_MATERIALS []
+CONST_CALLISTO_RULE (name:VAR_CALLISTO_ENUMLIST_FILTER_MATERIALS) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Seeds'
+group: Callisto
+enum: ["Ranarr seed","Snapdragon seed"]
+*/
+#define VAR_CALLISTO_ENUMLIST_FILTER_SEEDS []
+CONST_CALLISTO_RULE (name:VAR_CALLISTO_ENUMLIST_FILTER_SEEDS) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Other'
+group: Callisto
+enum: ["Coins","Dark crab","Super restore(4)","Supercompost","Dragon bones","Blighted anglerfish","Wilderness crabs teleport"]
+*/
+#define VAR_CALLISTO_ENUMLIST_FILTER_OTHER []
+CONST_CALLISTO_RULE (name:VAR_CALLISTO_ENUMLIST_FILTER_OTHER) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Secondary Supply roll'
+group: Callisto
+enum: ["Blighted anglerfish","Blighted karambwan","Blighted super restore(3)","Blighted super restore(4)","Ranging potion(2)","Super combat potion(2)"]
+*/
+#define VAR_CALLISTO_ENUMLIST_FILTER_SECONDARYSUPPLYROLL []
+CONST_CALLISTO_RULE (name:VAR_CALLISTO_ENUMLIST_FILTER_SECONDARYSUPPLYROLL) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Tertiary'
+group: Callisto
+enum: ["Looting bag","Brimstone key","Long bone","Callisto cub","Curved bone"]
+*/
+#define VAR_CALLISTO_ENUMLIST_FILTER_TERTIARY []
+CONST_CALLISTO_RULE (name:VAR_CALLISTO_ENUMLIST_FILTER_TERTIARY) {
+  hidden = true;
+}
+
+
+#define CONST_AREA_AMOXLIATL [1347,4493,0,1383,4529,0]
+#define CONST_AMOXLIATL_RULE(_cond) rule (area:CONST_AREA_AMOXLIATL && (_cond))
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Frozen tears'
+group: Amoxliatl
+enum: ["Frozen tear"]
+*/
+#define VAR_AMOXLIATL_ENUMLIST_FILTER_FROZENTEARS []
+CONST_AMOXLIATL_RULE (name:VAR_AMOXLIATL_ENUMLIST_FILTER_FROZENTEARS) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Weapons and armour'
+group: Amoxliatl
+enum: ["Rune mace","Rune pickaxe","Rune platebody","Rune platelegs"]
+*/
+#define VAR_AMOXLIATL_ENUMLIST_FILTER_WEAPONSANDARMOUR []
+CONST_AMOXLIATL_RULE (name:VAR_AMOXLIATL_ENUMLIST_FILTER_WEAPONSANDARMOUR) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Runes and ammunition'
+group: Amoxliatl
+enum: ["Water rune","Chaos rune","Death rune","Blood rune","Soul rune","Nature rune"]
+*/
+#define VAR_AMOXLIATL_ENUMLIST_FILTER_RUNESANDAMMUNITION []
+CONST_AMOXLIATL_RULE (name:VAR_AMOXLIATL_ENUMLIST_FILTER_RUNESANDAMMUNITION) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Other'
+group: Amoxliatl
+enum: ["Coal","Gold ore","Adamantite ore","Prayer potion(3)","Runite ore","Blessed bone shards","Water orb","Water talisman","Huasca seed"]
+*/
+#define VAR_AMOXLIATL_ENUMLIST_FILTER_OTHER []
+CONST_AMOXLIATL_RULE (name:VAR_AMOXLIATL_ENUMLIST_FILTER_OTHER) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Tertiary'
+group: Amoxliatl
+enum: ["Clue scroll (elite)","Reward casket (elite)","Pendant of ates (inert)","Glacial temotli","Tooth half of key (moon key)","Brimstone key","Moxi"]
+*/
+#define VAR_AMOXLIATL_ENUMLIST_FILTER_TERTIARY []
+CONST_AMOXLIATL_RULE (name:VAR_AMOXLIATL_ENUMLIST_FILTER_TERTIARY) {
+  hidden = true;
+}
+
+
+#define CONST_AREA_ZULRAH [2259,3065,0,2277,3080,0]
+#define CONST_ZULRAH_RULE(_cond) rule (area:CONST_AREA_ZULRAH && (_cond))
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: 100%'
+group: Zulrah
+enum: ["Zulrah's scales"]
+*/
+#define VAR_ZULRAH_ENUMLIST_FILTER_100 []
+CONST_ZULRAH_RULE (name:VAR_ZULRAH_ENUMLIST_FILTER_100) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Uniques'
+group: Zulrah
+enum: ["Tanzanite fang","Magic fang","Serpentine visage","Uncut onyx"]
+*/
+#define VAR_ZULRAH_ENUMLIST_FILTER_UNIQUES []
+CONST_ZULRAH_RULE (name:VAR_ZULRAH_ENUMLIST_FILTER_UNIQUES) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Mutagens'
+group: Zulrah
+enum: ["Flax","Tanzanite mutagen","Magma mutagen"]
+*/
+#define VAR_ZULRAH_ENUMLIST_FILTER_MUTAGENS []
+CONST_ZULRAH_RULE (name:VAR_ZULRAH_ENUMLIST_FILTER_MUTAGENS) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Weapons and armour'
+group: Zulrah
+enum: ["Battlestaff","Dragon med helm","Dragon halberd"]
+*/
+#define VAR_ZULRAH_ENUMLIST_FILTER_WEAPONSANDARMOUR []
+CONST_ZULRAH_RULE (name:VAR_ZULRAH_ENUMLIST_FILTER_WEAPONSANDARMOUR) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Runes'
+group: Zulrah
+enum: ["Death rune","Law rune","Chaos rune"]
+*/
+#define VAR_ZULRAH_ENUMLIST_FILTER_RUNES []
+CONST_ZULRAH_RULE (name:VAR_ZULRAH_ENUMLIST_FILTER_RUNES) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Herbs'
+group: Zulrah
+enum: ["Snapdragon","Dwarf weed","Toadflax","Torstol"]
+*/
+#define VAR_ZULRAH_ENUMLIST_FILTER_HERBS []
+CONST_ZULRAH_RULE (name:VAR_ZULRAH_ENUMLIST_FILTER_HERBS) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Seeds'
+group: Zulrah
+enum: ["Palm tree seed","Papaya tree seed","Calquat tree seed","Magic seed","Toadflax seed","Snapdragon seed","Dwarf weed seed","Torstol seed","Spirit seed"]
+*/
+#define VAR_ZULRAH_ENUMLIST_FILTER_SEEDS []
+CONST_ZULRAH_RULE (name:VAR_ZULRAH_ENUMLIST_FILTER_SEEDS) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Resources'
+group: Zulrah
+enum: ["Snakeskin","Runite ore","Pure essence","Yew logs","Adamantite bar","Coal","Dragon bones","Mahogany logs"]
+*/
+#define VAR_ZULRAH_ENUMLIST_FILTER_RESOURCES []
+CONST_ZULRAH_RULE (name:VAR_ZULRAH_ENUMLIST_FILTER_RESOURCES) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Shark drop table'
+group: Zulrah
+enum: ["Raw shark","Shark lure","Manta ray"]
+*/
+#define VAR_ZULRAH_ENUMLIST_FILTER_SHARKDROPTABLE []
+CONST_ZULRAH_RULE (name:VAR_ZULRAH_ENUMLIST_FILTER_SHARKDROPTABLE) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Other'
+group: Zulrah
+enum: ["Zul-andra teleport","Antidote++(4)","Dragonstone bolt tips","Grapes","Coconut","Swamp tar","Zulrah's scales"]
+*/
+#define VAR_ZULRAH_ENUMLIST_FILTER_OTHER []
+CONST_ZULRAH_RULE (name:VAR_ZULRAH_ENUMLIST_FILTER_OTHER) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Tertiary'
+group: Zulrah
+enum: ["Brimstone key","Jar of swamp","Pet snakeling"]
+*/
+#define VAR_ZULRAH_ENUMLIST_FILTER_TERTIARY []
+CONST_ZULRAH_RULE (name:VAR_ZULRAH_ENUMLIST_FILTER_TERTIARY) {
+  hidden = true;
+}
+
+
+/*@ define:input:vorkath
+type: boolean
+group: Vorkath
+label: Hide un-noted blue d-hide
+*/
+#define VAR_VORKATH_BOOLEAN_GENERAL_NOHIDE true
+
+/*@ define:input:vorkath
+type: boolean
+group: Vorkath
+label: Hide superior dragon bones (why?)
+*/
+#define VAR_VORKATH_BOOLEAN_GENERAL_NOBONE false
+
+CONST_VORKATH_RULE (VAR_VORKATH_BOOLEAN_GENERAL_NOHIDE && name:"Blue dragonhide" && noted:false) {
+  hidden = true;
+}
+CONST_VORKATH_RULE (VAR_VORKATH_BOOLEAN_GENERAL_NOBONE && name:"Superior dragon bones" && noted:false) {
+  hidden = true;
+}
+
+#define CONST_AREA_VORKATH [2256,4051,0,2288,4080,0]
+#define CONST_VORKATH_RULE(_cond) rule (area:CONST_AREA_VORKATH && (_cond))
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Weapons and armour'
+group: Vorkath
+enum: ["Rune longsword","Rune kiteshield","Battlestaff","Dragon battleaxe","Dragon longsword","Dragon platelegs","Dragon plateskirt"]
+*/
+#define VAR_VORKATH_ENUMLIST_FILTER_WEAPONSANDARMOUR []
+CONST_VORKATH_RULE (name:VAR_VORKATH_ENUMLIST_FILTER_WEAPONSANDARMOUR) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Runes'
+group: Vorkath
+enum: ["Chaos rune","Death rune","Wrath rune"]
+*/
+#define VAR_VORKATH_ENUMLIST_FILTER_RUNES []
+CONST_VORKATH_RULE (name:VAR_VORKATH_ENUMLIST_FILTER_RUNES) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Dragonhide'
+group: Vorkath
+enum: ["Blue dragonhide","Green dragonhide","Red dragonhide","Black dragonhide"]
+*/
+#define VAR_VORKATH_ENUMLIST_FILTER_DRAGONHIDE []
+CONST_VORKATH_RULE (name:VAR_VORKATH_ENUMLIST_FILTER_DRAGONHIDE) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Fletching materials'
+group: Vorkath
+enum: ["Dragon bolts (unf)","Dragonstone bolt tips","Onyx bolt tips","Rune dart tip","Dragon dart tip","Dragon arrowtips","Diamond bolt tips","Emerald bolt tips","Ruby bolt tips","Sapphire bolt tips"]
+*/
+#define VAR_VORKATH_ENUMLIST_FILTER_FLETCHINGMATERIALS ["Sapphire bolt tips","Emerald bolt tips","Ruby bolt tips","Diamond bolt tips"]
+CONST_VORKATH_RULE (name:VAR_VORKATH_ENUMLIST_FILTER_FLETCHINGMATERIALS) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Shark drop table'
+group: Vorkath
+enum: ["Raw shark","Shark lure","Manta ray"]
+*/
+#define VAR_VORKATH_ENUMLIST_FILTER_SHARKDROPTABLE []
+CONST_VORKATH_RULE (name:VAR_VORKATH_ENUMLIST_FILTER_SHARKDROPTABLE) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Other'
+group: Vorkath
+enum: ["Adamantite ore","Coins","Grapes","Magic logs","Dragon bones","Diamond","Dragonstone","Wrath talisman"]
+*/
+#define VAR_VORKATH_ENUMLIST_FILTER_OTHER ["Grapes","Wrath talisman"]
+CONST_VORKATH_RULE (name:VAR_VORKATH_ENUMLIST_FILTER_OTHER) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Tertiary'
+group: Vorkath
+enum: ["Scaly blue dragonhide","Vorkath's head","Brimstone key","Dragonbone necklace","Jar of decay","Vorki","Draconic visage","Skeletal visage"]
+*/
+#define VAR_VORKATH_ENUMLIST_FILTER_TERTIARY ["Scaly blue dragonhide"]
+CONST_VORKATH_RULE (name:VAR_VORKATH_ENUMLIST_FILTER_TERTIARY) {
+  hidden = true;
+}
+
+
+#define CONST_AREA_PHANTOMMUSPAH [2816,4224,0,2879,4287,0]
+#define CONST_PHANTOMMUSPAH_RULE(_cond) rule (area:CONST_AREA_PHANTOMMUSPAH && (_cond))
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Unique'
+group: Phantom Muspah
+enum: ["Ancient essence","Frozen cache","Ancient icon","Venator shard"]
+*/
+#define VAR_PHANTOMMUSPAH_ENUMLIST_FILTER_UNIQUE []
+CONST_PHANTOMMUSPAH_RULE (name:VAR_PHANTOMMUSPAH_ENUMLIST_FILTER_UNIQUE) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Supplies'
+group: Phantom Muspah
+enum: ["Shark","Summer pie","Ancient brew(3)","Ranging potion(3)","Super restore(3)","Prayer potion(3)"]
+*/
+#define VAR_PHANTOMMUSPAH_ENUMLIST_FILTER_SUPPLIES []
+CONST_PHANTOMMUSPAH_RULE (name:VAR_PHANTOMMUSPAH_ENUMLIST_FILTER_SUPPLIES) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Weapons and armour'
+group: Phantom Muspah
+enum: ["Rune kiteshield","Dragon plateskirt","Rune platelegs","Black d'hide body","Dragon platelegs","Rune sword"]
+*/
+#define VAR_PHANTOMMUSPAH_ENUMLIST_FILTER_WEAPONSANDARMOUR []
+CONST_PHANTOMMUSPAH_RULE (name:VAR_PHANTOMMUSPAH_ENUMLIST_FILTER_WEAPONSANDARMOUR) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Runes and ammunition'
+group: Phantom Muspah
+enum: ["Law rune","Soul rune","Death rune","Smoke rune","Chaos rune","Fire rune","Steel cannonball"]
+*/
+#define VAR_PHANTOMMUSPAH_ENUMLIST_FILTER_RUNESANDAMMUNITION []
+CONST_PHANTOMMUSPAH_RULE (name:VAR_PHANTOMMUSPAH_ENUMLIST_FILTER_RUNESANDAMMUNITION) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Herbs'
+group: Phantom Muspah
+enum: ["Grimy toadflax","Grimy kwuarm","Grimy dwarf weed","Grimy cadantine","Grimy lantadyme"]
+*/
+#define VAR_PHANTOMMUSPAH_ENUMLIST_FILTER_HERBS []
+CONST_PHANTOMMUSPAH_RULE (name:VAR_PHANTOMMUSPAH_ENUMLIST_FILTER_HERBS) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Seeds'
+group: Phantom Muspah
+enum: ["Yew seed","Torstol seed","Palm tree seed","Ranarr seed","Snapdragon seed","Spirit seed"]
+*/
+#define VAR_PHANTOMMUSPAH_ENUMLIST_FILTER_SEEDS []
+CONST_PHANTOMMUSPAH_RULE (name:VAR_PHANTOMMUSPAH_ENUMLIST_FILTER_SEEDS) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Resources'
+group: Phantom Muspah
+enum: ["Adamantite ore","Gold ore","Teak plank","Molten glass","Pure essence","Coal","Runite ore","Silver ore","Water orb","Dragon bolts (unf)","Limpwurt root"]
+*/
+#define VAR_PHANTOMMUSPAH_ENUMLIST_FILTER_RESOURCES []
+CONST_PHANTOMMUSPAH_RULE (name:VAR_PHANTOMMUSPAH_ENUMLIST_FILTER_RESOURCES) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Shark drop table'
+group: Phantom Muspah
+enum: ["Raw shark","Shark lure","Manta ray"]
+*/
+#define VAR_PHANTOMMUSPAH_ENUMLIST_FILTER_SHARKDROPTABLE []
+CONST_PHANTOMMUSPAH_RULE (name:VAR_PHANTOMMUSPAH_ENUMLIST_FILTER_SHARKDROPTABLE) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Tertiary'
+group: Phantom Muspah
+enum: ["Brimstone key","Charged ice","Muphin"]
+*/
+#define VAR_PHANTOMMUSPAH_ENUMLIST_FILTER_TERTIARY []
+CONST_PHANTOMMUSPAH_RULE (name:VAR_PHANTOMMUSPAH_ENUMLIST_FILTER_TERTIARY) {
+  hidden = true;
+}
+
+
+#define CONST_AREA_THENIGHTMARE [3840,9920,3,3903,9983,3]
+#define CONST_THENIGHTMARE_RULE(_cond) rule (area:CONST_AREA_THENIGHTMARE && (_cond))
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: 100%'
+group: The Nightmare
+enum: ["Big bones","Bones"]
+*/
+#define VAR_THENIGHTMARE_ENUMLIST_FILTER_100 []
+CONST_THENIGHTMARE_RULE (name:VAR_THENIGHTMARE_ENUMLIST_FILTER_100) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Uniques'
+group: The Nightmare
+enum: ["Nightmare staff","Inquisitor's great helm","Inquisitor's hauberk","Inquisitor's plateskirt","Inquisitor's mace","Eldritch orb","Harmonised orb","Volatile orb"]
+*/
+#define VAR_THENIGHTMARE_ENUMLIST_FILTER_UNIQUES []
+CONST_THENIGHTMARE_RULE (name:VAR_THENIGHTMARE_ENUMLIST_FILTER_UNIQUES) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Runes and ammunition'
+group: The Nightmare
+enum: ["Cosmic rune","Nature rune","Death rune","Blood rune","Soul rune","Steel cannonball","Rune arrow"]
+*/
+#define VAR_THENIGHTMARE_ENUMLIST_FILTER_RUNESANDAMMUNITION []
+CONST_THENIGHTMARE_RULE (name:VAR_THENIGHTMARE_ENUMLIST_FILTER_RUNESANDAMMUNITION) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Resources'
+group: The Nightmare
+enum: ["Mithril ore","Coal","Gold ore","Adamantite ore","Magic logs","Grimy cadantine","Grimy torstol","Snapdragon seed","Uncut emerald","Uncut ruby","Runite ore"]
+*/
+#define VAR_THENIGHTMARE_ENUMLIST_FILTER_RESOURCES []
+CONST_THENIGHTMARE_RULE (name:VAR_THENIGHTMARE_ENUMLIST_FILTER_RESOURCES) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Consumables'
+group: The Nightmare
+enum: ["Bass","Shark","Prayer potion(3)","Sanfew serum(3)","Saradomin brew(3)","Zamorak brew(3)"]
+*/
+#define VAR_THENIGHTMARE_ENUMLIST_FILTER_CONSUMABLES []
+CONST_THENIGHTMARE_RULE (name:VAR_THENIGHTMARE_ENUMLIST_FILTER_CONSUMABLES) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Coins'
+group: The Nightmare
+enum: ["Coins"]
+*/
+#define VAR_THENIGHTMARE_ENUMLIST_FILTER_COINS []
+CONST_THENIGHTMARE_RULE (name:VAR_THENIGHTMARE_ENUMLIST_FILTER_COINS) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Tertiary'
+group: The Nightmare
+enum: ["Little nightmare","Jar of dreams"]
+*/
+#define VAR_THENIGHTMARE_ENUMLIST_FILTER_TERTIARY []
+CONST_THENIGHTMARE_RULE (name:VAR_THENIGHTMARE_ENUMLIST_FILTER_TERTIARY) {
+  hidden = true;
+}
+
+
+#define CONST_AREA_DUKESUCELLUS [3027,6433,0,3051,6458,0]
+#define CONST_DUKESUCELLUS_RULE(_cond) rule (area:CONST_AREA_DUKESUCELLUS && (_cond))
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Uniques'
+group: Duke Sucellus
+enum: ["Magus vestige","Chromium ingot","Eye of the duke","Virtus mask","Virtus robe top","Virtus robe bottom"]
+*/
+#define VAR_DUKESUCELLUS_ENUMLIST_FILTER_UNIQUES []
+CONST_DUKESUCELLUS_RULE (name:VAR_DUKESUCELLUS_ENUMLIST_FILTER_UNIQUES) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Secondary uniques'
+group: Duke Sucellus
+enum: ["Frozen tablet","Awakener's orb","Ice quartz"]
+*/
+#define VAR_DUKESUCELLUS_ENUMLIST_FILTER_SECONDARYUNIQUES []
+CONST_DUKESUCELLUS_RULE (name:VAR_DUKESUCELLUS_ENUMLIST_FILTER_SECONDARYUNIQUES) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Supplies'
+group: Duke Sucellus
+enum: ["Pineapple pizza","Prayer potion(3)","Super combat potion(2)"]
+*/
+#define VAR_DUKESUCELLUS_ENUMLIST_FILTER_SUPPLIES []
+CONST_DUKESUCELLUS_RULE (name:VAR_DUKESUCELLUS_ENUMLIST_FILTER_SUPPLIES) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Weapons and armour'
+group: Duke Sucellus
+enum: ["Bronze chainbody","Mithril chainbody","Adamant chainbody","Dragon platelegs"]
+*/
+#define VAR_DUKESUCELLUS_ENUMLIST_FILTER_WEAPONSANDARMOUR []
+CONST_DUKESUCELLUS_RULE (name:VAR_DUKESUCELLUS_ENUMLIST_FILTER_WEAPONSANDARMOUR) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Resources'
+group: Duke Sucellus
+enum: ["Pure essence","Iron ore","Coal","Mithril ore","Adamantite ore","Runite ore","Sapphire","Emerald","Ruby","Uncut ruby","Uncut diamond","Bronze bar","Dragon arrowtips","Rune javelin tips","Dragon javelin tips","Raw sea turtle"]
+*/
+#define VAR_DUKESUCELLUS_ENUMLIST_FILTER_RESOURCES []
+CONST_DUKESUCELLUS_RULE (name:VAR_DUKESUCELLUS_ENUMLIST_FILTER_RESOURCES) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Runes and ammunition'
+group: Duke Sucellus
+enum: ["Air rune","Mist rune","Chaos rune","Soul rune"]
+*/
+#define VAR_DUKESUCELLUS_ENUMLIST_FILTER_RUNESANDAMMUNITION []
+CONST_DUKESUCELLUS_RULE (name:VAR_DUKESUCELLUS_ENUMLIST_FILTER_RUNESANDAMMUNITION) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Tertiary'
+group: Duke Sucellus
+enum: ["Odd key","Brimstone key","Baron","Ancient blood ornament kit"]
+*/
+#define VAR_DUKESUCELLUS_ENUMLIST_FILTER_TERTIARY []
+CONST_DUKESUCELLUS_RULE (name:VAR_DUKESUCELLUS_ENUMLIST_FILTER_TERTIARY) {
+  hidden = true;
+}
+
+
+#define CONST_AREA_THELEVIATHAN [2053,6355,0,2110,6390,0]
+#define CONST_THELEVIATHAN_RULE(_cond) rule (area:CONST_AREA_THELEVIATHAN && (_cond))
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Uniques'
+group: The Leviathan
+enum: ["Venator vestige","Chromium ingot","Leviathan's lure","Virtus mask","Virtus robe top","Virtus robe bottom"]
+*/
+#define VAR_THELEVIATHAN_ENUMLIST_FILTER_UNIQUES []
+CONST_THELEVIATHAN_RULE (name:VAR_THELEVIATHAN_ENUMLIST_FILTER_UNIQUES) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Secondary uniques'
+group: The Leviathan
+enum: ["Scarred tablet","Awakener's orb","Smoke quartz"]
+*/
+#define VAR_THELEVIATHAN_ENUMLIST_FILTER_SECONDARYUNIQUES []
+CONST_THELEVIATHAN_RULE (name:VAR_THELEVIATHAN_ENUMLIST_FILTER_SECONDARYUNIQUES) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Supplies'
+group: The Leviathan
+enum: ["Prayer potion(3)","Ranging potion(2)","Sea turtle"]
+*/
+#define VAR_THELEVIATHAN_ENUMLIST_FILTER_SUPPLIES []
+CONST_THELEVIATHAN_RULE (name:VAR_THELEVIATHAN_ENUMLIST_FILTER_SUPPLIES) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Resources'
+group: The Leviathan
+enum: ["Aether catalyst","Iron ore","Silver ore","Coal","Gold ore","Adamantite ore","Runite ore","Sapphire","Emerald","Ruby","Uncut ruby","Uncut diamond","Dragon javelin tips","Dragon bolts (unf)","Onyx bolt tips","Raw manta ray","Anglerfish"]
+*/
+#define VAR_THELEVIATHAN_ENUMLIST_FILTER_RESOURCES []
+CONST_THELEVIATHAN_RULE (name:VAR_THELEVIATHAN_ENUMLIST_FILTER_RESOURCES) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Runes and ammunition'
+group: The Leviathan
+enum: ["Bronze arrow","Mithril arrow","Adamant arrow","Rune arrow","Body rune","Earth rune","Smoke rune","Soul rune"]
+*/
+#define VAR_THELEVIATHAN_ENUMLIST_FILTER_RUNESANDAMMUNITION []
+CONST_THELEVIATHAN_RULE (name:VAR_THELEVIATHAN_ENUMLIST_FILTER_RUNESANDAMMUNITION) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Tertiary'
+group: The Leviathan
+enum: ["Brimstone key","Lil'viathan","Ancient blood ornament kit"]
+*/
+#define VAR_THELEVIATHAN_ENUMLIST_FILTER_TERTIARY []
+CONST_THELEVIATHAN_RULE (name:VAR_THELEVIATHAN_ENUMLIST_FILTER_TERTIARY) {
+  hidden = true;
+}
+
+
+#define CONST_AREA_THEWHISPERER [2631,6345,0,2684,6391,0]
+#define CONST_THEWHISPERER_RULE(_cond) rule (area:CONST_AREA_THEWHISPERER && (_cond))
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Uniques'
+group: The Whisperer
+enum: ["Bellator vestige","Chromium ingot","Siren's staff","Virtus mask","Virtus robe top","Virtus robe bottom"]
+*/
+#define VAR_THEWHISPERER_ENUMLIST_FILTER_UNIQUES []
+CONST_THEWHISPERER_RULE (name:VAR_THEWHISPERER_ENUMLIST_FILTER_UNIQUES) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Secondary uniques'
+group: The Whisperer
+enum: ["Sirenic tablet","Awakener's orb","Shadow quartz"]
+*/
+#define VAR_THEWHISPERER_ENUMLIST_FILTER_SECONDARYUNIQUES []
+CONST_THEWHISPERER_RULE (name:VAR_THEWHISPERER_ENUMLIST_FILTER_SECONDARYUNIQUES) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Supplies'
+group: The Whisperer
+enum: ["Ancient brew(2)","Prayer potion(3)","Manta ray"]
+*/
+#define VAR_THEWHISPERER_ENUMLIST_FILTER_SUPPLIES []
+CONST_THEWHISPERER_RULE (name:VAR_THEWHISPERER_ENUMLIST_FILTER_SUPPLIES) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Weapons and armour'
+group: The Whisperer
+enum: ["Bronze longsword","Mithril longsword","Adamant longsword","Battlestaff","Dragon plateskirt"]
+*/
+#define VAR_THEWHISPERER_ENUMLIST_FILTER_WEAPONSANDARMOUR []
+CONST_THEWHISPERER_RULE (name:VAR_THEWHISPERER_ENUMLIST_FILTER_WEAPONSANDARMOUR) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Resources'
+group: The Whisperer
+enum: ["Pure essence","Iron ore","Coal","Gold ore","Mithril ore","Adamantite ore","Runite ore","Sapphire","Emerald","Ruby","Uncut ruby","Uncut diamond","Dragon javelin tips","Runite bolts (unf)","Raw monkfish"]
+*/
+#define VAR_THEWHISPERER_ENUMLIST_FILTER_RESOURCES []
+CONST_THEWHISPERER_RULE (name:VAR_THEWHISPERER_ENUMLIST_FILTER_RESOURCES) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Runes and ammunition'
+group: The Whisperer
+enum: ["Water rune","Steam rune","Chaos rune","Death rune","Soul rune"]
+*/
+#define VAR_THEWHISPERER_ENUMLIST_FILTER_RUNESANDAMMUNITION []
+CONST_THEWHISPERER_RULE (name:VAR_THEWHISPERER_ENUMLIST_FILTER_RUNESANDAMMUNITION) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Tertiary'
+group: The Whisperer
+enum: ["Brimstone key","Ancient blood ornament kit","Wisp"]
+*/
+#define VAR_THEWHISPERER_ENUMLIST_FILTER_TERTIARY []
+CONST_THEWHISPERER_RULE (name:VAR_THEWHISPERER_ENUMLIST_FILTER_TERTIARY) {
+  hidden = true;
+}
+
+
+#define CONST_AREA_VARDORVIS [1117,3408,0,1141,3428,0]
+#define CONST_VARDORVIS_RULE(_cond) rule (area:CONST_AREA_VARDORVIS && (_cond))
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Uniques'
+group: Vardorvis
+enum: ["Ultor vestige","Chromium ingot","Executioner's axe head","Virtus mask","Virtus robe top","Virtus robe bottom"]
+*/
+#define VAR_VARDORVIS_ENUMLIST_FILTER_UNIQUES []
+CONST_VARDORVIS_RULE (name:VAR_VARDORVIS_ENUMLIST_FILTER_UNIQUES) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Secondary uniques'
+group: Vardorvis
+enum: ["Strangled tablet","Awakener's orb","Blood quartz"]
+*/
+#define VAR_VARDORVIS_ENUMLIST_FILTER_SECONDARYUNIQUES []
+CONST_VARDORVIS_RULE (name:VAR_VARDORVIS_ENUMLIST_FILTER_SECONDARYUNIQUES) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Supplies'
+group: Vardorvis
+enum: ["Tuna potato","Prayer potion(3)","Super combat potion(2)"]
+*/
+#define VAR_VARDORVIS_ENUMLIST_FILTER_SUPPLIES []
+CONST_VARDORVIS_RULE (name:VAR_VARDORVIS_ENUMLIST_FILTER_SUPPLIES) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Resources'
+group: Vardorvis
+enum: ["Pure essence","Iron ore","Silver ore","Coal","Mithril ore","Adamantite ore","Runite ore","Sapphire","Emerald","Ruby","Uncut ruby","Uncut diamond","Rune javelin tips","Dragon javelin tips","Dragon dart tip","Raw shark"]
+*/
+#define VAR_VARDORVIS_ENUMLIST_FILTER_RESOURCES []
+CONST_VARDORVIS_RULE (name:VAR_VARDORVIS_ENUMLIST_FILTER_RESOURCES) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Runes and ammunition'
+group: Vardorvis
+enum: ["Bronze javelin","Mithril javelin","Adamant javelin","Onyx bolts (e)","Mind rune","Fire rune","Lava rune","Blood rune","Soul rune"]
+*/
+#define VAR_VARDORVIS_ENUMLIST_FILTER_RUNESANDAMMUNITION []
+CONST_VARDORVIS_RULE (name:VAR_VARDORVIS_ENUMLIST_FILTER_RUNESANDAMMUNITION) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Tertiary'
+group: Vardorvis
+enum: ["Temple key (Desert Treasure II)","Brimstone key","Ancient blood ornament kit","Butch"]
+*/
+#define VAR_VARDORVIS_ENUMLIST_FILTER_TERTIARY []
+CONST_VARDORVIS_RULE (name:VAR_VARDORVIS_ENUMLIST_FILTER_TERTIARY) {
+  hidden = true;
+}
+
+
+#define CONST_AREA_GROTESQUEGUARDIANS [1664,4544,0,1727,4607,0]
+#define CONST_GROTESQUEGUARDIANS_RULE(_cond) rule (area:CONST_AREA_GROTESQUEGUARDIANS && (_cond))
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: 100%'
+group: Grotesque Guardians
+enum: ["Granite dust"]
+*/
+#define VAR_GROTESQUEGUARDIANS_ENUMLIST_FILTER_100 []
+CONST_GROTESQUEGUARDIANS_RULE (name:VAR_GROTESQUEGUARDIANS_ENUMLIST_FILTER_100) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Unique'
+group: Grotesque Guardians
+enum: ["Granite maul","Granite gloves","Granite ring","Granite hammer","Black tourmaline core"]
+*/
+#define VAR_GROTESQUEGUARDIANS_ENUMLIST_FILTER_UNIQUE []
+CONST_GROTESQUEGUARDIANS_RULE (name:VAR_GROTESQUEGUARDIANS_ENUMLIST_FILTER_UNIQUE) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Weapons and armour'
+group: Grotesque Guardians
+enum: ["Rune pickaxe","Rune full helm","Rune platelegs","Rune 2h sword","Rune battleaxe","Dragon longsword","Adamant boots","Dragon med helm"]
+*/
+#define VAR_GROTESQUEGUARDIANS_ENUMLIST_FILTER_WEAPONSANDARMOUR []
+CONST_GROTESQUEGUARDIANS_RULE (name:VAR_GROTESQUEGUARDIANS_ENUMLIST_FILTER_WEAPONSANDARMOUR) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Supplies'
+group: Grotesque Guardians
+enum: ["Mushroom potato","Saradomin brew(4)","Magic potion(2)","Ranging potion(2)","Super combat potion(2)","Prayer potion(4)"]
+*/
+#define VAR_GROTESQUEGUARDIANS_ENUMLIST_FILTER_SUPPLIES []
+CONST_GROTESQUEGUARDIANS_RULE (name:VAR_GROTESQUEGUARDIANS_ENUMLIST_FILTER_SUPPLIES) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Resources'
+group: Grotesque Guardians
+enum: ["Gold ore","Adamantite bar","Gold bar","Mithril bar","Coal","Runite ore","Runite bar"]
+*/
+#define VAR_GROTESQUEGUARDIANS_ENUMLIST_FILTER_RESOURCES []
+CONST_GROTESQUEGUARDIANS_RULE (name:VAR_GROTESQUEGUARDIANS_ENUMLIST_FILTER_RESOURCES) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Shark drop table'
+group: Grotesque Guardians
+enum: ["Raw shark","Shark lure","Raw sea turtle"]
+*/
+#define VAR_GROTESQUEGUARDIANS_ENUMLIST_FILTER_SHARKDROPTABLE []
+CONST_GROTESQUEGUARDIANS_RULE (name:VAR_GROTESQUEGUARDIANS_ENUMLIST_FILTER_SHARKDROPTABLE) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Other'
+group: Grotesque Guardians
+enum: ["Coins","Chaos rune","Crystal key","Death rune","Dragon dart tip","Diamond bolt tips","Dragonstone bolt tips","Onyx bolt tips","Dragon arrowtips","Soul rune"]
+*/
+#define VAR_GROTESQUEGUARDIANS_ENUMLIST_FILTER_OTHER []
+CONST_GROTESQUEGUARDIANS_RULE (name:VAR_GROTESQUEGUARDIANS_ENUMLIST_FILTER_OTHER) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Tertiary'
+group: Grotesque Guardians
+enum: ["Brimstone key","Noon","Jar of stone"]
+*/
+#define VAR_GROTESQUEGUARDIANS_ENUMLIST_FILTER_TERTIARY []
+CONST_GROTESQUEGUARDIANS_RULE (name:VAR_GROTESQUEGUARDIANS_ENUMLIST_FILTER_TERTIARY) {
+  hidden = true;
+}
+
+
+#define CONST_AREA_ABYSSALSIRE [2944,4736,0,3135,4863,0]
+#define CONST_ABYSSALSIRE_RULE(_cond) rule (area:CONST_AREA_ABYSSALSIRE && (_cond))
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Pre-roll'
+group: Abyssal Sire
+enum: ["Unsired"]
+*/
+#define VAR_ABYSSALSIRE_ENUMLIST_FILTER_PREROLL []
+CONST_ABYSSALSIRE_RULE (name:VAR_ABYSSALSIRE_ENUMLIST_FILTER_PREROLL) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: 100%'
+group: Abyssal Sire
+enum: ["Abyssal ashes"]
+*/
+#define VAR_ABYSSALSIRE_ENUMLIST_FILTER_100 []
+CONST_ABYSSALSIRE_RULE (name:VAR_ABYSSALSIRE_ENUMLIST_FILTER_100) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Weapons and armour'
+group: Abyssal Sire
+enum: ["Battlestaff","Rune full helm","Mystic lava staff","Rune sword","Rune platebody","Rune kiteshield","Mystic air staff","Air battlestaff"]
+*/
+#define VAR_ABYSSALSIRE_ENUMLIST_FILTER_WEAPONSANDARMOUR []
+CONST_ABYSSALSIRE_RULE (name:VAR_ABYSSALSIRE_ENUMLIST_FILTER_WEAPONSANDARMOUR) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Runes and ammunition'
+group: Abyssal Sire
+enum: ["Blood rune","Death rune","Law rune","Soul rune","Cosmic rune","Steel cannonball"]
+*/
+#define VAR_ABYSSALSIRE_ENUMLIST_FILTER_RUNESANDAMMUNITION []
+CONST_ABYSSALSIRE_RULE (name:VAR_ABYSSALSIRE_ENUMLIST_FILTER_RUNESANDAMMUNITION) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Herbs'
+group: Abyssal Sire
+enum: ["Grimy kwuarm","Grimy dwarf weed","Grimy cadantine","Grimy lantadyme"]
+*/
+#define VAR_ABYSSALSIRE_ENUMLIST_FILTER_HERBS []
+CONST_ABYSSALSIRE_RULE (name:VAR_ABYSSALSIRE_ENUMLIST_FILTER_HERBS) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Materials'
+group: Abyssal Sire
+enum: ["Earth orb","Pure essence","Magic logs","Uncut diamond","Coal","Runite ore","Onyx bolt tips","Runite bar","Aether catalyst"]
+*/
+#define VAR_ABYSSALSIRE_ENUMLIST_FILTER_MATERIALS []
+CONST_ABYSSALSIRE_RULE (name:VAR_ABYSSALSIRE_ENUMLIST_FILTER_MATERIALS) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Other'
+group: Abyssal Sire
+enum: ["Coins","Chilli potato","Super restore(4)","Binding necklace","Saradomin brew(3)","Jug of water"]
+*/
+#define VAR_ABYSSALSIRE_ENUMLIST_FILTER_OTHER []
+CONST_ABYSSALSIRE_RULE (name:VAR_ABYSSALSIRE_ENUMLIST_FILTER_OTHER) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Tertiary'
+group: Abyssal Sire
+enum: ["Brimstone key"]
+*/
+#define VAR_ABYSSALSIRE_ENUMLIST_FILTER_TERTIARY []
+CONST_ABYSSALSIRE_RULE (name:VAR_ABYSSALSIRE_ENUMLIST_FILTER_TERTIARY) {
+  hidden = true;
+}
+
+
+#define CONST_AREA_KRAKEN [2268,10021,0,2292,10045,0]
+#define CONST_KRAKEN_RULE(_cond) rule (area:CONST_AREA_KRAKEN && (_cond))
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Weapons and armour'
+group: Kraken
+enum: ["Mystic water staff","Rune warhammer","Rune longsword","Mystic robe top","Mystic robe bottom","Trident of the seas (full)"]
+*/
+#define VAR_KRAKEN_ENUMLIST_FILTER_WEAPONSANDARMOUR []
+CONST_KRAKEN_RULE (name:VAR_KRAKEN_ENUMLIST_FILTER_WEAPONSANDARMOUR) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Runes'
+group: Kraken
+enum: ["Water rune","Mist rune","Chaos rune","Death rune","Blood rune","Soul rune"]
+*/
+#define VAR_KRAKEN_ENUMLIST_FILTER_RUNES []
+CONST_KRAKEN_RULE (name:VAR_KRAKEN_ENUMLIST_FILTER_RUNES) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Seeds'
+group: Kraken
+enum: ["Watermelon seed","Torstol seed","Magic seed"]
+*/
+#define VAR_KRAKEN_ENUMLIST_FILTER_SEEDS []
+CONST_KRAKEN_RULE (name:VAR_KRAKEN_ENUMLIST_FILTER_SEEDS) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Materials'
+group: Kraken
+enum: ["Seaweed","Battlestaff","Unpowered orb","Diamond","Oak plank","Runite bar","Raw shark","Raw monkfish","Grimy snapdragon"]
+*/
+#define VAR_KRAKEN_ENUMLIST_FILTER_MATERIALS []
+CONST_KRAKEN_RULE (name:VAR_KRAKEN_ENUMLIST_FILTER_MATERIALS) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Other'
+group: Kraken
+enum: ["Coins","Shark","Pirate boots","Sanfew serum(4)","Edible seaweed","Harpoon","Bucket","Crystal key","Rusty sword","Antidote++(4)","Dragonstone ring","Kraken tentacle"]
+*/
+#define VAR_KRAKEN_ENUMLIST_FILTER_OTHER []
+CONST_KRAKEN_RULE (name:VAR_KRAKEN_ENUMLIST_FILTER_OTHER) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Tertiary'
+group: Kraken
+enum: ["Brimstone key","Jar of dirt","Pet kraken"]
+*/
+#define VAR_KRAKEN_ENUMLIST_FILTER_TERTIARY []
+CONST_KRAKEN_RULE (name:VAR_KRAKEN_ENUMLIST_FILTER_TERTIARY) {
+  hidden = true;
+}
+
+
+#define CONST_AREA_CERBERUS [1208,1215,0,1394,1340,0]
+#define CONST_CERBERUS_RULE(_cond) rule (area:CONST_AREA_CERBERUS && (_cond))
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: 100%'
+group: Cerberus
+enum: ["Infernal ashes"]
+*/
+#define VAR_CERBERUS_ENUMLIST_FILTER_100 []
+CONST_CERBERUS_RULE (name:VAR_CERBERUS_ENUMLIST_FILTER_100) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Uniques'
+group: Cerberus
+enum: ["Primordial crystal","Pegasian crystal","Eternal crystal","Smouldering stone"]
+*/
+#define VAR_CERBERUS_ENUMLIST_FILTER_UNIQUES []
+CONST_CERBERUS_RULE (name:VAR_CERBERUS_ENUMLIST_FILTER_UNIQUES) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Weapons and armour'
+group: Cerberus
+enum: ["Rune platebody","Rune chainbody","Rune 2h sword","Black d'hide body","Rune axe","Rune pickaxe","Battlestaff","Rune full helm","Lava battlestaff","Rune halberd"]
+*/
+#define VAR_CERBERUS_ENUMLIST_FILTER_WEAPONSANDARMOUR []
+CONST_CERBERUS_RULE (name:VAR_CERBERUS_ENUMLIST_FILTER_WEAPONSANDARMOUR) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Runes and ammunition'
+group: Cerberus
+enum: ["Fire rune","Soul rune","Pure essence","Blood rune","Steel cannonball","Runite bolts (unf)","Death rune"]
+*/
+#define VAR_CERBERUS_ENUMLIST_FILTER_RUNESANDAMMUNITION []
+CONST_CERBERUS_RULE (name:VAR_CERBERUS_ENUMLIST_FILTER_RUNESANDAMMUNITION) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Other'
+group: Cerberus
+enum: ["Coal","Super restore(4)","Summer pie","Coins","Dragon bones","Unholy symbol","Wine of zamorak","Ashes","Fire orb","Grimy torstol","Runite ore","Uncut diamond","Torstol seed","Ranarr seed","Key master teleport"]
+*/
+#define VAR_CERBERUS_ENUMLIST_FILTER_OTHER []
+CONST_CERBERUS_RULE (name:VAR_CERBERUS_ENUMLIST_FILTER_OTHER) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Tertiary'
+group: Cerberus
+enum: ["Ensouled hellhound head","Clue scroll (elite)","Reward casket (elite)","Brimstone key","Jar of souls","Hellpuppy"]
+*/
+#define VAR_CERBERUS_ENUMLIST_FILTER_TERTIARY []
+CONST_CERBERUS_RULE (name:VAR_CERBERUS_ENUMLIST_FILTER_TERTIARY) {
+  hidden = true;
+}
+
+
+#define CONST_AREA_ARAXXOR [3608,9795,0,3651,9837,0]
+#define CONST_ARAXXOR_RULE(_cond) rule (area:CONST_AREA_ARAXXOR && (_cond))
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Unique'
+group: Araxxor
+enum: ["Noxious pommel","Noxious point","Noxious blade","Araxyte fang"]
+*/
+#define VAR_ARAXXOR_ENUMLIST_FILTER_UNIQUE []
+CONST_ARAXXOR_RULE (name:VAR_ARAXXOR_ENUMLIST_FILTER_UNIQUE) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Supplies'
+group: Araxxor
+enum: ["Araxyte venom sack","Super combat potion(1)","Prayer potion(4)","Shark","Wild pie"]
+*/
+#define VAR_ARAXXOR_ENUMLIST_FILTER_SUPPLIES []
+CONST_ARAXXOR_RULE (name:VAR_ARAXXOR_ENUMLIST_FILTER_SUPPLIES) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Weapons and armour'
+group: Araxxor
+enum: ["Rune kiteshield","Rune platelegs","Dragon mace","Rune 2h sword","Dragon platelegs"]
+*/
+#define VAR_ARAXXOR_ENUMLIST_FILTER_WEAPONSANDARMOUR []
+CONST_ARAXXOR_RULE (name:VAR_ARAXXOR_ENUMLIST_FILTER_WEAPONSANDARMOUR) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Runes and ammunition'
+group: Araxxor
+enum: ["Death rune","Nature rune","Mud rune","Blood rune"]
+*/
+#define VAR_ARAXXOR_ENUMLIST_FILTER_RUNESANDAMMUNITION []
+CONST_ARAXXOR_RULE (name:VAR_ARAXXOR_ENUMLIST_FILTER_RUNESANDAMMUNITION) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Seeds'
+group: Araxxor
+enum: ["Yew seed","Toadflax seed","Ranarr seed","Snapdragon seed","Magic seed"]
+*/
+#define VAR_ARAXXOR_ENUMLIST_FILTER_SEEDS []
+CONST_ARAXXOR_RULE (name:VAR_ARAXXOR_ENUMLIST_FILTER_SEEDS) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Resources'
+group: Araxxor
+enum: ["Coal","Adamantite ore","Raw shark","Yew logs","Runite ore","Raw monkfish","Pure essence"]
+*/
+#define VAR_ARAXXOR_ENUMLIST_FILTER_RESOURCES []
+CONST_ARAXXOR_RULE (name:VAR_ARAXXOR_ENUMLIST_FILTER_RESOURCES) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Other'
+group: Araxxor
+enum: ["Spider cave teleport","Earth orb","Araxyte venom sack","Mort myre fungus","Antidote++(3)","Wine of zamorak","Red spiders' eggs","Bark","Araxyte head","Jar of venom"]
+*/
+#define VAR_ARAXXOR_ENUMLIST_FILTER_OTHER []
+CONST_ARAXXOR_RULE (name:VAR_ARAXXOR_ENUMLIST_FILTER_OTHER) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Tertiary'
+group: Araxxor
+enum: ["Coagulated venom","Brimstone key","Nid"]
+*/
+#define VAR_ARAXXOR_ENUMLIST_FILTER_TERTIARY []
+CONST_ARAXXOR_RULE (name:VAR_ARAXXOR_ENUMLIST_FILTER_TERTIARY) {
+  hidden = true;
+}
+
+
+#define CONST_AREA_THERMONUCLEARSMOKEDEVIL [2345,9434,0,2380,9464,0]
+#define CONST_THERMONUCLEARSMOKEDEVIL_RULE(_cond) rule (area:CONST_AREA_THERMONUCLEARSMOKEDEVIL && (_cond))
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: 100%'
+group: Thermonuclear smoke devil
+enum: ["Ashes"]
+*/
+#define VAR_THERMONUCLEARSMOKEDEVIL_ENUMLIST_FILTER_100 []
+CONST_THERMONUCLEARSMOKEDEVIL_RULE (name:VAR_THERMONUCLEARSMOKEDEVIL_ENUMLIST_FILTER_100) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Pre-roll'
+group: Thermonuclear smoke devil
+enum: ["Occult necklace","Smoke battlestaff","Dragon chainbody"]
+*/
+#define VAR_THERMONUCLEARSMOKEDEVIL_ENUMLIST_FILTER_PREROLL []
+CONST_THERMONUCLEARSMOKEDEVIL_RULE (name:VAR_THERMONUCLEARSMOKEDEVIL_ENUMLIST_FILTER_PREROLL) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Weapons and armour'
+group: Thermonuclear smoke devil
+enum: ["Rune dagger","Rune chainbody","Red d'hide body","Rune battleaxe","Mystic air staff","Mystic fire staff","Rune scimitar","Rune knife(p++)","Dragon scimitar","Ancient staff"]
+*/
+#define VAR_THERMONUCLEARSMOKEDEVIL_ENUMLIST_FILTER_WEAPONSANDARMOUR []
+CONST_THERMONUCLEARSMOKEDEVIL_RULE (name:VAR_THERMONUCLEARSMOKEDEVIL_ENUMLIST_FILTER_WEAPONSANDARMOUR) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Runes and ammunition'
+group: Thermonuclear smoke devil
+enum: ["Smoke rune","Air rune","Soul rune","Rune arrow"]
+*/
+#define VAR_THERMONUCLEARSMOKEDEVIL_ENUMLIST_FILTER_RUNESANDAMMUNITION []
+CONST_THERMONUCLEARSMOKEDEVIL_RULE (name:VAR_THERMONUCLEARSMOKEDEVIL_ENUMLIST_FILTER_RUNESANDAMMUNITION) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Consumables'
+group: Thermonuclear smoke devil
+enum: ["Ugthanki kebab","Tuna potato","Sanfew serum(4)","Prayer potion(4)"]
+*/
+#define VAR_THERMONUCLEARSMOKEDEVIL_ENUMLIST_FILTER_CONSUMABLES []
+CONST_THERMONUCLEARSMOKEDEVIL_RULE (name:VAR_THERMONUCLEARSMOKEDEVIL_ENUMLIST_FILTER_CONSUMABLES) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Resources'
+group: Thermonuclear smoke devil
+enum: ["Pure essence","Molten glass","Mithril bar","Magic logs","Gold ore","Diamond","Raw shark","Shark lure"]
+*/
+#define VAR_THERMONUCLEARSMOKEDEVIL_ENUMLIST_FILTER_RESOURCES []
+CONST_THERMONUCLEARSMOKEDEVIL_RULE (name:VAR_THERMONUCLEARSMOKEDEVIL_ENUMLIST_FILTER_RESOURCES) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Other'
+group: Thermonuclear smoke devil
+enum: ["Coins","Tinderbox","Fire talisman","Desert goat horn","Grimy toadflax","Onyx bolt tips","Snapdragon seed","Ranarr seed","Grapes","Magic seed","Dragonstone ring","Crystal key"]
+*/
+#define VAR_THERMONUCLEARSMOKEDEVIL_ENUMLIST_FILTER_OTHER []
+CONST_THERMONUCLEARSMOKEDEVIL_RULE (name:VAR_THERMONUCLEARSMOKEDEVIL_ENUMLIST_FILTER_OTHER) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Tertiary'
+group: Thermonuclear smoke devil
+enum: ["Brimstone key","Jar of smoke","Pet smoke devil"]
+*/
+#define VAR_THERMONUCLEARSMOKEDEVIL_ENUMLIST_FILTER_TERTIARY []
+CONST_THERMONUCLEARSMOKEDEVIL_RULE (name:VAR_THERMONUCLEARSMOKEDEVIL_ENUMLIST_FILTER_TERTIARY) {
+  hidden = true;
+}
+
+
+#define CONST_AREA_ALCHEMICALHYDRA [1346,10251,0,1385,10287,0]
+#define CONST_ALCHEMICALHYDRA_RULE(_cond) rule (area:CONST_AREA_ALCHEMICALHYDRA && (_cond))
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: 100%'
+group: Alchemical Hydra
+enum: ["Hydra bones"]
+*/
+#define VAR_ALCHEMICALHYDRA_ENUMLIST_FILTER_100 []
+CONST_ALCHEMICALHYDRA_RULE (name:VAR_ALCHEMICALHYDRA_ENUMLIST_FILTER_100) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Pre-roll'
+group: Alchemical Hydra
+enum: ["Hydra's eye","Hydra's fang","Hydra's heart","Hydra tail","Hydra leather","Hydra's claw","Dragon thrownaxe","Dragon knife"]
+*/
+#define VAR_ALCHEMICALHYDRA_ENUMLIST_FILTER_PREROLL []
+CONST_ALCHEMICALHYDRA_RULE (name:VAR_ALCHEMICALHYDRA_ENUMLIST_FILTER_PREROLL) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Weapons and armour'
+group: Alchemical Hydra
+enum: ["Mystic fire staff","Mystic water staff","Battlestaff","Black d'hide body","Dragon longsword","Dragon med helm","Rune platebody","Dragon battleaxe","Rune platelegs","Rune plateskirt","Mystic robe top (light)","Mystic robe bottom (light)"]
+*/
+#define VAR_ALCHEMICALHYDRA_ENUMLIST_FILTER_WEAPONSANDARMOUR []
+CONST_ALCHEMICALHYDRA_RULE (name:VAR_ALCHEMICALHYDRA_ENUMLIST_FILTER_WEAPONSANDARMOUR) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Runes and ammunition'
+group: Alchemical Hydra
+enum: ["Chaos rune","Death rune","Blood rune","Astral rune","Dragonstone bolts (e)","Onyx bolts (e)"]
+*/
+#define VAR_ALCHEMICALHYDRA_ENUMLIST_FILTER_RUNESANDAMMUNITION []
+CONST_ALCHEMICALHYDRA_RULE (name:VAR_ALCHEMICALHYDRA_ENUMLIST_FILTER_RUNESANDAMMUNITION) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Herbs'
+group: Alchemical Hydra
+enum: ["Grimy avantoe","Grimy kwuarm","Grimy ranarr weed","Grimy snapdragon","Grimy cadantine","Grimy dwarf weed","Grimy lantadyme","Grimy torstol"]
+*/
+#define VAR_ALCHEMICALHYDRA_ENUMLIST_FILTER_HERBS []
+CONST_ALCHEMICALHYDRA_RULE (name:VAR_ALCHEMICALHYDRA_ENUMLIST_FILTER_HERBS) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Other'
+group: Alchemical Hydra
+enum: ["Coins","Shark","Ranging potion(3)","Super restore(3)","Dragon bones","Crystal key"]
+*/
+#define VAR_ALCHEMICALHYDRA_ENUMLIST_FILTER_OTHER []
+CONST_ALCHEMICALHYDRA_RULE (name:VAR_ALCHEMICALHYDRA_ENUMLIST_FILTER_OTHER) {
+  hidden = true;
+}
+
+/*@ define:input
+type: enumlist
+label: 'Hide drops: Tertiary'
+group: Alchemical Hydra
+enum: ["Brimstone key","Alchemical hydra heads","Jar of chemicals","Ikkle hydra"]
+*/
+#define VAR_ALCHEMICALHYDRA_ENUMLIST_FILTER_TERTIARY []
+CONST_ALCHEMICALHYDRA_RULE (name:VAR_ALCHEMICALHYDRA_ENUMLIST_FILTER_TERTIARY) {
+  hidden = true;
+}
+
+
+
+
+/*@ define:module:cox
+---
+name: CoX
+*/
+
+/*@ define:input:cox
+type: style
+label: Overload
+group: potions
+*/
+#define VAR_COX_OVL_USERSTYLE \
+  textColor = "#1e88e5";\
+  textAccent = 4;
+
+/*@ define:input:cox
+type: style
+label: Prayer enhance
+group: potions
+*/
+#define VAR_COX_PEH_USERSTYLE \
+  textColor = "#ff00ff";\
+  textAccent = 4;
+
+/*@ define:input:cox
+type: style
+label: Revitalisation
+group: potions
+*/
+#define VAR_COX_REV_USERSTYLE \
+  textColor = "#e91e63";\
+  textAccent = 4;
+
+/*@ define:input:cox
+type: style
+label: Xeric's aid
+group: potions
+*/
+#define VAR_COX_XER_USERSTYLE \
+  textColor = "#ffff00";\
+  textAccent = 4;
+
+rule (name:"overload*") {
+  VAR_COX_OVL_USERSTYLE
+}
+rule (name:"prayer enhance*") {
+  VAR_COX_PEH_USERSTYLE
+}
+rule (name:"revitalisation*") {
+  VAR_COX_REV_USERSTYLE
+}
+rule (name:"xeric's aid*") {
+  VAR_COX_XER_USERSTYLE
+}
+
+
+
+/*@ define:module:toa
+---
+name: ToA
+*/
+
+/*@ define:input
+type: style
+label: Ambrosia
+*/
+#define VAR_TOA_AMB_USERSTYLE \
+  textColor = "#acffac";\
+  textAccent = 4;
+
+/*@ define:input
+type: style
+label: Liquid adrenaline
+*/
+#define VAR_TOA_LQA_USERSTYLE \
+  textColor = "#35c6d7";\
+  textAccent = 4;
+
+/*@ define:input
+type: style
+label: Nectar
+*/
+#define VAR_TOA_NEC_USERSTYLE \
+  textColor = "#ffff00";\
+  textAccent = 4;
+
+/*@ define:input
+type: style
+label: Tears of elidinis
+*/
+#define VAR_TOA_TOE_USERSTYLE \
+  textColor = "#e91e63";\
+  textAccent = 4;
+
+/*@ define:input
+type: style
+label: Smelling salts
+*/
+#define VAR_TOA_SMS_STYLE \
+  textColor = "#d8b01a";\
+  textAccent = 4;
+
+/*@ define:input
+type: style
+label: Silk dressing
+*/
+#define VAR_TOA_SLD_STYLE \
+  textColor = "#d0ffff";\
+  textAccent = 4;
+
+/*@ define:input
+type: style
+label: Blessed crystal scarab
+*/
+#define VAR_TOA_BCS_STYLE \
+  textColor = "#ffffff";\
+  textAccent = 4;
+
+/*@ define:input
+type: style
+label: Honey locust
+*/
+#define VAR_TOA_HNL_STYLE \
+  textColor = "#b17f00";\
+  textAccent = 4;
+
+rule (name:"ambrosia*") { VAR_TOA_AMB_USERSTYLE }
+rule (name:"liquid adrenaline*") { VAR_TOA_LQA_USERSTYLE }
+rule (name:"nectar*") { VAR_TOA_NEC_USERSTYLE }
+rule (name:"tears of elidinis*") { VAR_TOA_TOE_USERSTYLE }
+rule (name:"smelling salts*") { VAR_TOA_SMS_STYLE }
+rule (name:"silk dressing*") { VAR_TOA_SLD_STYLE }
+rule (name:"blessed crystal scarab*") { VAR_TOA_BCS_STYLE }
+rule (name:"honey locust*") { VAR_TOA_HNL_STYLE }
+
+
+/*@ define:module:shadesofmortton
+name: "Shades of Mort'ton"
+*/
+
+/*@ define:input
+type: style
+group: Bronze keys
+label: Bronze key black
+*/
+#define VAR_SOM_BRONZEBLACK_STYLE \
+  hidden = false;\
+  textColor = "#ffffff";\
+  backgroundColor = "#5b462a";\
+  borderColor = "#000000";
+
+/*@ define:input
+type: style
+group: Bronze keys
+label: Bronze key purple
+*/
+#define VAR_SOM_BRONZEPURPLE_STYLE \
+  hidden = false;\
+  textColor = "#ffffff";\
+  backgroundColor = "#5b462a";\
+  borderColor = "#800080";
+
+/*@ define:input
+type: style
+group: Bronze keys
+label: Bronze key red
+*/
+#define VAR_SOM_BRONZERED_STYLE \
+  hidden = false;\
+  textColor = "#ffffff";\
+  backgroundColor = "#5b462a";\
+  borderColor = "#a00000";
+
+/*@ define:input
+type: style
+group: Bronze keys
+label: Bronze key brown
+*/
+#define VAR_SOM_BRONZEBROWN_STYLE \
+  hidden = false;\
+  textColor = "#ffffff";\
+  backgroundColor = "#5b462a";\
+  borderColor = "#964b00";
+
+/*@ define:input
+type: style
+group: Bronze keys
+label: Bronze key crimson
+*/
+#define VAR_SOM_BRONZECRIMSON_STYLE \
+  hidden = false;\
+  textColor = "#ffffff";\
+  backgroundColor = "#5b462a";\
+  borderColor = "#ff143c";
+
+/*@ define:input
+type: style
+group: Steel keys
+label: Steel key black
+*/
+#define VAR_SOM_STEELBLACK_STYLE \
+  hidden = false;\
+  textColor = "#ffffff";\
+  backgroundColor = "#908686";\
+  borderColor = "#000000";
+
+/*@ define:input
+type: style
+group: Steel keys
+label: Steel key purple
+*/
+#define VAR_SOM_STEELPURPLE_STYLE \
+  hidden = false;\
+  textColor = "#ffffff";\
+  backgroundColor = "#908686";\
+  borderColor = "#800080";
+
+/*@ define:input
+type: style
+group: Steel keys
+label: Steel key red
+*/
+#define VAR_SOM_STEELRED_STYLE \
+  hidden = false;\
+  textColor = "#ffffff";\
+  backgroundColor = "#908686";\
+  borderColor = "#a00000";
+
+/*@ define:input
+type: style
+group: Steel keys
+label: Steel key brown
+*/
+#define VAR_SOM_STEELBROWN_STYLE \
+  hidden = false;\
+  textColor = "#ffffff";\
+  backgroundColor = "#908686";\
+  borderColor = "#964b00";
+
+/*@ define:input
+type: style
+group: Steel keys
+label: Steel key crimson
+*/
+#define VAR_SOM_STEELCRIMSON_STYLE \
+  hidden = false;\
+  textColor = "#ffffff";\
+  backgroundColor = "#908686";\
+  borderColor = "#ff143c";
+
+/*@ define:input
+type: style
+group: Black keys
+label: Black key black
+*/
+#define VAR_SOM_BLACKBLACK_STYLE \
+  hidden = false;\
+  textColor = "#ffffff";\
+  backgroundColor = "#000000";\
+  borderColor = "#000000";
+
+/*@ define:input
+type: style
+group: Black keys
+label: Black key purple
+*/
+#define VAR_SOM_BLACKPURPLE_STYLE \
+  hidden = false;\
+  textColor = "#ffffff";\
+  backgroundColor = "#000000";\
+  borderColor = "#800080";
+
+/*@ define:input
+type: style
+group: Black keys
+label: Black key red
+*/
+#define VAR_SOM_BLACKRED_STYLE \
+  hidden = false;\
+  textColor = "#ffffff";\
+  backgroundColor = "#000000";\
+  borderColor = "#a00000";
+
+/*@ define:input
+type: style
+group: Black keys
+label: Black key brown
+*/
+#define VAR_SOM_BLACKBROWN_STYLE \
+  hidden = false;\
+  textColor = "#ffffff";\
+  backgroundColor = "#000000";\
+  borderColor = "#964b00";
+
+/*@ define:input
+type: style
+group: Black keys
+label: Black key crimson
+*/
+#define VAR_SOM_BLACKCRIMSON_STYLE \
+  hidden = false;\
+  textColor = "#ffffff";\
+  backgroundColor = "#000000";\
+  borderColor = "#ff143c";
+
+/*@ define:input
+type: style
+group: Silver keys
+label: Silver key black
+*/
+#define VAR_SOM_SILVERBLACK_STYLE \
+  hidden = false;\
+  textColor = "#ffffff";\
+  backgroundColor = "#a8a8b4";\
+  borderColor = "#000000";
+
+/*@ define:input
+type: style
+group: Silver keys
+label: Silver key purple
+*/
+#define VAR_SOM_SILVERPURPLE_STYLE \
+  hidden = false;\
+  textColor = "#ffffff";\
+  backgroundColor = "#a8a8b4";\
+  borderColor = "#800080";
+
+/*@ define:input
+type: style
+group: Silver keys
+label: Silver key red
+*/
+#define VAR_SOM_SILVERRED_STYLE \
+  hidden = false;\
+  textColor = "#ffffff";\
+  backgroundColor = "#a8a8b4";\
+  borderColor = "#a00000";
+
+/*@ define:input
+type: style
+group: Silver keys
+label: Silver key brown
+*/
+#define VAR_SOM_SILVERBROWN_STYLE \
+  hidden = false;\
+  textColor = "#ffffff";\
+  backgroundColor = "#a8a8b4";\
+  borderColor = "#964b00";
+
+/*@ define:input
+type: style
+group: Silver keys
+label: Silver key crimson
+*/
+#define VAR_SOM_SILVERCRIMSON_STYLE \
+  hidden = false;\
+  textColor = "#ffffff";\
+  backgroundColor = "#a8a8b4";\
+  borderColor = "#ff143c";
+
+/*@ define:input
+type: style
+group: Gold keys
+label: Gold key black
+*/
+#define VAR_SOM_GOLDBLACK_STYLE \
+  hidden = false;\
+  textColor = "#ffffff";\
+  backgroundColor = "#d8b01a";\
+  borderColor = "#000000";
+
+/*@ define:input
+type: style
+group: Gold keys
+label: Gold key purple
+*/
+#define VAR_SOM_GOLDPURPLE_STYLE \
+  hidden = false;\
+  textColor = "#ffffff";\
+  backgroundColor = "#d8b01a";\
+  borderColor = "#800080";
+
+/*@ define:input
+type: style
+group: Gold keys
+label: Gold key red
+*/
+#define VAR_SOM_GOLDRED_STYLE \
+  hidden = false;\
+  textColor = "#ffffff";\
+  backgroundColor = "#d8b01a";\
+  borderColor = "#a00000";
+
+/*@ define:input
+type: style
+group: Gold keys
+label: Gold key brown
+*/
+#define VAR_SOM_GOLDBROWN_STYLE \
+  hidden = false;\
+  textColor = "#ffffff";\
+  backgroundColor = "#d8b01a";\
+  borderColor = "#964b00";
+
+/*@ define:input
+type: style
+group: Gold keys
+label: Gold key crimson
+*/
+#define VAR_SOM_GOLDCRIMSON_STYLE \
+  hidden = false;\
+  textColor = "#ffffff";\
+  backgroundColor = "#d8b01a";\
+  borderColor = "#ff143c";
+
+
+/*@ define:input
+type: style
+group: Shades
+label: Loar remains
+*/
+#define VAR_SOM_LOAR_STYLE \
+  hidden = false;\
+  textColor = "#ffffff";\
+  backgroundColor = "#905b462a";
+
+/*@ define:input
+type: style
+group: Shades
+label: Phrin remains
+*/
+#define VAR_SOM_PHRIN_STYLE \
+  hidden = false;\
+  textColor = "#ffffff";\
+  backgroundColor = "#905b462a";
+
+/*@ define:input
+type: style
+group: Shades
+label: Riyl remains
+*/
+#define VAR_SOM_RIYL_STYLE \
+  hidden = false;\
+  textColor = "#ffffff";\
+  backgroundColor = "#90908686";
+
+/*@ define:input
+type: style
+group: Shades
+label: Asyn remains
+*/
+#define VAR_SOM_ASYN_STYLE \
+  hidden = false;\
+  textColor = "#ffffff";\
+  backgroundColor = "#90000000";
+
+/*@ define:input
+type: style
+group: Shades
+label: Fiyr remains
+*/
+#define VAR_SOM_FIYR_STYLE \
+  hidden = false;\
+  textColor = "#ffffff";\
+  backgroundColor = "#90a8a8b4";
+
+/*@ define:input
+type: style
+group: Shades
+label: Urium remains
+*/
+#define VAR_SOM_URIUM_STYLE \
+  hidden = false;\
+  textColor = "#ffffff";\
+  backgroundColor = "#90d8b01a";
+
+rule (name:"Bronze key black")   { VAR_SOM_BRONZEBLACK_STYLE }
+rule (name:"Bronze key purple")  { VAR_SOM_BRONZEPURPLE_STYLE }
+rule (name:"Bronze key red")     { VAR_SOM_BRONZERED_STYLE }
+rule (name:"Bronze key brown")   { VAR_SOM_BRONZEBROWN_STYLE }
+rule (name:"Bronze key crimson") { VAR_SOM_BRONZECRIMSON_STYLE }
+
+rule (name:"Steel key black")   { VAR_SOM_STEELBLACK_STYLE }
+rule (name:"Steel key purple")  { VAR_SOM_STEELPURPLE_STYLE }
+rule (name:"Steel key red")     { VAR_SOM_STEELRED_STYLE }
+rule (name:"Steel key brown")   { VAR_SOM_STEELBROWN_STYLE }
+rule (name:"Steel key crimson") { VAR_SOM_STEELCRIMSON_STYLE }
+
+rule (name:"Black key black")   { VAR_SOM_BLACKBLACK_STYLE }
+rule (name:"Black key purple")  { VAR_SOM_BLACKPURPLE_STYLE }
+rule (name:"Black key red")     { VAR_SOM_BLACKRED_STYLE }
+rule (name:"Black key brown")   { VAR_SOM_BLACKBROWN_STYLE }
+rule (name:"Black key crimson") { VAR_SOM_BLACKCRIMSON_STYLE }
+
+rule (name:"Silver key black")   { VAR_SOM_SILVERBLACK_STYLE }
+rule (name:"Silver key purple")  { VAR_SOM_SILVERPURPLE_STYLE }
+rule (name:"Silver key red")     { VAR_SOM_SILVERRED_STYLE }
+rule (name:"Silver key brown")   { VAR_SOM_SILVERBROWN_STYLE }
+rule (name:"Silver key crimson") { VAR_SOM_SILVERCRIMSON_STYLE }
+
+rule (name:"Gold key black")   { VAR_SOM_GOLDBLACK_STYLE }
+rule (name:"Gold key purple")  { VAR_SOM_GOLDPURPLE_STYLE }
+rule (name:"Gold key red")     { VAR_SOM_GOLDRED_STYLE }
+rule (name:"Gold key brown")   { VAR_SOM_GOLDBROWN_STYLE }
+rule (name:"Gold key crimson") { VAR_SOM_GOLDCRIMSON_STYLE }
+
+rule (name:"Loar remains")  { VAR_SOM_LOAR_STYLE }
+rule (name:"Phrin remains") { VAR_SOM_PHRIN_STYLE }
+rule (name:"Riyl remains")  { VAR_SOM_RIYL_STYLE }
+rule (name:"Asyn remains")  { VAR_SOM_ASYN_STYLE }
+rule (name:"Fiyr remains")  { VAR_SOM_FIYR_STYLE }
+rule (name:"Urium remains") { VAR_SOM_URIUM_STYLE }
+
+
+/*@ define:module:defender
+name: Defenders
+*/
+
+
+/*@ define:input
+type: enumlist
+group: 'Defenders'
+label: Items
+enum: ["Bronze defender","Iron defender","Steel defender","Black defender","Mithril defender","Adamant defender","Rune defender","Dragon defender"]
+*/
+#define VAR_DEFENDER_EQUIP_DEFENDER_LIST ["Bronze defender","Iron defender","Steel defender","Black defender","Mithril defender","Adamant defender","Rune defender","Dragon defender"]
+
+/*@ define:input
+type: style
+group: 'Defenders'
+label: Items
+exampleItem: 'Dragon defender'
+exampleItemId: 12954
+*/
+#define VAR_DEFENDER_EQUIP_DEFENDER_STYLE \
+  showLootbeam = true; \
+  icon = CurrentItem(); \
+  sound = 6765; \
+  backgroundColor = "#80000000";
+
+rule (name:VAR_DEFENDER_EQUIP_DEFENDER_LIST) { hidden = false; VAR_DEFENDER_EQUIP_DEFENDER_STYLE }
+
+
+
+
+/*@ define:module:uniques
+---
+name: Uniques
+*/
+
+/*@ define:input:uniques
+type: stringlist
+label: Items
+group: Tier S
+*/
+#define VAR_UNIQUE_STIER ["Infernal cape","Fire cape","Dizana's quiver*","Unsired","Ancient blood ornament kit","Ultor vestige","Venator vestige","Bellator vestige","Magus vestige","Executioner's axe head","Leviathan's lure","Siren's staff","Eye of the duke","Slepey tablet","*max cape","*mutagen","*champion scroll"]
+
+/*@ define:input:uniques
+type: stringlist
+label: Items
+group: Tier A
+*/
+#define VAR_UNIQUE_ATIER ["Mokhaiotl cloth", "Larran's key", "Brimstone key","Jar of *","Noxious pommel","Noxious point","Noxious blade","* half of key (moon key)"]
+
+/*@ define:input:uniques
+type: stringlist
+label: Items
+group: Tier B
+*/
+#define VAR_UNIQUE_BTIER ["dark totem","mossy key","giant key","ecumenical key","abyssal head","araxyte head","alchemical hydra heads","kbd heads","kq head*","dark claw","bludgeon claw","bludgeon spine","bludgeon axon","hydra's eye","hydra's fang","hydra's heart","strangled tablet","scarred tablet","sirenic tablet","frozen tablet","scurrius' spine","vorkath's head"]
+
+/*@ define:input:uniques
+type: stringlist
+label: Items
+group: Tier C
+*/
+#define VAR_UNIQUE_CTIER ["dark totem top","dark totem base","dark totem middle","long bone","curved bone","looting bag","unidentified small fossil","unidentified medium fossil","unidentified large fossil","unidentified rare fossil","key master teleport","chromium ingot","blood quartz","smoke quartz","shadow quartz","ice quartz","pendant of ates*","frozen cache","ancient icon","charged ice","parasitic egg"]
+
+/*@ define:input:uniques
+type: style
+label: Style
+group: Tier S
+exampleItem: Executioner's axe head
+*/
+#define VAR_UNIQUE_STIER_CUSTOMSTYLE \
+  hidden = false;\
+  textColor = "#ff0000";\
+  backgroundColor = "#ffffff";\
+  borderColor = "#ff0000";\
+  fontType = 3;\
+  showLootbeam = true;
+
+/*@ define:input:uniques
+type: style
+label: Style
+group: Tier A
+exampleItem: Brimstone key
+*/
+#define VAR_UNIQUE_ATIER_CUSTOMSTYLE \
+  hidden = false;\
+  textColor = "#ffffff";\
+  backgroundColor = "#af6025";\
+  borderColor = "#ffffff";\
+  textAccent = 3;\
+  showLootbeam = true;
+
+/*@ define:input:uniques
+type: style
+label: Style
+group: Tier B
+exampleItem: Araxyte head
+*/
+#define VAR_UNIQUE_BTIER_CUSTOMSTYLE \
+  hidden = false;\
+  textColor = "#000000";\
+  backgroundColor = "#af6025";\
+  borderColor = "#000000";\
+  textAccent = 3;
+
+/*@ define:input:uniques
+type: style
+label: Style
+group: Tier C
+exampleItem: Dark totem top
+*/
+#define VAR_UNIQUE_CTIER_CUSTOMSTYLE \
+  hidden = false;\
+  textColor = "#af6025";\
+  backgroundColor = "#350d0d";\
+  borderColor = "#af6025";\
+  textAccent = 3;
+
+rule (name:VAR_UNIQUE_STIER) { VAR_UNIQUE_STIER_CUSTOMSTYLE }
+rule (name:VAR_UNIQUE_ATIER) { VAR_UNIQUE_ATIER_CUSTOMSTYLE }
+rule (name:VAR_UNIQUE_BTIER) { VAR_UNIQUE_BTIER_CUSTOMSTYLE }
+rule (name:VAR_UNIQUE_CTIER) { VAR_UNIQUE_CTIER_CUSTOMSTYLE }
+
+
+
+
+/*@ define:module:potions
+---
+name: Potions
+*/
+
+#define CONST_POTION_HIGHLIGHT(_name, _userstyle) \
+  rule (name:_name && noted:false) {\
+    _userstyle\
+  }
+
+/*@ define:input:potions
+type: style
+label: Super restore
+*/
+#define VAR_POTION_RESTORE_USERSTYLE \
+  hidden = false;\
+  textColor = "#e91e63";\
+  textAccent = 2;
+
+/*@ define:input:potions
+type: style
+label: Saradomin brew
+*/
+#define VAR_POTION_BREW_USERSTYLE \
+  hidden = false;\
+  textColor = "#ffff00";\
+  textAccent = 2;
+
+/*@ define:input:potions
+type: style
+label: Prayer potion
+*/
+#define VAR_POTION_PRAYER_USERSTYLE \
+  hidden = false;\
+  textColor = "#59d6ae";\
+  textAccent = 2;
+
+/*@ define:input:potions
+type: style
+label: Sanfew serum
+*/
+#define VAR_POTION_SANFEW_USERSTYLE \
+  hidden = false;\
+  textColor = "#e59e9e";\
+  textAccent = 2;
+
+/*@ define:input:potions
+type: style
+label: Super combat potion
+*/
+#define VAR_POTION_SUPERCOMBAT_USERSTYLE \
+  hidden = false;\
+  textColor = "#2a9e16";\
+  textAccent = 2;
+
+/*@ define:input:potions
+type: style
+label: Ranging potion
+*/
+#define VAR_POTION_RANGE_USERSTYLE \
+  hidden = false;\
+  textColor = "#5fb7da";\
+  textAccent = 2;
+
+/*@ define:input:potions
+type: style
+label: Bastion potion
+*/
+#define VAR_POTION_BASTION_USERSTYLE \
+  hidden = false;\
+  textColor = "#db721c";\
+  textAccent = 2;
+
+CONST_POTION_HIGHLIGHT("super restore*",        VAR_POTION_RESTORE_USERSTYLE)
+CONST_POTION_HIGHLIGHT("saradomin brew*",       VAR_POTION_BREW_USERSTYLE)
+CONST_POTION_HIGHLIGHT("prayer potion*",        VAR_POTION_PRAYER_USERSTYLE)
+CONST_POTION_HIGHLIGHT("sanfew serum*",         VAR_POTION_SANFEW_USERSTYLE)
+CONST_POTION_HIGHLIGHT("*super combat potion*", VAR_POTION_SUPERCOMBAT_USERSTYLE)
+CONST_POTION_HIGHLIGHT("*ranging potion*",      VAR_POTION_RANGE_USERSTYLE)
+CONST_POTION_HIGHLIGHT("*bastion potion*",      VAR_POTION_BASTION_USERSTYLE)
+
+
+
+
+/*@ define:module:clues
+---
+name: Clues
+description: |
+  Styles apply to the following items:
+
+  * Clue scrolls
+  * Scroll boxes
+  * Challenge scrolls
+  * Reward caskets
+*/
+
+/*@ define:input:clues
+type: style
+label: Beginner clue
+*/
+#define VAR_CLUE_BEGINNER_CUSTOMSTYLE \
+  hidden = false;\
+  textColor = "#ffffff";\
+  menuTextColor = "#ffe0e0e0";\
+  backgroundColor = "#beb287";\
+  borderColor = "#ffffff";
+
+/*@ define:input:clues
+type: style
+label: Easy clue
+*/
+#define VAR_CLUE_EASY_CUSTOMSTYLE \
+  hidden = false;\
+  textColor = "#00ff00";\
+  menuTextColor = "#29802d";\
+  backgroundColor = "#beb287";\
+  borderColor = "#00ff00";
+
+/*@ define:input:clues
+type: style
+label: Medium clue
+*/
+#define VAR_CLUE_MEDIUM_CUSTOMSTYLE \
+  hidden = false;\
+  textColor = "#00ffff";\
+  menuTextColor = "#569699";\
+  backgroundColor = "#beb287";\
+  borderColor = "#00ffff";
+
+/*@ define:input:clues
+type: style
+label: Hard clue
+*/
+#define VAR_CLUE_HARD_CUSTOMSTYLE \
+  hidden = false;\
+  textColor = "#ff00ff";\
+  menuTextColor = "#833798";\
+  backgroundColor = "#beb287";\
+  borderColor = "#ff00ff";
+
+/*@ define:input:clues
+type: style
+label: Elite clue
+*/
+#define VAR_CLUE_ELITE_CUSTOMSTYLE \
+  hidden = false;\
+  textColor = "#ffff00";\
+  menuTextColor = "#bda518";\
+  backgroundColor = "#beb287";\
+  borderColor = "#ffff00";
+
+/*@ define:input:clues
+type: style
+label: Master clue
+*/
+#define VAR_CLUE_MASTER_CUSTOMSTYLE \
+  hidden = false;\
+  textColor = "#ff0000";\
+  menuTextColor = "#9b3026";\
+  backgroundColor = "#beb287";\
+  borderColor = "#ff0000";
+
+
+rule (name:["scroll box (beginner)", "clue scroll (beginner)", "reward casket (beginner)", "challenge scroll (beginner)"]) {
+  VAR_CLUE_BEGINNER_CUSTOMSTYLE
+}
+rule (name:["scroll box (easy)", "clue scroll (easy)", "reward casket (easy)", "challenge scroll (easy)"]) {
+  VAR_CLUE_EASY_CUSTOMSTYLE
+}
+rule (name:["scroll box (medium)", "clue scroll (medium)", "reward casket (medium)", "challenge scroll (medium)"]) {
+  VAR_CLUE_MEDIUM_CUSTOMSTYLE
+}
+rule (name:["scroll box (hard)", "clue scroll (hard)", "reward casket (hard)", "challenge scroll (hard)"]) {
+  VAR_CLUE_HARD_CUSTOMSTYLE
+}
+rule (name:["scroll box (elite)", "clue scroll (elite)", "reward casket (elite)", "challenge scroll (elite)"]) {
+  VAR_CLUE_ELITE_CUSTOMSTYLE
+}
+rule (name:["scroll box (master)", "clue scroll (master)", "reward casket (master)", "challenge scroll (master)"]) {
+  VAR_CLUE_MASTER_CUSTOMSTYLE
+}
+
+
+
+
+/*@ define:module:herbs
+---
+name: Herbs
+description: |
+  Handles both grimy and cleaned herbs.
+
+  These rules apply to unnoted herbs only. Noted ones will fallthrough to value
+  rules.
+*/
+
+#define CONST_HERB_HERBS [\
+  "*guam leaf",\
+  "*marrentill",\
+  "*tarromin",\
+  "*harralander",\
+  "*ranarr weed",\
+  "*toadflax",\
+  "*irit leaf",\
+  "*avantoe",\
+  "*kwuarm",\
+  "*huasca",\
+  "*snapdragon",\
+  "*cadantine",\
+  "*lantadyme",\
+  "*dwarf weed",\
+  "*torstol",\
+]
+
+#define CONST_HERB_DEFAULTCOLOR GREEN
+
+/*@ define:input:herbs
+type: number
+label: Minimum value
+*/
+#define VAR_HERB_MINVALUE 1
+
+/*@ define:input:herbs
+type: enumlist
+label: Always show
+enum: [
+  {"label":"Guam leaf","value":"*guam leaf"},
+  {"label":"Marrentill","value":"*marrentill"},
+  {"label":"Tarromin","value":"*tarromin"},
+  {"label":"Harralander","value":"*harralander"},
+  {"label":"Ranarr weed","value":"*ranarr weed"},
+  {"label":"Toadflax","value":"*toadflax"},
+  {"label":"Irit leaf","value":"*irit leaf"},
+  {"label":"Avantoe","value":"*avantoe"},
+  {"label":"Kwuarm","value":"*kwuarm"},
+  {"label":"Huasca","value":"*huasca"},
+  {"label":"Snapdragon","value":"*snapdragon"},
+  {"label":"Cadantine","value":"*cadantine"},
+  {"label":"Lantadyme","value":"*lantadyme"},
+  {"label":"Dwarf weed","value":"*dwarf weed"},
+  {"label":"Torstol","value":"*torstol"}
+]
+*/
+#define VAR_HERB_SHOW []
+
+/*@ define:input:herbs
+type: enumlist
+label: Always hide
+enum: [
+  {"label":"Guam leaf","value":"*guam leaf"},
+  {"label":"Marrentill","value":"*marrentill"},
+  {"label":"Tarromin","value":"*tarromin"},
+  {"label":"Harralander","value":"*harralander"},
+  {"label":"Ranarr weed","value":"*ranarr weed"},
+  {"label":"Toadflax","value":"*toadflax"},
+  {"label":"Irit leaf","value":"*irit leaf"},
+  {"label":"Avantoe","value":"*avantoe"},
+  {"label":"Kwuarm","value":"*kwuarm"},
+  {"label":"Huasca","value":"*huasca"},
+  {"label":"Snapdragon","value":"*snapdragon"},
+  {"label":"Cadantine","value":"*cadantine"},
+  {"label":"Lantadyme","value":"*lantadyme"},
+  {"label":"Dwarf weed","value":"*dwarf weed"},
+  {"label":"Torstol","value":"*torstol"}
+]
+*/
+#define VAR_HERB_HIDE ["*guam leaf","*marrentill","*tarromin"]
+
+/*@ define:input:herbs
+type: style
+label: Style
+exampleItem: Grimy torstol
+*/
+#define VAR_HERB_CUSTOMSTYLE \
+  hidden = false;\
+  textColor = "#00ff00";
+
+apply (noted:false && name:CONST_HERB_HERBS) { VAR_HERB_CUSTOMSTYLE }
+
+apply (noted:false && name:CONST_HERB_HERBS && value:<VAR_HERB_MINVALUE) { hidden = true; }
+
+rule (noted:false && name:VAR_HERB_SHOW) { hidden = false; }
+rule (noted:false && name:VAR_HERB_HIDE) { hidden = true; }
+
+rule (noted:false && name:CONST_HERB_HERBS) {}
+
+
+
+
+/*@ define:module:currency_/_tokens
+---
+name: Currency / Tokens
+*/
+
+/*@ define:input:currency_/_tokens
+type: stringlist
+label: Currency / Token items
+*/
+#define VAR_CURRENCY_ITEMS ["Mole claw","Mole skin","Trading sticks","Numulite","Abyssal pearls","Anima-infused bark","Barronite shards","Blood money","Ecto-token","Frog token","Golden nugget","Glistening tear","Hallowed mark","Intelligence","Mark of grace","Mermaid's tear","Minnow","Molch pearl","Nuggets","Stardust","Tokkul","Termites","Unidentified minerals","Warrior guild token","Blessed bone shards","Sun-kissed bones","Ecumenical key shard"]
+
+/*@ define:input:currency_/_tokens
+type: style
+label: Style
+exampleItem: Mark of grace
+exampleItemId: 11849
+*/
+#define VAR_CURRENCY_USERSTYLE \
+  textColor = "#beb287"; \
+  icon = CurrentItem();
+
+apply (name:VAR_CURRENCY_ITEMS) { VAR_CURRENCY_USERSTYLE }
+
+
+
+/*@ define:module:item_values
+---
+name: Item values
+*/
+
+/*@ define:input:item_values
+type: number
+label: Value
+group: '++Insane tier'
+*/
+#define VAR_VALUE_T5_VALUE 100000000
+
+/*@ define:input:item_values
+type: number
+label: Value
+group: '+Insane tier'
+*/
+#define VAR_VALUE_T4_VALUE 50000000
+
+/*@ define:input:item_values
+type: number
+label: Value
+group: Insane tier
+*/
+#define VAR_VALUE_T3_VALUE 10000000
+
+/*@ define:input:item_values
+type: number
+label: Value
+group: High tier
+*/
+#define VAR_VALUE_T2_VALUE 1000000
+
+/*@ define:input:item_values
+type: number
+label: Value
+group: Medium tier
+*/
+#define VAR_VALUE_T1_VALUE 100000
+
+/*@ define:input:item_values
+type: number
+label: Value
+group: Low tier
+*/
+#define VAR_VALUE_T0_VALUE 20000
+
+/*@ define:input:item_values
+type: style
+label: Style
+group: '++Insane tier'
+exampleItem: Torva platebody (damaged)
+*/
+#define VAR_VALUE_T5_CUSTOMSTYLE \
+  hidden = false;\
+  textColor = "#ff0000";\
+  borderColor = "#ff0000";\
+  backgroundColor = "#ffffff";\
+  textAccent = 3;\
+  showLootbeam = true;
+
+/*@ define:input:item_values
+type: style
+label: Style
+group: '+Insane tier'
+exampleItem: Zaryte vambraces
+*/
+#define VAR_VALUE_T4_CUSTOMSTYLE \
+  hidden = false;\
+  textColor = "#ffffff";\
+  borderColor = "#ffffff";\
+  backgroundColor = "#80ff0000";\
+  showLootbeam = true;\
+  lootbeamColor = "#ff0000";
+
+/*@ define:input:item_values
+type: style
+label: Style
+group: Insane tier
+exampleItem: Bandos tassets
+*/
+#define VAR_VALUE_T3_CUSTOMSTYLE \
+  hidden = false;\
+  textColor = "#ff66b2";\
+  borderColor = "#ff66b2";\
+  backgroundColor = "#80ffffff";\
+  textAccent = 4;\
+  showLootbeam = true;
+
+/*@ define:input:item_values
+type: style
+label: Style
+group: High tier
+exampleItem: Abyssal whip
+*/
+#define VAR_VALUE_T2_CUSTOMSTYLE \
+  hidden = false;\
+  textColor = "#ff9600";\
+  borderColor = "#ff9600";\
+  backgroundColor = "#80ffffff";\
+  textAccent = 4;\
+  showLootbeam = true;
+
+/*@ define:input:item_values
+type: style
+label: Style
+group: Medium tier
+exampleItem: Dragon pickaxe
+*/
+#define VAR_VALUE_T1_CUSTOMSTYLE \
+  hidden = false;\
+  textColor = "#99ff99";\
+  borderColor = "#99ff99";
+
+/*@ define:input:item_values
+type: style
+label: Style
+group: Low tier
+exampleItem: Rune platebody
+*/
+#define VAR_VALUE_T0_CUSTOMSTYLE \
+  hidden = false;\
+  textColor = "#66b2ff";
+
+/*@ define:input
+type: number
+group: Minimum value
+label: Hide below value
+*/
+#define VAR_VALUE_MINVALUE 0
+
+/*@ define:input
+type: boolean
+group: Minimum value
+label: "Always show untradeables"
+*/
+#define VAR_VALUE_SHOWUNTRADEABLE true
+
+rule (value:>=VAR_VALUE_T5_VALUE) { VAR_VALUE_T5_CUSTOMSTYLE }
+rule (value:>=VAR_VALUE_T4_VALUE) { VAR_VALUE_T4_CUSTOMSTYLE }
+rule (value:>=VAR_VALUE_T3_VALUE) { VAR_VALUE_T3_CUSTOMSTYLE }
+rule (value:>=VAR_VALUE_T2_VALUE) { VAR_VALUE_T2_CUSTOMSTYLE }
+rule (value:>=VAR_VALUE_T1_VALUE) { VAR_VALUE_T1_CUSTOMSTYLE }
+rule (value:>=VAR_VALUE_T0_VALUE) { VAR_VALUE_T0_CUSTOMSTYLE }
+
+rule ((tradeable:true || !VAR_VALUE_SHOWUNTRADEABLE) && value:<VAR_VALUE_MINVALUE) {
+  hidden = true;
+}
