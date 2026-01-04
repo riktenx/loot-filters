@@ -16,7 +16,7 @@ public class DefaultFilter {
 	}
 
 	public static LootFilter loadDefaultFilter(String name) {
-		var resource = name.equals(RIKTENS) ? "riktensfilter.rs2f" : "joesfilter.rs2f";
+		var resource = name.equals(RIKTENS) ? "default-riktens.rs2f" : "default-joes.rs2f";
 		try {
 			var src = Sources.loadScriptResource(DefaultFilter.class, resource);
 			return LootFilter.fromSource(name, src);
