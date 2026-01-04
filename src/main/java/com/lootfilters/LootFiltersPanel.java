@@ -3,7 +3,6 @@ package com.lootfilters;
 import com.lootfilters.lang.CompileException;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.swing.SwingUtilities;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.ui.PluginPanel;
 import net.runelite.client.util.LinkBrowser;
@@ -149,8 +148,8 @@ public class LootFiltersPanel extends PluginPanel {
 				return;
 			}
 
-			plugin.setSelectedFilterFilename(filename);
-			onReloadFilters();
+			plugin.addChatMessage("Import ok.");
+			plugin.setSelectedFilter(filename);
 			return;
 		}
 
@@ -161,13 +160,13 @@ public class LootFiltersPanel extends PluginPanel {
             return;
         }
 
-        plugin.setSelectedFilterFilename(filename);
-        onReloadFilters();
+		plugin.addChatMessage("Import ok.");
+        plugin.setSelectedFilter(filename);
     }
 
     private void onFilterSelect(ActionEvent event) {
         var selected = (String) filterSelect.getSelectedItem();
-        plugin.setSelectedFilterFilename(NONE_ITEM.equals(selected) ? null : selected);
+        plugin.setSelectedFilter(NONE_ITEM.equals(selected) ? null : selected);
     }
 
     private JButton createIconButton(BufferedImage icon, String tooltip, Runnable onClick) {
@@ -193,8 +192,7 @@ public class LootFiltersPanel extends PluginPanel {
     }
 
     private void onReloadFilters() {
-        reflowFilterSelect(lootFilterManager.getFilenames(), plugin.getSelectedFilterFilename());
-        reflowFilterDescription();
+		lootFilterManager.reload().thenAccept(plugin::onSelectedFilterReloaded);
     }
 
     private void onBrowseFolder() {
@@ -215,13 +213,13 @@ public class LootFiltersPanel extends PluginPanel {
         if (filters.contains(selected)) { // selected filter could be gone
             filterSelect.setSelectedItem(selected);
         } else {
-            plugin.setSelectedFilterFilename(null);
+            plugin.setSelectedFilter(null);
         }
         filterSelect.addActionListener(this::onFilterSelect);
     }
 
     public void reflowFilterDescription() {
-        if (plugin.getSelectedFilterFilename() == null) {
+        if (plugin.getSelectedFilter() == null) {
             filterDescription.setText(NONE_DESCRIPTION);
             return;
         }

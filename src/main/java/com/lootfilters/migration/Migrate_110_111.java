@@ -38,7 +38,7 @@ public class Migrate_110_111 {
 		}
 		plugin.getConfigManager().setConfiguration(LootFiltersPlugin.CONFIG_GROUP, NAME, true);
 
-		var selected = plugin.getSelectedFilterFilename(); // this will be the old format i.e. the actual filter name
+		var selected = plugin.getSelectedFilter(); // this will be the old format i.e. the actual filter name
 		if (selected == null || DefaultFilter.isDefaultFilter(selected)) {
 			return;
 		}
