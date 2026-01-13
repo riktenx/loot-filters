@@ -123,7 +123,7 @@ public class LootFiltersPlugin extends Plugin {
 	public void setSelectedFilter(String name) {
 		if (name != null) {
 			configManager.setConfiguration(CONFIG_GROUP, SELECTED_FILTER_KEY, name);
-			if (DefaultFilter.isDefaultFilter(name)) {
+			if (DefaultFilter.isDefault(name)) {
 				config.setPreferredDefault(name);
 			}
 		} else {
@@ -220,7 +220,7 @@ public class LootFiltersPlugin extends Plugin {
 			filterManager.loadFiles();
 			var selected = getSelectedFilter();
 			if (!config.showDefaultFilters()) {
-				if (DefaultFilter.isDefaultFilter(selected)) {
+				if (DefaultFilter.isDefault(selected)) {
 					selected = null;
 					setSelectedFilter(null);
 				}
@@ -230,7 +230,7 @@ public class LootFiltersPlugin extends Plugin {
 
 		if (event.getKey().equals(SELECTED_FILTER_KEY)) {
 			var selected = getSelectedFilter();
-			if (DefaultFilter.isDefaultFilter(selected)) {
+			if (DefaultFilter.isDefault(selected)) {
 				config.setPreferredDefault(selected);
 			}
 

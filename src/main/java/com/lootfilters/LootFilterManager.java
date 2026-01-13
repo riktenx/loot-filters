@@ -59,7 +59,9 @@ public class LootFilterManager {
 
 		filenames.clear();
 		if (config.showDefaultFilters()) {
-			filenames.addAll(DefaultFilter.defaultFilters());
+			filenames.addAll(DefaultFilter.all().stream()
+				.map(DefaultFilter::getName)
+				.collect(Collectors.toList()));
 		}
 		filenames.addAll(next);
     }
@@ -70,8 +72,8 @@ public class LootFilterManager {
 			if (selected == null) {
 				return saveLoaded(LootFilter.Nop);
 			}
-			if (DefaultFilter.isDefaultFilter(selected)) {
-				return saveLoaded(DefaultFilter.loadDefaultFilter(selected));
+			if (DefaultFilter.isDefault(selected)) {
+				return saveLoaded(DefaultFilter.loadByName(selected));
 			}
 
 			var file = new File(LootFiltersPlugin.FILTER_DIRECTORY, selected);
