@@ -39,14 +39,14 @@ public class Migrate_110_111 {
 		plugin.getConfigManager().setConfiguration(LootFiltersPlugin.CONFIG_GROUP, NAME, true);
 
 		var selected = plugin.getSelectedFilter(); // this will be the old format i.e. the actual filter name
-		if (selected == null || DefaultFilter.isDefaultFilter(selected)) {
+		if (selected == null || DefaultFilter.isDefault(selected)) {
 			return;
 		}
 
 		// we are just going to do this one-off migration synchronously so plugin startUp() doesn't have to think about it
 		plugin.getFilterManager().loadFiles();
 		for (var filename : plugin.getFilterManager().getFilenames()) {
-			if (DefaultFilter.isDefaultFilter(filename)) {
+			if (DefaultFilter.isDefault(filename)) {
 				continue;
 			}
 

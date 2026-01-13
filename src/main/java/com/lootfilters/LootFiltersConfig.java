@@ -21,7 +21,7 @@ import java.awt.Color;
 @ConfigGroup("loot-filters")
 public interface LootFiltersConfig extends Config {
     @ConfigItem(keyName = "preferredDefaultFilter", hidden = true, name = "", description = "")
-    default String getPreferredDefault() { return DefaultFilter.RIKTENS; }
+    default String getPreferredDefault() { return DefaultFilter.RIKTEN.getName(); }
     @ConfigItem(keyName = "preferredDefaultFilter", hidden = true, name = "", description = "")
     void setPreferredDefault(String name);
 
@@ -50,7 +50,8 @@ public interface LootFiltersConfig extends Config {
             name = "Show plugin panel",
             description = "Show the plugin panel in the side nav. The entire plugin, including the active loot filter, will still operate if the panel is hidden.",
             section = general,
-            position = -10
+            position = -10,
+		warning = "this feature causes you to get the diccsucc"
     )
     default boolean showPluginPanel() { return true; }
 
