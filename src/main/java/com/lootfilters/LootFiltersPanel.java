@@ -4,6 +4,7 @@ import com.lootfilters.lang.CompileException;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import net.runelite.client.ui.FontManager;
 import net.runelite.client.ui.PluginPanel;
 import net.runelite.client.util.LinkBrowser;
 
@@ -42,6 +43,7 @@ public class LootFiltersPanel extends PluginPanel {
 
     private JPanel root;
 	private JComboBox<String> filterSelect;
+	private JTextArea filterName;
     private JTextArea filterDescription;
 
 	@Inject
@@ -57,6 +59,10 @@ public class LootFiltersPanel extends PluginPanel {
 		root.setLayout(new BoxLayout(root, BoxLayout.Y_AXIS));
 
 		filterSelect = new JComboBox<>();
+
+		filterName = new JTextArea();
+		filterName.setFont(FontManager.getRunescapeBoldFont());
+		filterName.setEditable(false);
 
 		filterDescription = new JTextArea();
 		filterDescription.setLineWrap(true);
@@ -102,6 +108,9 @@ public class LootFiltersPanel extends PluginPanel {
         root.add(mid);
         root.add(filterSelect);
         root.add(bottom);
+		root.add(Box.createVerticalStrut(10));
+		root.add(filterName);
+		root.add(Box.createVerticalStrut(5));
         root.add(filterDescription);
 
         add(root);
@@ -218,8 +227,9 @@ public class LootFiltersPanel extends PluginPanel {
         filterSelect.addActionListener(this::onFilterSelect);
     }
 
-    public void reflowFilterDescription() {
+    public void reflowFilterInfo() {
         if (plugin.getSelectedFilter() == null) {
+			filterName.setText("");
             filterDescription.setText(NONE_DESCRIPTION);
             return;
         }
@@ -229,6 +239,7 @@ public class LootFiltersPanel extends PluginPanel {
         if (desc == null || desc.isBlank()) {
             desc = BLANK_DESCRIPTION;
         }
+		filterName.setText(filter.getName());
         filterDescription.setText(desc.replaceAll("<br>", "\n"));
     }
 }

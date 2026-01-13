@@ -171,7 +171,7 @@ public class LootFiltersPlugin extends Plugin {
 			activeFilter = FilterUtil.withConfigRules(filter, config);
 
 			pluginPanel.reflowFilterSelect(filterManager.getFilenames(), getSelectedFilter());
-
+			pluginPanel.reflowFilterInfo();
 		});
 	}
 
@@ -243,7 +243,7 @@ public class LootFiltersPlugin extends Plugin {
 	public void onSelectedFilterReloaded(LootFilter filter) {
 		activeFilter = FilterUtil.withConfigRules(filter, config);
 		pluginPanel.reflowFilterSelect(filterManager.getFilenames(), getSelectedFilter());
-		pluginPanel.reflowFilterDescription();
+		pluginPanel.reflowFilterInfo();
 
 		resetDisplay();
 	}
