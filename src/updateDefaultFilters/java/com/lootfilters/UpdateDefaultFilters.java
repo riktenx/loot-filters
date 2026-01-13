@@ -2,6 +2,7 @@ package com.lootfilters;
 
 import java.io.FileOutputStream;
 import java.net.URL;
+import java.util.zip.GZIPOutputStream;
 
 public class UpdateDefaultFilters {
 	public static void main(String[] args) throws Exception {
@@ -16,7 +17,10 @@ public class UpdateDefaultFilters {
 			var src = new String(stream.readAllBytes());
 			LootFilter.fromSource(filter.getName(), src);
 
-			try (var writer = new FileOutputStream("src/main/resources/com/lootfilters/" + filter.getFilename())) {
+			try (
+				var inner = new FileOutputStream("src/main/resources/com/lootfilters/" + filter.getFilename());
+				var writer = new GZIPOutputStream(inner)
+			) {
 				writer.write(src.getBytes());
 			}
 		}

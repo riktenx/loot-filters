@@ -1,5 +1,6 @@
 package com.lootfilters.lang;
 
+import java.util.zip.GZIPInputStream;
 import lombok.Getter;
 
 import java.io.IOException;
@@ -29,7 +30,10 @@ public class Sources {
     }
 
 	public static String loadScriptResource(Class<?> clazz, String name) throws IOException {
-		try (var stream = clazz.getResourceAsStream(name)) {
+		try (
+			var inner = clazz.getResourceAsStream(name);
+			var stream = new GZIPInputStream(inner);
+		) {
 			return loadScriptResource(stream);
 		}
 	}

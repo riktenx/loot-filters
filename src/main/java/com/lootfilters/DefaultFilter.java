@@ -57,6 +57,6 @@ public enum DefaultFilter {
 		return name
 			.toLowerCase()
 			.replace(" ", "_")
-			.replaceAll("[^a-z]", "") + ".rs2f";
+			.replaceAll("[^a-z]", "") + ".rs2f.gz";
 	}
 }
