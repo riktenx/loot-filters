@@ -15,17 +15,16 @@ repositories {
 
 def runeLiteVersion = 'latest.release'
 
-def updateDefaultFiltersSources = sourceSets.create("updateDefaultFilters")
-
-configurations.create("updateDefaultFilters") {
+def scriptSources = sourceSets.create("script")
+configurations.create("script") {
     sourceSets {
-        add(updateDefaultFiltersSources)
+        add(scriptSources)
     }
 
     dependencies {
-        updateDefaultFiltersImplementation group: 'net.runelite', name:'client', version: runeLiteVersion
+        scriptImplementation group: 'net.runelite', name:'client', version: runeLiteVersion
 
-        updateDefaultFiltersImplementation sourceSets.main.output
+        scriptImplementation sourceSets.main.output
     }
 }
 
