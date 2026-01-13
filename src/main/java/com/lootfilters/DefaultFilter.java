@@ -46,7 +46,7 @@ public enum DefaultFilter {
 		}
 
 		try {
-			var src = Sources.loadScriptResource(DefaultFilter.class, filter.filename);
+			var src = Sources.loadScriptResource(DefaultFilter.class, filter.filename, true);
 			return LootFilter.fromSource(name, src);
 		} catch (Exception e) {
 			return LootFilter.Nop;

@@ -29,10 +29,10 @@ public class Sources {
         return normalizeCrlf(new String(in.readAllBytes()));
     }
 
-	public static String loadScriptResource(Class<?> clazz, String name) throws IOException {
+	public static String loadScriptResource(Class<?> clazz, String name, boolean gzip) throws IOException {
 		try (
 			var inner = clazz.getResourceAsStream(name);
-			var stream = new GZIPInputStream(inner);
+			var stream = gzip ? new GZIPInputStream(inner) : inner;
 		) {
 			return loadScriptResource(stream);
 		}
