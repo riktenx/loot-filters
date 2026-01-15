@@ -85,21 +85,22 @@ public class LootFilter {
     }
 
     public @NonNull DisplayConfig findMatch(LootFiltersPlugin plugin, PluginTileItem item) {
-        var display = new DisplayConfig(Color.WHITE).toBuilder()
-                .compact(plugin.getConfig().compactMode())
-                .build();
+        var display = DisplayConfig.builder()
+                .textColor(Color.WHITE)
+                .compact(plugin.getConfig().compactMode());
+        var trace = new ArrayList<Integer>();
         for (var rule : rules) {
             if (!rule.getCond().test(plugin, item)) {
                 continue;
             }
 
-            display = display.merge(rule.getDisplay());
-            display.getEvalTrace().add(rule.getSourceLine());
+            display.apply(rule.getDisplay());
+            trace.add(rule.getSourceLine());
             if (rule.isTerminal()) {
-                return display;
+                return display.build(trace);
             }
         }
-        return display;
+        return display.build(trace);
     }
 
     public static Builder builder() {
