@@ -286,6 +286,24 @@ public interface LootFiltersConfig extends Config {
     )
     @Range(max = 32)
     default int overlayZOffset() { return 16; }
+
+    @ConfigItem(
+            keyName = "lootLabelYOffset",
+            name = "Loot label Y offset",
+            description = "Vertical offset (separation) from the item.<br>" +
+                    "Positive values move the label AWAY from the item in the direction of the stack.",
+            section = displayOverrides,
+            position = 97
+    )
+    default int lootLabelYOffset() { return 0; }
+    @ConfigItem(
+            keyName = "reverseLootStacking",
+            name = "Reverse loot stacking",
+            description = "Stack loot labels downwards instead of upwards.",
+            section = displayOverrides,
+            position = 96
+    )
+    default boolean reverseLootStacking() { return false; }
     @ConfigItem(
             keyName = "compactMode",
             name = "Compact mode",

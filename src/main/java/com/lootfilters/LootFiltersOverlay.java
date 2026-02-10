@@ -146,6 +146,10 @@ public class LootFiltersOverlay extends Overlay {
             // non-compact
 
             for (var item : items.get(false)) {
+                var itemScale = getItemScale(tile);
+                var baseOffset = (int) (config.lootLabelYOffset() * itemScale);
+                var shift = baseOffset + currentOffset;
+
                 var leftOffset = 0;
                 var match = item.getOverlayKey().getDisplayConfig();
 
@@ -188,11 +192,14 @@ public class LootFiltersOverlay extends Overlay {
                 var fm = g.getFontMetrics(g.getFont());
                 var textWidth = fm.stringWidth(displayText);
                 var textHeight = fm.getHeight();
+                var visualOffset = config.reverseLootStacking() ? -(shift + textHeight) : shift;
 
                 var text = new TextComponent();
                 text.setText(displayText);
                 text.setColor(match.isHidden() ? config.hiddenColor() : match.getTextColor());
-                text.setPosition(new Point(textPoint.x, textPoint.y - currentOffset));
+                // TextComponent uses y as baseline
+                // Position = anchorY - visualOffset
+                text.setPosition(new Point(textPoint.x, textPoint.y - visualOffset));
                 if (match.getTextAccentColor() != null) {
                     text.setAccentColor(match.getTextAccentColor());
                 }
@@ -201,9 +208,8 @@ public class LootFiltersOverlay extends Overlay {
                 }
 
                 var boundingBox = new Rectangle(
-                        textPoint.x - BOX_PAD, textPoint.y - currentOffset - textHeight - BOX_PAD,
-                        textWidth + 2 * BOX_PAD, textHeight + 2 * BOX_PAD
-                );
+                        textPoint.x - BOX_PAD, textPoint.y - visualOffset - textHeight - BOX_PAD,
+                        textWidth + 2 * BOX_PAD, textHeight + 2 * BOX_PAD);
 
                 if (config.iconPosition() == IconPosition.INSIDE) { // correct for previous image offset
                     boundingBox.x -= iconWidth;
@@ -231,12 +237,12 @@ public class LootFiltersOverlay extends Overlay {
 
                 if (match.getIcon() != null) {
                     var cacheKey = match.getIcon().getCacheKey(item.getFirstItem());
-                    var d = renderIcon(g, cacheKey, textPoint, currentOffset);
+                    var d = renderIcon(g, cacheKey, textPoint, visualOffset);
                     leftOffset += d.width;
                 }
                 if (match.isShowDespawn() || plugin.isHotkeyActive()) {
                     var type = plugin.isHotkeyActive() ? DespawnTimerType.PIE : config.despawnTimerType();
-                    renderDespawnTimer(g, type, item.getFirstItem(), textPoint, textWidth, currentOffset, leftOffset, false);
+                    renderDespawnTimer(g, type, item.getFirstItem(), textPoint, textWidth, visualOffset, leftOffset, false);
                 }
 
                 currentOffset += textHeight + BOX_PAD + 3;
@@ -283,11 +289,19 @@ public class LootFiltersOverlay extends Overlay {
         if (imagePoint == null) {
             return -1;
         }
+
+        var itemScale = getItemScale(tile);
+        var baseOffset = (int) (config.lootLabelYOffset() * itemScale);
+        var shift = baseOffset + currentOffset;
+        var drawY = config.reverseLootStacking()
+                ? imagePoint.y + shift - BOX_PAD    // DOWN (Symmetrical to UP)
+                : imagePoint.y - shift - boxHeight; // UP
+
         // item square size- 1 px padding outside the bounding box, 1 px inside, item width, 1 px, 1 px.
         var boundingBox = new Rectangle(
-                imagePoint.x + (fullBoxWidth) * rowOffset - Math.round(fullBoxWidth * ((rowSize - 1) / 2f)), imagePoint.y - currentOffset - boxHeight,
-                boxWidth + 2, boxHeight + 2
-        );
+                imagePoint.x + (fullBoxWidth) * rowOffset - Math.round(fullBoxWidth * ((rowSize - 1) / 2f)),
+                drawY,
+                boxWidth + 2, boxHeight + 2);
 
         if (display.getBackgroundColor() != null) {
             g.setColor(display.getBackgroundColor());
@@ -594,5 +608,31 @@ public class LootFiltersOverlay extends Overlay {
         var point = Perspective.getCanvasTextLocation(client, graphics, localLocation, text, zOffset);
         return point != null ? new Point(point.getX(), point.getY()) : null;
     }
-}
 
+    private double getItemScale(Tile tile) {
+        var loc = tile.getLocalLocation();
+        if (loc == null) {
+            return 1.0;
+        }
+
+        int cx = client.getCameraX();
+        int cy = client.getCameraY();
+        int cz = client.getCameraZ();
+
+        int ix = loc.getX();
+        int iy = loc.getY();
+        int iz = client.getTileHeights()[client.getPlane()][loc.getSceneX()][loc.getSceneY()];
+
+        double dist = Math.sqrt(Math.pow(cx - ix, 2) + Math.pow(cy - iy, 2) + Math.pow(cz - iz, 2));
+        double itemScale = 1.0;
+
+        if (dist > 0) {
+            itemScale = (client.get3dZoom() / dist) * 1.5;
+        }
+
+        double pitchRatio = client.getCameraPitch() / 383.0;
+        itemScale *= (1.0 + (pitchRatio * 2.5));
+
+        return itemScale;
+    }
+}
