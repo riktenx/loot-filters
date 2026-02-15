@@ -147,7 +147,7 @@ public class LootFiltersOverlay extends Overlay {
 
             for (var item : items.get(false)) {
                 var itemScale = getItemScale(tile);
-                var baseOffset = (int) (config.lootLabelYOffset() * itemScale);
+                var baseOffset = (int) (config.adaptiveYOffset() * itemScale);
                 var shift = baseOffset + currentOffset;
 
                 var leftOffset = 0;
@@ -192,7 +192,7 @@ public class LootFiltersOverlay extends Overlay {
                 var fm = g.getFontMetrics(g.getFont());
                 var textWidth = fm.stringWidth(displayText);
                 var textHeight = fm.getHeight();
-                var visualOffset = config.reverseLootStacking() ? -(shift + textHeight) : shift;
+                var visualOffset = config.reverseOverlay() ? -(shift + textHeight) : shift;
 
                 var text = new TextComponent();
                 text.setText(displayText);
@@ -291,9 +291,9 @@ public class LootFiltersOverlay extends Overlay {
         }
 
         var itemScale = getItemScale(tile);
-        var baseOffset = (int) (config.lootLabelYOffset() * itemScale);
+        var baseOffset = (int) (config.adaptiveYOffset() * itemScale);
         var shift = baseOffset + currentOffset;
-        var drawY = config.reverseLootStacking()
+        var drawY = config.reverseOverlay()
                 ? imagePoint.y + shift - BOX_PAD    // DOWN (Symmetrical to UP)
                 : imagePoint.y - shift - boxHeight; // UP
 
@@ -610,6 +610,10 @@ public class LootFiltersOverlay extends Overlay {
     }
 
     private double getItemScale(Tile tile) {
+		if (config.adaptiveYOffset() == 0) {
+			return 0;
+		}
+
         var loc = tile.getLocalLocation();
         if (loc == null) {
             return 1.0;
@@ -621,7 +625,8 @@ public class LootFiltersOverlay extends Overlay {
 
         int ix = loc.getX();
         int iy = loc.getY();
-        int iz = client.getTileHeights()[client.getPlane()][loc.getSceneX()][loc.getSceneY()];
+		int plane = client.getTopLevelWorldView().getPlane();
+        int iz = client.getTopLevelWorldView().getTileHeights()[plane][loc.getSceneX()][loc.getSceneY()];
 
         double dist = Math.sqrt(Math.pow(cx - ix, 2) + Math.pow(cy - iy, 2) + Math.pow(cz - iz, 2));
         double itemScale = 1.0;

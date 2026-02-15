@@ -278,9 +278,7 @@ public interface LootFiltersConfig extends Config {
     @ConfigItem(
             keyName = "overlayZOffset",
             name = "Overlay z-offset",
-            description = "Adjusts the initial vertical offset of the text overlay.<br><br>" +
-                    "This is the initial z-axis offset in 3D space. Each individual unit does not necessary correspond<br>" +
-                    "to a full pixel, it will vary by camera perspective.",
+            description = "Adjusts the 3D-space vertical offset of the text overlay.",
             section = displayOverrides,
             position = 95
     )
@@ -288,22 +286,23 @@ public interface LootFiltersConfig extends Config {
     default int overlayZOffset() { return 16; }
 
     @ConfigItem(
-            keyName = "lootLabelYOffset",
-            name = "Loot label Y offset",
-            description = "Vertical offset (separation) from the item.<br>" +
-                    "Positive values move the label AWAY from the item in the direction of the stack.",
-            section = displayOverrides,
-            position = 97
-    )
-    default int lootLabelYOffset() { return 0; }
-    @ConfigItem(
-            keyName = "reverseLootStacking",
-            name = "Reverse loot stacking",
-            description = "Stack loot labels downwards instead of upwards.",
+            keyName = "adaptiveYOffset",
+            name = "Adaptive y-offset",
+            description = "Adjusts the adaptive vertical offset of the text overlay.<br><br>" +
+					"The actual offset will adjust with camera perspective and zoom<br>" +
+					"in an effort to keep the overlay away from the 3D item on the ground.",
             section = displayOverrides,
             position = 96
     )
-    default boolean reverseLootStacking() { return false; }
+    default int adaptiveYOffset() { return 0; }
+    @ConfigItem(
+            keyName = "reverseOverlay",
+            name = "Reverse overlay",
+            description = "Stack labels in the text overlay downwards.",
+            section = displayOverrides,
+            position = 97
+    )
+    default boolean reverseOverlay() { return false; }
     @ConfigItem(
             keyName = "compactMode",
             name = "Compact mode",
