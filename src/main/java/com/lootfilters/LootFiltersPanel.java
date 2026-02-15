@@ -1,6 +1,11 @@
 package com.lootfilters;
 
 import com.lootfilters.lang.CompileException;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
@@ -45,6 +50,7 @@ public class LootFiltersPanel extends PluginPanel {
 	private JComboBox<String> filterSelect;
 	private JTextArea filterName;
     private JTextArea filterDescription;
+	private JTextArea filterError;
 
 	@Inject
     public LootFiltersPanel(LootFiltersPlugin plugin, LootFilterManager lootFilterManager) {
@@ -61,12 +67,18 @@ public class LootFiltersPanel extends PluginPanel {
 		filterSelect = new JComboBox<>();
 
 		filterName = new JTextArea();
-		filterName.setFont(FontManager.getRunescapeBoldFont());
 		filterName.setEditable(false);
+		filterName.setFont(FontManager.getRunescapeBoldFont());
 
 		filterDescription = new JTextArea();
-		filterDescription.setLineWrap(true);
 		filterDescription.setEditable(false);
+		filterDescription.setLineWrap(true);
+
+		filterError = new JTextArea();
+		filterError.setEditable(false);
+		filterError.setVisible(false);
+		filterError.setLineWrap(true);
+		filterError.setForeground(Color.RED);
 
         var top = new JPanel();
         top.setLayout(new BoxLayout(top, BoxLayout.X_AXIS));
@@ -112,6 +124,7 @@ public class LootFiltersPanel extends PluginPanel {
 		root.add(filterName);
 		root.add(Box.createVerticalStrut(5));
         root.add(filterDescription);
+		root.add(filterError);
 
         add(root);
     }
@@ -134,7 +147,9 @@ public class LootFiltersPanel extends PluginPanel {
             plugin.addChatMessage("Importing...");
             newFilter = LootFilter.fromSourcesWithPreamble(Map.of("clipboard", newSrc));
         } catch (CompileException e) {
-            plugin.addChatMessage("Import failed: " + e.getMessage());
+			var msg = "Import failed: " + e.getMessage();
+            plugin.addChatMessage(msg);
+			showError(msg);
             return;
         }
 
@@ -228,6 +243,10 @@ public class LootFiltersPanel extends PluginPanel {
     }
 
     public void reflowFilterInfo() {
+		filterName.setVisible(true);
+		filterDescription.setVisible(true);
+		filterError.setVisible(false);
+
         if (plugin.getSelectedFilter() == null) {
 			filterName.setText("");
             filterDescription.setText(NONE_DESCRIPTION);
@@ -242,4 +261,16 @@ public class LootFiltersPanel extends PluginPanel {
 		filterName.setText(filter.getName());
         filterDescription.setText(desc.replaceAll("<br>", "\n"));
     }
+
+	private static final DateTimeFormatter ERROR_DATE_FMT = DateTimeFormatter
+		.ofPattern("hh:mm:ss")
+		.withZone(ZoneId.systemDefault());
+
+	public void showError(String text) {
+		filterName.setVisible(false);
+		filterDescription.setVisible(false);
+		filterError.setVisible(true);
+
+		filterError.setText("[" + ERROR_DATE_FMT.format(Instant.now()) + "]\n" + text);
+	}
 }

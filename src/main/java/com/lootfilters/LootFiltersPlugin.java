@@ -89,6 +89,7 @@ public class LootFiltersPlugin extends Plugin {
 	@Inject private AudioPlayer audioPlayer;
 	@Inject private InfoBoxManager infoBoxManager;
 
+	@Getter
 	private LootFiltersPanel pluginPanel;
 
 	private NavigationButton pluginPanelNav;
@@ -234,7 +235,15 @@ public class LootFiltersPlugin extends Plugin {
 				config.setPreferredDefault(selected);
 			}
 
-			filterManager.loadFilter().thenAccept(this::onSelectedFilterReloaded);
+			filterManager.loadFilter().handle((filter, e) -> {
+				if (e != null) {
+					onFilterLoadError(e);
+					return null;
+				}
+
+				onSelectedFilterReloaded(filter);
+				return null;
+			});
 		} else {
 			onSelectedFilterReloaded(filterManager.getLoadedFilter());
 		}
@@ -246,6 +255,14 @@ public class LootFiltersPlugin extends Plugin {
 		pluginPanel.reflowFilterInfo();
 
 		resetDisplay();
+	}
+
+	private LootFilter onFilterLoadError(Throwable e)
+	{
+		var msg = "Failed to load filter: " + e.getMessage();
+		addChatMessage(msg);
+		pluginPanel.showError(msg);
+		return null;
 	}
 
 	@Subscribe

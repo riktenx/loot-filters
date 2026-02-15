@@ -20,10 +20,8 @@ public class Sources {
             preamble = loadScriptResource(preambleStream);
         } catch (IOException e) {
             throw new RuntimeException("init static sources", e);
-        } catch (CompileException e) {
-            throw new RuntimeException("init static filters", e);
         }
-    }
+	}
 
     public static String loadScriptResource(InputStream in) throws IOException {
         return normalizeCrlf(new String(in.readAllBytes()));

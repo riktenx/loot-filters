@@ -1,5 +1,7 @@
 package com.lootfilters;
 
+import com.lootfilters.lang.CompileException;
+import java.io.FileNotFoundException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Map;
@@ -7,6 +9,7 @@ import java.util.concurrent.CompletableFuture;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.Getter;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
@@ -68,38 +71,29 @@ public class LootFilterManager {
 
 	public CompletableFuture<LootFilter> loadFilter() {
 		return CompletableFuture.supplyAsync(() -> {
-			var selected = plugin.getSelectedFilter();
-			if (selected == null) {
-				return saveLoaded(LootFilter.Nop);
-			}
-			if (DefaultFilter.isDefault(selected)) {
-				return saveLoaded(DefaultFilter.loadByName(selected));
-			}
-
-			var file = new File(LootFiltersPlugin.FILTER_DIRECTORY, selected);
-			if (!file.exists()) {
-				return saveLoaded(LootFilter.Nop);
-			}
-
-			String src;
 			try {
-				src = Files.readString(file.toPath());
+				return doLoadFilter();
 			} catch (Exception e) {
-				return saveLoaded(LootFilter.Nop);
+				throw new RuntimeException(e);
 			}
-
-			var filter = LootFilter.fromSourcesWithPreamble(Map.of(file.getName(), src))
-				.toBuilder()
-				.setFilename(file.getName())
-				.build();
-			if (filter.getName() == null || filter.getName().isBlank()) {
-				filter = filter.toBuilder()
-					.setName(file.getName())
-					.build();
-			}
-
-			return saveLoaded(filter);
 		});
+	}
+
+	private LootFilter doLoadFilter() throws IOException
+	{
+		var selected = plugin.getSelectedFilter();
+		if (selected == null) {
+			return saveLoaded(LootFilter.Nop);
+		}
+		if (DefaultFilter.isDefault(selected)) {
+			return saveLoaded(DefaultFilter.loadByName(selected));
+		}
+
+		var file = new File(LootFiltersPlugin.FILTER_DIRECTORY, selected);
+		var src = Files.readString(file.toPath());
+		var filter = LootFilter.fromSource(file.getName(), src);
+
+		return saveLoaded(filter);
 	}
 
 	public void createFilter(String name, String src) throws IOException {
