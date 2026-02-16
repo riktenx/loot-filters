@@ -39,10 +39,8 @@ public class Migrate_133_140 {
         }
 
         for (var i = 0; i < toMigrate.size(); ++i) {
-            plugin.getFilterManager().saveNewFilter("migrated_filter_" + i, toMigrate.get(i));
+            plugin.getFilterManager().createFilter("migrated_filter_" + i, toMigrate.get(i));
         }
-        plugin.reloadFilters();
-        plugin.getPluginPanel().reflowFilterSelect(plugin.getLoadedFilters(), plugin.getSelectedFilterName());
     }
 
     private List<String> getConfigUserFilters() {

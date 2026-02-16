@@ -1,7 +1,15 @@
 package com.lootfilters;
 
 import com.lootfilters.lang.CompileException;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import net.runelite.client.ui.FontManager;
 import net.runelite.client.ui.PluginPanel;
 import net.runelite.client.util.LinkBrowser;
 
@@ -29,31 +37,49 @@ import static com.lootfilters.util.TextUtil.quote;
 import static javax.swing.JOptionPane.showConfirmDialog;
 
 @Slf4j
+@Singleton
 public class LootFiltersPanel extends PluginPanel {
     private static final String NONE_ITEM = "<none>";
     private static final String NONE_DESCRIPTION = "Select a filter to show its description.";
     private static final String BLANK_DESCRIPTION = "<no description provided>";
 
     private final LootFiltersPlugin plugin;
-    private final JComboBox<String> filterSelect;
-    private final JPanel root;
-    private final JTextArea filterDescription;
+	private final LootFilterManager lootFilterManager;
 
-    public LootFiltersPanel(LootFiltersPlugin plugin) {
+    private JPanel root;
+	private JComboBox<String> filterSelect;
+	private JTextArea filterName;
+    private JTextArea filterDescription;
+	private JTextArea filterError;
+
+	@Inject
+    public LootFiltersPanel(LootFiltersPlugin plugin, LootFilterManager lootFilterManager) {
         this.plugin = plugin;
+		this.lootFilterManager = lootFilterManager;
 
-        filterSelect = new JComboBox<>();
-        filterDescription = new JTextArea();
-        filterDescription.setLineWrap(true);
-        filterDescription.setEditable(false);
-
-        root = new JPanel();
-        root.setLayout(new BoxLayout(root, BoxLayout.Y_AXIS));
-
-        init();
+		init();
     }
 
-    private void init() {
+    public void init() {
+		root = new JPanel();
+		root.setLayout(new BoxLayout(root, BoxLayout.Y_AXIS));
+
+		filterSelect = new JComboBox<>();
+
+		filterName = new JTextArea();
+		filterName.setEditable(false);
+		filterName.setFont(FontManager.getRunescapeBoldFont());
+
+		filterDescription = new JTextArea();
+		filterDescription.setEditable(false);
+		filterDescription.setLineWrap(true);
+
+		filterError = new JTextArea();
+		filterError.setEditable(false);
+		filterError.setVisible(false);
+		filterError.setLineWrap(true);
+		filterError.setForeground(Color.RED);
+
         var top = new JPanel();
         top.setLayout(new BoxLayout(top, BoxLayout.X_AXIS));
         var mid = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -94,12 +120,13 @@ public class LootFiltersPanel extends PluginPanel {
         root.add(mid);
         root.add(filterSelect);
         root.add(bottom);
+		root.add(Box.createVerticalStrut(10));
+		root.add(filterName);
+		root.add(Box.createVerticalStrut(5));
         root.add(filterDescription);
+		root.add(filterError);
 
         add(root);
-
-        reflowFilterSelect(plugin.getLoadedFilters(), plugin.getSelectedFilterName());
-        reflowFilterDescription();
     }
 
     private void onImportClipboard() {
@@ -120,7 +147,9 @@ public class LootFiltersPanel extends PluginPanel {
             plugin.addChatMessage("Importing...");
             newFilter = LootFilter.fromSourcesWithPreamble(Map.of("clipboard", newSrc));
         } catch (CompileException e) {
-            plugin.addChatMessage("Import failed: " + e.getMessage());
+			var msg = "Import failed: " + e.getMessage();
+            plugin.addChatMessage(msg);
+			showError(msg);
             return;
         }
 
@@ -129,41 +158,39 @@ public class LootFiltersPanel extends PluginPanel {
             return;
         }
 
-        var existing = plugin.getLoadedFilters();
-        for (var filter : existing) {
-            if (!filter.getName().equals(newFilter.getName())) {
-                continue;
-            }
-            if (!confirm("Filter " + quote(filter.getName()) + " already exists. Update it?")) {
-                return;
-            }
+        var existing = lootFilterManager.getFilenames();
+		var filename = LootFilterManager.toFilename(newFilter.getName());
+		if (existing.contains(filename)) {
+			if (!confirm("File " + quote(filename) + " already exists. Update it?")) {
+				return;
+			}
 
-            try {
-                plugin.getFilterManager().updateFilter(filter.getFilename(), newSrc);
-            } catch (Exception e) {
-                plugin.addChatMessage("Import failed: " + e.getMessage());
-                return;
-            }
+			try {
+				lootFilterManager.updateFilter(filename, newSrc);
+			} catch (Exception e) {
+				plugin.addChatMessage("Import failed: " + e.getMessage());
+				return;
+			}
 
-            plugin.setSelectedFilterName(newFilter.getName());
-            onReloadFilters();
-            return;
-        }
+			plugin.addChatMessage("Import ok.");
+			plugin.setSelectedFilter(filename);
+			return;
+		}
 
         try {
-            plugin.getFilterManager().saveNewFilter(newFilter.getName(), newSrc);
+            lootFilterManager.createFilter(newFilter.getName(), newSrc);
         } catch (Exception e) {
             plugin.addChatMessage("Import failed: " + e.getMessage());
             return;
         }
 
-        plugin.setSelectedFilterName(newFilter.getName());
-        onReloadFilters();
+		plugin.addChatMessage("Import ok.");
+        plugin.setSelectedFilter(filename);
     }
 
     private void onFilterSelect(ActionEvent event) {
         var selected = (String) filterSelect.getSelectedItem();
-        plugin.setSelectedFilterName(NONE_ITEM.equals(selected) ? null : selected);
+        plugin.setSelectedFilter(NONE_ITEM.equals(selected) ? null : selected);
     }
 
     private JButton createIconButton(BufferedImage icon, String tooltip, Runnable onClick) {
@@ -189,16 +216,14 @@ public class LootFiltersPanel extends PluginPanel {
     }
 
     private void onReloadFilters() {
-        plugin.reloadFilters();
-        reflowFilterSelect(plugin.getLoadedFilters(), plugin.getSelectedFilterName());
-        reflowFilterDescription();
+		lootFilterManager.reload().thenAccept(plugin::onSelectedFilterReloaded);
     }
 
     private void onBrowseFolder() {
         LinkBrowser.open(LootFiltersPlugin.PLUGIN_DIRECTORY.getAbsolutePath());
     }
 
-    public void reflowFilterSelect(List<LootFilter> filters, String selected) {
+    public void reflowFilterSelect(List<String> filters, String selected) {
         for (var l : filterSelect.getActionListeners()) {
             filterSelect.removeActionListener(l);
         }
@@ -206,19 +231,24 @@ public class LootFiltersPanel extends PluginPanel {
         filterSelect.removeAllItems();
         filterSelect.addItem(NONE_ITEM);
         for (var filter : filters) {
-            filterSelect.addItem(filter.getName());
+            filterSelect.addItem(filter);
         }
 
-        if (plugin.hasFilter(selected)) { // selected filter could be gone
+        if (filters.contains(selected)) { // selected filter could be gone
             filterSelect.setSelectedItem(selected);
         } else {
-            plugin.setSelectedFilterName(null);
+            plugin.setSelectedFilter(null);
         }
         filterSelect.addActionListener(this::onFilterSelect);
     }
 
-    public void reflowFilterDescription() {
-        if (plugin.getSelectedFilterName() == null) {
+    public void reflowFilterInfo() {
+		filterName.setVisible(true);
+		filterDescription.setVisible(true);
+		filterError.setVisible(false);
+
+        if (plugin.getSelectedFilter() == null) {
+			filterName.setText("");
             filterDescription.setText(NONE_DESCRIPTION);
             return;
         }
@@ -228,6 +258,19 @@ public class LootFiltersPanel extends PluginPanel {
         if (desc == null || desc.isBlank()) {
             desc = BLANK_DESCRIPTION;
         }
+		filterName.setText(filter.getName());
         filterDescription.setText(desc.replaceAll("<br>", "\n"));
     }
+
+	private static final DateTimeFormatter ERROR_DATE_FMT = DateTimeFormatter
+		.ofPattern("hh:mm:ss")
+		.withZone(ZoneId.systemDefault());
+
+	public void showError(String text) {
+		filterName.setVisible(false);
+		filterDescription.setVisible(false);
+		filterError.setVisible(true);
+
+		filterError.setText("[" + ERROR_DATE_FMT.format(Instant.now()) + "]\n" + text);
+	}
 }

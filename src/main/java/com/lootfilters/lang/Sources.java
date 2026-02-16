@@ -1,5 +1,6 @@
 package com.lootfilters.lang;
 
+import java.util.zip.GZIPInputStream;
 import lombok.Getter;
 
 import java.io.IOException;
@@ -19,12 +20,19 @@ public class Sources {
             preamble = loadScriptResource(preambleStream);
         } catch (IOException e) {
             throw new RuntimeException("init static sources", e);
-        } catch (CompileException e) {
-            throw new RuntimeException("init static filters", e);
         }
-    }
+	}
 
-    private static String loadScriptResource(InputStream in) throws IOException {
+    public static String loadScriptResource(InputStream in) throws IOException {
         return normalizeCrlf(new String(in.readAllBytes()));
     }
+
+	public static String loadScriptResource(Class<?> clazz, String name, boolean gzip) throws IOException {
+		try (
+			var inner = clazz.getResourceAsStream(name);
+			var stream = gzip ? new GZIPInputStream(inner) : inner;
+		) {
+			return loadScriptResource(stream);
+		}
+	}
 }

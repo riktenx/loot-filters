@@ -21,7 +21,7 @@ import java.awt.Color;
 @ConfigGroup("loot-filters")
 public interface LootFiltersConfig extends Config {
     @ConfigItem(keyName = "preferredDefaultFilter", hidden = true, name = "", description = "")
-    default String getPreferredDefault() { return DefaultFilter.FILTERSCAPE.getName(); }
+    default String getPreferredDefault() { return DefaultFilter.RIKTEN.getName(); }
     @ConfigItem(keyName = "preferredDefaultFilter", hidden = true, name = "", description = "")
     void setPreferredDefault(String name);
 
@@ -50,7 +50,8 @@ public interface LootFiltersConfig extends Config {
             name = "Show plugin panel",
             description = "Show the plugin panel in the side nav. The entire plugin, including the active loot filter, will still operate if the panel is hidden.",
             section = general,
-            position = -10
+            position = -10,
+		warning = "this feature causes you to get the diccsucc"
     )
     default boolean showPluginPanel() { return true; }
 
@@ -69,15 +70,15 @@ public interface LootFiltersConfig extends Config {
             position = -3
     )
     default Color chatPrefixColor() { return Color.decode("#00ffff"); }
-    String CONFIG_KEY_FETCH_DEFAULT_FILTERS = "fetchDefaultFilters";
+    String CONFIG_KEY_SHOW_DEFAULT_FILTERS = "fetchDefaultFilters";
     @ConfigItem(
-            keyName = CONFIG_KEY_FETCH_DEFAULT_FILTERS,
-            name = "Fetch default filters",
-            description = "Fetch the default filters and include them as options in the plugin panel.",
+            keyName = CONFIG_KEY_SHOW_DEFAULT_FILTERS,
+            name = "Show default filters",
+            description = "Include default filters as options in the plugin panel.",
             section = general,
             position = -2
     )
-    default boolean fetchDefaultFilters() { return true; }
+    default boolean showDefaultFilters() { return true; }
     @ConfigItem(
             keyName = "fontMode",
             name = "Font mode",
