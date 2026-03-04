@@ -132,29 +132,25 @@ public class LootFiltersPanel extends PluginPanel {
     private void onImportClipboard() {
         var newSrc = getClipboard();
         if (newSrc == null) {
-            plugin.addChatMessage("Import failed: no text in clipboard.");
+            showError("Import failed: no text in clipboard.");
             return;
         }
 
         if (newSrc.startsWith("https://filterscape.xyz/import")) {
-            plugin.addChatMessage("This is a link to import a filter on filterscape.xyz, taking you there now...");
             LinkBrowser.browse(newSrc + "&pluginRedirect=true");
             return;
         }
 
         LootFilter newFilter;
         try {
-            plugin.addChatMessage("Importing...");
             newFilter = LootFilter.fromSourcesWithPreamble(Map.of("clipboard", newSrc));
-        } catch (CompileException e) {
-			var msg = "Import failed: " + e.getMessage();
-            plugin.addChatMessage(msg);
-			showError(msg);
+        } catch (Exception e) {
+			showError("Import failed: " + e.getMessage());
             return;
         }
 
         if (newFilter.getName() == null || newFilter.getName().isBlank()) {
-            plugin.addChatMessage("Import failed: this filter does not have a name.");
+            showError("Import failed: this filter does not have a name.");
             return;
         }
 
@@ -168,25 +164,29 @@ public class LootFiltersPanel extends PluginPanel {
 			try {
 				lootFilterManager.updateFilter(filename, newSrc);
 			} catch (Exception e) {
-				plugin.addChatMessage("Import failed: " + e.getMessage());
+				showError("Import failed: " + e.getMessage());
 				return;
 			}
 
-			plugin.addChatMessage("Import ok.");
-			plugin.setSelectedFilter(filename);
+			finalizeImport(filename);
 			return;
 		}
 
         try {
             lootFilterManager.createFilter(newFilter.getName(), newSrc);
         } catch (Exception e) {
-            plugin.addChatMessage("Import failed: " + e.getMessage());
+            showError("Import failed: " + e.getMessage());
             return;
         }
 
-		plugin.addChatMessage("Import ok.");
-        plugin.setSelectedFilter(filename);
+		finalizeImport(filename);
     }
+
+	private void finalizeImport(String filename) {
+		plugin.addChatMessage("Import ok.");
+		plugin.setSelectedFilter(filename);
+		onReloadFilters();
+	}
 
     private void onFilterSelect(ActionEvent event) {
         var selected = (String) filterSelect.getSelectedItem();
