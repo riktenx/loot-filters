@@ -3,20 +3,20 @@ package com.lootfilters;
 import com.google.gson.Gson;
 import com.google.inject.Provides;
 import com.lootfilters.migration.Migrate_1105_1106;
+import com.lootfilters.migration.Migrate_110_111;
 import com.lootfilters.migration.Migrate_133_140;
 import com.lootfilters.model.DisplayConfigIndex;
 import com.lootfilters.model.IconIndex;
 import com.lootfilters.model.PluginTileItem;
 import com.lootfilters.model.SoundProvider;
+import com.lootfilters.util.FilterUtil;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
-import net.runelite.api.GameState;
 import net.runelite.api.Tile;
 import net.runelite.api.events.ClientTick;
-import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.ItemDespawned;
 import net.runelite.api.events.ItemQuantityChanged;
 import net.runelite.api.events.ItemSpawned;
@@ -38,10 +38,8 @@ import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.ui.overlay.infobox.InfoBoxManager;
-import okhttp3.OkHttpClient;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -50,7 +48,6 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import static com.lootfilters.util.FilterUtil.withConfigRules;
 import static net.runelite.client.RuneLite.RUNELITE_DIR;
 import static net.runelite.client.util.ColorUtil.colorToHexCode;
 
@@ -89,11 +86,12 @@ public class LootFiltersPlugin extends Plugin {
 	@Inject private ItemManager itemManager;
 	@Inject private Notifier notifier;
 	@Inject private SpriteManager spriteManager;
-	@Inject private OkHttpClient okHttpClient;
 	@Inject private AudioPlayer audioPlayer;
 	@Inject private InfoBoxManager infoBoxManager;
 
+	@Getter
 	private LootFiltersPanel pluginPanel;
+
 	private NavigationButton pluginPanelNav;
 
 	@Inject private TileItemIndex tileItemIndex;
@@ -102,13 +100,16 @@ public class LootFiltersPlugin extends Plugin {
 	@Inject private IconIndex iconIndex;
 
 	private final MenuEntryComposer menuEntryComposer = new MenuEntryComposer(this);
-	private final LootFilterManager filterManager = new LootFilterManager(this);
+
+	@Inject
+	private LootFilterManager filterManager;
+
 	private final ExecutorService audioDispatcher = Executors.newSingleThreadExecutor();
 	private final Set<SoundProvider> queuedAudio = new HashSet<>();
 	private final List<String> queuedChatMessages = new ArrayList<>();
 
-	@Getter private LootFilter activeFilter;
-	private List<LootFilter> parsedUserFilters;
+	@Getter
+	private LootFilter activeFilter; // parsed filter + config decoration
 
 	@Setter private int hoveredItem = -1;
 	@Setter private int hoveredHide = -1;
@@ -116,36 +117,19 @@ public class LootFiltersPlugin extends Plugin {
 	@Setter private boolean hotkeyActive = false;
 	@Setter private boolean isOverlayEnabled = true;
 
-	public String getSelectedFilterName() {
+	public String getSelectedFilter() {
 		return configManager.getConfiguration(CONFIG_GROUP, SELECTED_FILTER_KEY);
 	}
 
-	public void setSelectedFilterName(String name) {
+	public void setSelectedFilter(String name) {
 		if (name != null) {
 			configManager.setConfiguration(CONFIG_GROUP, SELECTED_FILTER_KEY, name);
-			if (name.equals(DefaultFilter.FILTERSCAPE.getName()) || name.equals(DefaultFilter.JOESFILTER.getName())) {
+			if (DefaultFilter.isDefault(name)) {
 				config.setPreferredDefault(name);
 			}
 		} else {
 			configManager.unsetConfiguration(CONFIG_GROUP, SELECTED_FILTER_KEY);
 		}
-	}
-
-	public List<LootFilter> getLoadedFilters() {
-		var filters = new ArrayList<LootFilter>();
-		filters.addAll(filterManager.getDefaultFilters());
-		filters.addAll(parsedUserFilters);
-		return filters;
-	}
-
-	public LootFilter getSelectedFilter() {
-		return getLoadedFilters().stream()
-				.filter(it -> it.getName().equals(getSelectedFilterName()))
-				.findFirst().orElse(LootFilter.Nop);
-	}
-
-	public boolean hasFilter(String name) {
-		return getLoadedFilters().stream().anyMatch(it -> it.getName().equals(name));
 	}
 
 	public void addChatMessage(String msg) {
@@ -158,14 +142,14 @@ public class LootFiltersPlugin extends Plugin {
 
 	@Override
 	protected void startUp() {
-		initPluginDirectory();
+		// panel needs to come into being on EDT once LAF is setup
+		pluginPanel = injector.getInstance(LootFiltersPanel.class);
+
 		overlayManager.add(overlay);
 		infoBoxManager.addInfoBox(overlayStateIndicator);
+		keyManager.registerKeyListener(hotkeyListener);
+		mouseManager.registerMouseListener(mouseAdapter);
 
-		parsedUserFilters = filterManager.loadFilters();
-		loadSelectedFilter();
-
-		pluginPanel = new LootFiltersPanel(this);
 		pluginPanelNav = NavigationButton.builder()
 				.tooltip("Loot Filters")
 				.icon(Icons.PANEL_ICON)
@@ -174,28 +158,37 @@ public class LootFiltersPlugin extends Plugin {
 		if (config.showPluginPanel()) {
 			clientToolbar.addNavigation(pluginPanelNav);
 		}
-		keyManager.registerKeyListener(hotkeyListener);
-		mouseManager.registerMouseListener(mouseAdapter);
+
+		initPluginDirectory();
 
 		Migrate_133_140.run(this);
 		Migrate_1105_1106.run(this);
+		Migrate_110_111.run(this);
 
-		if (config.fetchDefaultFilters()) {
-			filterManager.fetchDefaultFilters(this::onFetchDefaultFilters);
+		if (config.showDefaultFilters() && getSelectedFilter() == null) {
+			setSelectedFilter(config.getPreferredDefault());
 		}
+		filterManager.startUp().thenAccept(filter -> {
+			activeFilter = FilterUtil.withConfigRules(filter, config);
+
+			pluginPanel.reflowFilterSelect(filterManager.getFilenames(), getSelectedFilter());
+			pluginPanel.reflowFilterInfo();
+		});
 	}
 
 	@Override
 	protected void shutDown() {
 		overlayManager.remove(overlay);
 		infoBoxManager.removeInfoBox(overlayStateIndicator);
-
-		filterManager.getDefaultFilters().clear();
-		clearIndices();
-
-		clientToolbar.removeNavigation(pluginPanelNav);
 		keyManager.unregisterKeyListener(hotkeyListener);
 		mouseManager.unregisterMouseListener(mouseAdapter);
+
+		clientToolbar.removeNavigation(pluginPanelNav);
+
+		clearIndices();
+
+		filterManager.shutDown();
+		activeFilter = null;
 	}
 
 	private void initPluginDirectory() {
@@ -224,31 +217,52 @@ public class LootFiltersPlugin extends Plugin {
 			}
 		}
 
-		if (event.getKey().equals(LootFiltersConfig.CONFIG_KEY_FETCH_DEFAULT_FILTERS)) {
-			if (config.fetchDefaultFilters()) {
-				filterManager.fetchDefaultFilters(this::onFetchDefaultFilters);
-			} else {
-				var selected = getSelectedFilterName();
-				filterManager.getDefaultFilters().clear();
-				if (selected != null && selected.equals(DefaultFilter.FILTERSCAPE.getName())) {
+		if (event.getKey().equals(LootFiltersConfig.CONFIG_KEY_SHOW_DEFAULT_FILTERS)) {
+			filterManager.loadFiles();
+			var selected = getSelectedFilter();
+			if (!config.showDefaultFilters()) {
+				if (DefaultFilter.isDefault(selected)) {
 					selected = null;
-					setSelectedFilterName(null);
+					setSelectedFilter(null);
 				}
-				pluginPanel.reflowFilterSelect(getLoadedFilters(), selected);
 			}
+			pluginPanel.reflowFilterSelect(filterManager.getFilenames(), selected);
 		}
 
 		if (event.getKey().equals(SELECTED_FILTER_KEY)) {
-			var selected = getSelectedFilterName();
-			if (DefaultFilter.all().stream().anyMatch(it -> it.getName().equals(selected))) {
-				addChatMessage("Loaded " + selected + ". Visit filterscape.xyz to configure it.");
+			var selected = getSelectedFilter();
+			if (DefaultFilter.isDefault(selected)) {
+				config.setPreferredDefault(selected);
 			}
+
+			filterManager.loadFilter().handle((filter, e) -> {
+				if (e != null) {
+					onFilterLoadError(e);
+					return null;
+				}
+
+				onSelectedFilterReloaded(filter);
+				return null;
+			});
+		} else {
+			onSelectedFilterReloaded(filterManager.getLoadedFilter());
 		}
+	}
 
-		loadSelectedFilter();
+	public void onSelectedFilterReloaded(LootFilter filter) {
+		activeFilter = FilterUtil.withConfigRules(filter, config);
+		pluginPanel.reflowFilterSelect(filterManager.getFilenames(), getSelectedFilter());
+		pluginPanel.reflowFilterInfo();
+
 		resetDisplay();
+	}
 
-		pluginPanel.reflowFilterDescription();
+	private LootFilter onFilterLoadError(Throwable e)
+	{
+		var msg = "Failed to load filter: " + e.getMessage();
+		addChatMessage(msg);
+		pluginPanel.showError(msg);
+		return null;
 	}
 
 	@Subscribe
@@ -360,28 +374,11 @@ public class LootFiltersPlugin extends Plugin {
 		iconIndex.clear();
 	}
 
-	public void reloadFilters() {
-		parsedUserFilters = filterManager.loadFilters();
-		loadSelectedFilter();
-		resetDisplay();
-	}
-
-	private void loadSelectedFilter() {
-		activeFilter = withConfigRules(getSelectedFilter(), config);
-	}
-
 	private void resetDisplay() {
 		clientThread.invoke(() -> {
 			displayIndex.reset(this);
 			lootbeamIndex.reset(this);
 			iconIndex.reset(this);
 		});
-	}
-
-	private void onFetchDefaultFilters() {
-		if (getSelectedFilterName() == null) {
-			setSelectedFilterName(config.getPreferredDefault());
-		}
-		pluginPanel.reflowFilterSelect(getLoadedFilters(), getSelectedFilterName());
 	}
 }

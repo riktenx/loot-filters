@@ -1,7 +1,7 @@
 package com.lootfilters.lang;
 
-public class CompileException extends RuntimeException {
-    public CompileException(String message) {
+public abstract class CompileException extends RuntimeException {
+    protected CompileException(String message) {
         super(message);
     }
 }

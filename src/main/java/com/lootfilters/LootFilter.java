@@ -6,10 +6,12 @@ import com.lootfilters.lang.Parser;
 import com.lootfilters.lang.Preprocessor;
 import com.lootfilters.lang.Sources;
 import com.lootfilters.lang.TokenStream;
+import com.lootfilters.lang.TokenizeException;
 import com.lootfilters.model.PluginTileItem;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.SneakyThrows;
 import lombok.ToString;
 
 import java.awt.Color;
@@ -19,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.lootfilters.lang.Location.UNKNOWN_SOURCE_NAME;
 import static com.lootfilters.util.TextUtil.normalizeCrlf;
 
 @Getter
@@ -52,7 +53,7 @@ public class LootFilter {
         return fromSources(new LinkedHashMap<>(sources));
     }
 
-    public static LootFilter fromSources(LinkedHashMap<String, String> sources) throws CompileException {
+	public static LootFilter fromSources(LinkedHashMap<String, String> sources) throws CompileException {
         var combinedStream = sources
                 .entrySet().stream()
                 .map(source -> {
@@ -63,7 +64,13 @@ public class LootFilter {
                     }
                     return new Lexer(source.getKey(), normalizeCrlf(sourceValue));
                 })
-                .map(Lexer::tokenize)
+                .map(it -> {
+					try {
+						return it.tokenize();
+					} catch (TokenizeException e) {
+						throw new RuntimeException(e);
+					}
+				})
                 .flatMap(tokenStream -> tokenStream.getTokens().stream())
                 .collect(Collectors.collectingAndThen(Collectors.toList(), TokenStream::new));
 
@@ -71,9 +78,15 @@ public class LootFilter {
         return new Parser(postproc).parse();
     }
 
-    public static LootFilter fromSource(String source) throws CompileException {
-        return fromSourcesWithPreamble(Map.of(UNKNOWN_SOURCE_NAME, source));
-    }
+	public static LootFilter fromSource(String filename, String source) throws CompileException {
+		var filter = fromSourcesWithPreamble(Map.of(filename, source))
+			.toBuilder()
+			.setFilename(filename);
+		if (filter.name == null || filter.name.isBlank()) {
+			filter.setName(filename);
+		}
+		return filter.build();
+	}
 
     public Builder toBuilder() {
         var builder = new Builder();
