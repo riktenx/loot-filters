@@ -50,8 +50,7 @@ public interface LootFiltersConfig extends Config {
             name = "Show plugin panel",
             description = "Show the plugin panel in the side nav. The entire plugin, including the active loot filter, will still operate if the panel is hidden.",
             section = general,
-            position = -10,
-		warning = "this feature causes you to get the diccsucc"
+            position = -10
     )
     default boolean showPluginPanel() { return true; }
 
