@@ -1,7 +1,5 @@
 package com.lootfilters.lang;
 
-import lombok.AllArgsConstructor;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
@@ -11,37 +9,48 @@ import java.util.stream.Collectors;
 /**
  * TokenStream wraps a list of Tokens to expose retrieval APIs suitable for parsing.
  */
-@AllArgsConstructor
 public class TokenStream {
     private final List<Token> tokens;
+    private int index = 0;
+
+    public TokenStream(List<Token> tokens) {
+        this.tokens = tokens;
+    }
 
     /**
      * Returns a shallow copy of the token stream.
      */
     public List<Token> getTokens() {
-        return new ArrayList<>(tokens);
+        return new ArrayList<>(tokens.subList(index, tokens.size()));
     }
 
     /**
      * Peek at the first token in the stream, ignoring whitespace, without consuming it.
      */
     public Token peek() {
-        return tokens.stream()
-                .filter(Token::isSemantic)
-                .findFirst()
-                .orElse(null);
+        for (int i = index; i < tokens.size(); i++) {
+            var token = tokens.get(i);
+            if (token.isSemantic()) {
+				return token;
+			}
+        }
+
+        return null;
     }
 
     /**
      * Consume the first token in the stream, optionally including whitespace.
      */
     public Token take(boolean includeWhitespace) {
-        while (isNotEmpty()) {
-            var next = tokens.remove(0);
+        for (int i = index; i < tokens.size(); i++) {
+            var next = tokens.get(i);
             if (next.isSemantic() || includeWhitespace && next.isWhitespace()) {
+                index = i + 1;
                 return next;
             }
         }
+
+        index = tokens.size();
         return null;
     }
 
@@ -96,13 +105,18 @@ public class TokenStream {
      */
     public List<Token> takeLine() {
         var line = new ArrayList<Token>();
-        while (!tokens.isEmpty()) {
-            var next = tokens.remove(0);
+        int i;
+
+        for (i = index; i < tokens.size(); ++i) {
+            var next = tokens.get(i);
             if (next.is(Token.Type.NEWLINE)) {
-                return line;
+                ++i;
+                break;
             }
             line.add(next);
         }
+
+        index = i;
         return line;
     }
 
@@ -255,7 +269,10 @@ public class TokenStream {
     }
 
     public boolean isNotEmpty() { // this doesn't _currently_ need a version that checks non-semantic
-        return tokens.stream().anyMatch(Token::isSemantic);
+        for (int i = index; i < tokens.size(); i++) {
+            if (tokens.get(i).isSemantic()) return true;
+        }
+        return false;
     }
 
     @Override

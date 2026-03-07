@@ -6,6 +6,8 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
@@ -42,6 +44,8 @@ public class LootFiltersPanel extends PluginPanel {
     private static final String NONE_ITEM = "<none>";
     private static final String NONE_DESCRIPTION = "Select a filter to show its description.";
     private static final String BLANK_DESCRIPTION = "<no description provided>";
+
+	private static final Executor importExecutor = Executors.newSingleThreadExecutor();
 
     private final LootFiltersPlugin plugin;
 	private final LootFilterManager lootFilterManager;
