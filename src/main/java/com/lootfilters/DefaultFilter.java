@@ -3,7 +3,9 @@ package com.lootfilters;
 import com.lootfilters.lang.Sources;
 import java.util.List;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Getter
 public enum DefaultFilter {
 	RIKTEN(
@@ -14,6 +16,10 @@ public enum DefaultFilter {
 		"[default: Joe's filter]",
 		"https://raw.githubusercontent.com/typical-whack/loot-filters-modules/refs/heads/main/default-filter.rs2f"
 	),
+	STORN(
+		"[default: Storn's filter]",
+		"https://raw.githubusercontent.com/Storn42/Storn-Filter/refs/heads/main/default.rs2f"
+	)
 	;
 
 	private final String name, filename, url;
@@ -49,6 +55,7 @@ public enum DefaultFilter {
 			var src = Sources.loadScriptResource(DefaultFilter.class, filter.filename, true);
 			return LootFilter.fromSource(name, src);
 		} catch (Exception e) {
+			log.error("load {}", name, e);
 			return LootFilter.Nop;
 		}
 	}
