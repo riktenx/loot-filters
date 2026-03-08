@@ -21,6 +21,10 @@ public class FilterUtil {
      * Wraps a user-defined loot filter with config defaults (highlight/hide, value tiers, etc.).
      */
     public static LootFilter withConfigRules(LootFilter filter, LootFiltersConfig config) {
+		if (filter == null) { // this should not happen but as a prophylactic
+			filter = LootFilter.Nop;
+		}
+
         var withConfig = new ArrayList<FilterRule>();
 
         withConfig.add(FilterRule.highlight(config));

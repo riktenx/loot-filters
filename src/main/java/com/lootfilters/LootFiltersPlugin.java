@@ -109,7 +109,7 @@ public class LootFiltersPlugin extends Plugin {
 	private final List<String> queuedChatMessages = new ArrayList<>();
 
 	@Getter
-	private LootFilter activeFilter; // parsed filter + config decoration
+	private LootFilter activeFilter = LootFilter.Nop; // parsed filter + config decoration
 
 	@Setter private int hoveredItem = -1;
 	@Setter private int hoveredHide = -1;
@@ -188,7 +188,7 @@ public class LootFiltersPlugin extends Plugin {
 		clearIndices();
 
 		filterManager.shutDown();
-		activeFilter = null;
+		activeFilter = LootFilter.Nop;
 	}
 
 	private void initPluginDirectory() {
