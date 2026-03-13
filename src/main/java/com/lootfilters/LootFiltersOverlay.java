@@ -583,10 +583,10 @@ public class LootFiltersOverlay extends Overlay {
             return pLoc.distanceTo(tLoc) <= MAX_DISTANCE;
         }
 
-        if (pLoc.getWorldView() != -1) {
+        if (pLoc.getWorldView() != WorldView.TOPLEVEL) {
             pLoc = toTopLevel(client, pLoc);
         }
-        if (tLoc.getWorldView() != -1) {
+        if (tLoc.getWorldView() != WorldView.TOPLEVEL) {
             tLoc = toTopLevel(client, tLoc);
         }
         return pLoc.distanceTo(tLoc) <= MAX_DISTANCE;
