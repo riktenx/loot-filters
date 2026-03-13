@@ -40,8 +40,10 @@ import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.ui.overlay.infobox.InfoBoxManager;
 
 import javax.inject.Inject;
+import javax.swing.SwingUtilities;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -173,6 +175,10 @@ public class LootFiltersPlugin extends Plugin {
 
 			pluginPanel.reflowFilterSelect(filterManager.getFilenames(), getSelectedFilter());
 			pluginPanel.reflowFilterInfo();
+		}).exceptionally(e -> {
+			log.error("init filter manager", e);
+			pluginPanel.reflowFilterSelect(filterManager.getFilenames(), getSelectedFilter());
+			return null;
 		});
 	}
 
@@ -251,8 +257,11 @@ public class LootFiltersPlugin extends Plugin {
 
 	public void onSelectedFilterReloaded(LootFilter filter) {
 		activeFilter = FilterUtil.withConfigRules(filter, config);
-		pluginPanel.reflowFilterSelect(filterManager.getFilenames(), getSelectedFilter());
-		pluginPanel.reflowFilterInfo();
+
+		SwingUtilities.invokeLater(() -> {
+			pluginPanel.reflowFilterSelect(filterManager.getFilenames(), getSelectedFilter());
+			pluginPanel.reflowFilterInfo();
+		});
 
 		resetDisplay();
 	}
