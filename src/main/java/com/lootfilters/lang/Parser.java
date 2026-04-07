@@ -6,6 +6,7 @@ import com.lootfilters.FilterRule;
 import com.lootfilters.model.SoundProvider;
 import com.lootfilters.model.BufferedImageProvider;
 import com.lootfilters.ast.leaf.AccountTypeCondition;
+import com.lootfilters.ast.leaf.VarCondition;
 import com.lootfilters.ast.AndCondition;
 import com.lootfilters.ast.leaf.AreaCondition;
 import com.lootfilters.model.Comparator;
@@ -25,11 +26,14 @@ import com.lootfilters.ast.OrCondition;
 import com.lootfilters.ast.Condition;
 import com.lootfilters.model.TextAccent;
 import com.lootfilters.model.ValueType;
+import com.lootfilters.model.VarTransform;
 import lombok.RequiredArgsConstructor;
 import net.runelite.api.coords.WorldPoint;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 
 import static com.lootfilters.lang.Token.Type.APPLY;
@@ -66,6 +70,7 @@ public class Parser {
     private final TokenStream tokens;
 
     private final LootFilter.Builder builder = LootFilter.builder();
+    private final Map<String, VarTransform> varTransforms = new HashMap<>();
 
     public LootFilter parse() throws ParseException {
         while (tokens.isNotEmpty()) {
@@ -76,6 +81,8 @@ public class Parser {
                 parseRule(true, tok.getLocation().getLineNumber());
             } else if (tok.is(APPLY)) {
                 parseRule(false, tok.getLocation().getLineNumber());
+            } else if (tok.is(IDENTIFIER) && tok.getValue().equals("varexpr")) {
+                parseVarExpr();
             } else {
                 throw new ParseException("unexpected token", tok);
             }
@@ -259,6 +266,10 @@ public class Parser {
                 return parseAreaRule();
             case "accountType":
                 return parseAccountTypeRule();
+            case "var":
+                return parseVarRule(false);
+            case "varbit":
+                return parseVarRule(true);
             default:
                 throw new ParseException("unknown rule identifier", first);
         }
@@ -330,6 +341,58 @@ public class Parser {
     private AccountTypeCondition parseAccountTypeRule() {
         var type = tokens.takeExpect(LITERAL_INT).expectInt();
         return new AccountTypeCondition(type);
+    }
+
+    private void parseVarExpr() {
+        var nameToken = tokens.takeExpect(IDENTIFIER);
+        var name = nameToken.getValue();
+        tokens.takeExpect(COLON);
+
+        var vToken = tokens.takeExpect(IDENTIFIER);
+        if (!vToken.getValue().equals("v")) {
+            throw new ParseException("varexpr must start with 'v'", vToken);
+        }
+
+        var ops = new ArrayList<VarTransform.Op>();
+        while (tokens.isNotEmpty() && isBitwiseOp(tokens.peek())) {
+            var op = tokens.take();
+            var operand = tokens.takeExpect(LITERAL_INT).expectInt();
+            ops.add(new VarTransform.Op(toBitwiseOpType(op), operand));
+        }
+
+        varTransforms.put(name, new VarTransform(ops));
+    }
+
+    private VarCondition parseVarRule(boolean useVarbit) {
+        var next = tokens.peek();
+        if (next.is(IDENTIFIER)) {
+            var name = tokens.take().getValue();
+            var transform = varTransforms.get(name);
+            if (transform == null) {
+                throw new ParseException("unknown varexpr '" + name + "'", next);
+            }
+            var varId = tokens.takeExpect(LITERAL_INT).expectInt();
+            return new VarCondition(varId, transform, useVarbit);
+        } else if (next.is(LITERAL_INT)) {
+            var varId = tokens.take().expectInt();
+            return new VarCondition(varId, VarTransform.IDENTITY, useVarbit);
+        }
+        throw new ParseException("var: expected transform name or var id", next);
+    }
+
+    private boolean isBitwiseOp(Token tok) {
+        return tok.is(Token.Type.OP_RSHIFT) || tok.is(Token.Type.OP_LSHIFT)
+                || tok.is(Token.Type.OP_BITAND) || tok.is(Token.Type.OP_BITOR);
+    }
+
+    private VarTransform.OpType toBitwiseOpType(Token tok) {
+        switch (tok.getType()) {
+            case OP_RSHIFT: return VarTransform.OpType.RSHIFT;
+            case OP_LSHIFT: return VarTransform.OpType.LSHIFT;
+            case OP_BITAND: return VarTransform.OpType.BITAND;
+            case OP_BITOR:  return VarTransform.OpType.BITOR;
+            default: throw new ParseException("expected bitwise operator", tok);
+        }
     }
 
     private Condition buildRule(List<Condition> postfix) {
