@@ -374,6 +374,7 @@ public class LootFiltersPlugin extends Plugin {
 			client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", chatMsg, "loot-filters", false);
 		}
 		queuedChatMessages.clear();
+		clientThread.invokeLater(client::refreshChat);
 	}
 
 	private void clearIndices() {
