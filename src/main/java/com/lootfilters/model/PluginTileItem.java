@@ -40,7 +40,7 @@ public class PluginTileItem {
         this.despawnInstant = Instant.now().plusMillis((getDespawnTime() - spawnTime) * 600L);
         this.isStackable = composition.isStackable();
         this.isNoted = composition.getNote() != -1;
-        this.isTradeable = composition.isTradeable() || linkedNoteComposition.isTradeable();
+        this.isTradeable = composition.isTradeable() || (linkedNoteComposition.getId() != -1 && linkedNoteComposition.isTradeable());
         this.tile = tile;
         this.worldView = tile.getItemLayer().getWorldView().getId();
     }
