@@ -1,23 +1,18 @@
 package com.lootfilters;
 
 import com.lootfilters.lang.CompileException;
-import java.io.FileNotFoundException;
-import java.nio.file.Files;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Map;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.Getter;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
+import net.runelite.client.util.FileManager;
 
 import static com.lootfilters.util.TextUtil.quote;
 
@@ -29,6 +24,9 @@ public class LootFilterManager {
 
 	@Inject
 	private LootFiltersConfig config;
+
+	@Inject
+	private FileManager fileManager;
 
 	@Getter
 	private final List<String> filenames = new ArrayList<>();
@@ -55,18 +53,23 @@ public class LootFilterManager {
 	}
 
     public void loadFiles() {
-        var next = Arrays.stream(LootFiltersPlugin.FILTER_DIRECTORY.listFiles())
-                .filter(it -> !it.getName().startsWith("."))
-				.map(it -> it.getName())
-                .collect(Collectors.toList());
+		try (var stream = fileManager.walk("filters")) {
+			var next = stream
+				.filter(e -> !e.isDirectory())
+				.filter(e -> !e.getPath().startsWith("."))
+				.map(e -> e.getPath())
+				.collect(Collectors.toList());
 
-		filenames.clear();
-		if (config.showDefaultFilters()) {
-			filenames.addAll(DefaultFilter.all().stream()
-				.map(DefaultFilter::getName)
-				.collect(Collectors.toList()));
+			filenames.clear();
+			if (config.showDefaultFilters()) {
+				filenames.addAll(DefaultFilter.all().stream()
+					.map(DefaultFilter::getName)
+					.collect(Collectors.toList()));
+			}
+			filenames.addAll(next);
+		} catch (IOException e) {
+			log.error("load filter files", e);
 		}
-		filenames.addAll(next);
     }
 
 	public CompletableFuture<LootFilter> loadFilter() {
@@ -89,32 +92,30 @@ public class LootFilterManager {
 			return saveLoaded(DefaultFilter.loadByName(selected));
 		}
 
-		var file = new File(LootFiltersPlugin.FILTER_DIRECTORY, selected);
-		var src = Files.readString(file.toPath());
-		var filter = LootFilter.fromSource(file.getName(), src);
+		String src;
+		try (var is = fileManager.read("filters", selected)) {
+			src = new String(is.readAllBytes(), StandardCharsets.UTF_8);
+		}
+		var filter = LootFilter.fromSource(selected, src);
 
 		return saveLoaded(filter);
 	}
 
 	public void createFilter(String name, String src) throws IOException {
         var sanitized = toFilename(name);
-        var newFile = new File(LootFiltersPlugin.FILTER_DIRECTORY, toFilename(name));
-        if (!newFile.createNewFile()) {
+        if (fileManager.exists("filters", sanitized)) {
             throw new IOException("could not create file " + sanitized);
         }
-
-        try (var writer = new FileWriter(newFile)) {
+        try (var writer = new OutputStreamWriter(fileManager.write("filters", sanitized), StandardCharsets.UTF_8)) {
             writer.write(src);
         }
     }
 
     public void updateFilter(String filename, String src) throws IOException {
-        var file = new File(LootFiltersPlugin.FILTER_DIRECTORY, filename);
-        if (!file.exists()) {
+        if (!fileManager.exists("filters", filename)) {
             throw new IOException("attempt to update nonexistent file " + quote(filename));
         }
-
-        try (var writer = new FileWriter(file)) {
+        try (var writer = new OutputStreamWriter(fileManager.write("filters", filename), StandardCharsets.UTF_8)) {
             writer.write(src);
         }
     }

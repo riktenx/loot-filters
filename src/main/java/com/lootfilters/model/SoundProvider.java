@@ -48,10 +48,9 @@ public abstract class SoundProvider {
 
         @Override
         public void play(LootFiltersPlugin plugin) {
-            try {
-                var soundFile = new java.io.File(LootFiltersPlugin.SOUND_DIRECTORY, filename);
+            try (var is = plugin.getFileManager().read("sounds", filename)) {
                 var gain = 20f * (float) Math.log10(plugin.getConfig().soundVolume() / 100f);
-                plugin.getAudioPlayer().play(soundFile, gain);
+                plugin.getAudioPlayer().play(is, gain);
             } catch (Exception e) {
                 log.warn("play audio {}", filename, e);
             }

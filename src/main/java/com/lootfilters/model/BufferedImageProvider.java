@@ -10,7 +10,6 @@ import net.runelite.client.util.ImageUtil;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 
-import static com.lootfilters.LootFiltersPlugin.ICON_DIRECTORY;
 
 @Slf4j
 public abstract class BufferedImageProvider {
@@ -66,8 +65,8 @@ public abstract class BufferedImageProvider {
 
         @Override
         public BufferedImage getImage(LootFiltersPlugin plugin, PluginTileItem item, int... height) {
-            try {
-                return ImageIO.read(new java.io.File(ICON_DIRECTORY, filename));
+            try (var is = plugin.getFileManager().read("icons", filename)) {
+                return ImageIO.read(is);
             } catch (Exception e) {
                 log.warn("load image file {}", filename, e);
                 return null;

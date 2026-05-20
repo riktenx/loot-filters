@@ -39,9 +39,11 @@ import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.ui.overlay.infobox.InfoBoxManager;
 
+import net.runelite.client.util.FileManager;
+
 import javax.inject.Inject;
 import javax.swing.SwingUtilities;
-import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -50,7 +52,6 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import static net.runelite.client.RuneLite.RUNELITE_DIR;
 import static net.runelite.client.util.ColorUtil.colorToHexCode;
 
 @Slf4j
@@ -64,11 +65,6 @@ import static net.runelite.client.util.ColorUtil.colorToHexCode;
 public class LootFiltersPlugin extends Plugin {
 	public static final String CONFIG_GROUP = "loot-filters";
 	public static final String SELECTED_FILTER_KEY = "selected-filter";
-
-	public static final File PLUGIN_DIRECTORY = new File(RUNELITE_DIR, "loot-filters");
-	public static final File FILTER_DIRECTORY = new File(PLUGIN_DIRECTORY, "filters");
-	public static final File SOUND_DIRECTORY = new File(PLUGIN_DIRECTORY, "sounds");
-	public static final File ICON_DIRECTORY = new File(PLUGIN_DIRECTORY, "icons");
 
 	@Inject private Client client;
 	@Inject private ClientThread clientThread;
@@ -105,6 +101,9 @@ public class LootFiltersPlugin extends Plugin {
 
 	@Inject
 	private LootFilterManager filterManager;
+
+	@Inject
+	private FileManager fileManager;
 
 	private final ExecutorService audioDispatcher = Executors.newSingleThreadExecutor();
 	private final Set<SoundProvider> queuedAudio = new HashSet<>();
@@ -198,10 +197,13 @@ public class LootFiltersPlugin extends Plugin {
 	}
 
 	private void initPluginDirectory() {
-		PLUGIN_DIRECTORY.mkdir();
-		FILTER_DIRECTORY.mkdir();
-		SOUND_DIRECTORY.mkdir();
-		ICON_DIRECTORY.mkdir();
+		try {
+			fileManager.mkdir("filters");
+			fileManager.mkdir("sounds");
+			fileManager.mkdir("icons");
+		} catch (IOException e) {
+			log.error("init plugin directory", e);
+		}
 	}
 
 	@Provides

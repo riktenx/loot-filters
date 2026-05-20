@@ -13,7 +13,7 @@ repositories {
 	mavenCentral()
 }
 
-def runeLiteVersion = 'latest.release'
+def runeLiteVersion = '1.12.27-SNAPSHOT'
 
 def scriptSources = sourceSets.create("script")
 configurations.create("script") {

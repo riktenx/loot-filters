@@ -3,8 +3,7 @@ package com.lootfilters.migration;
 import com.lootfilters.DefaultFilter;
 import com.lootfilters.LootFilter;
 import com.lootfilters.LootFiltersPlugin;
-import java.io.File;
-import java.nio.file.Files;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import javax.swing.JOptionPane;
 import lombok.AllArgsConstructor;
@@ -50,8 +49,10 @@ public class Migrate_110_111 {
 				continue;
 			}
 
-			var file = new File(LootFiltersPlugin.FILTER_DIRECTORY, filename);
-			var src = Files.readString(file.toPath());
+			String src;
+			try (var is = plugin.getFileManager().read("filters", filename)) {
+				src = new String(is.readAllBytes(), StandardCharsets.UTF_8);
+			}
 			var filter = LootFilter.fromSource(filename, src);
 			if (filter.getName().equals(selected)) {
 				log.info("migrate 1.10 -> 1.11: {} maps to {}", filter.getName(), filename);
