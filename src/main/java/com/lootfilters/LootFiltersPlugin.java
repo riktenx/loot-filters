@@ -311,6 +311,9 @@ public class LootFiltersPlugin extends Plugin {
 			lootbeamIndex.put(tile, item, beam);
 		}
 		if (match.isNotify()) {
+			if (config.customSystemNotification().isEnabled()) {
+				notifier.notify(config.customSystemNotification(), "[Loot Filters] You received a drop: " + item.getName());
+			}
 			notifier.notify("[Loot Filters] You received a drop: " + item.getName());
 		}
 		if (match.getSound() != null && config.soundVolume() > 0) {
