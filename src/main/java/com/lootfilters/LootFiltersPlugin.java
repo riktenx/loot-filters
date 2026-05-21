@@ -313,8 +313,9 @@ public class LootFiltersPlugin extends Plugin {
 		if (match.isNotify()) {
 			if (config.customSystemNotification().isEnabled()) {
 				notifier.notify(config.customSystemNotification(), "[Loot Filters] You received a drop: " + item.getName());
+			} else {
+				notifier.notify("[Loot Filters] You received a drop: " + item.getName());
 			}
-			notifier.notify("[Loot Filters] You received a drop: " + item.getName());
 		}
 		if (match.getSound() != null && config.soundVolume() > 0) {
 			queuedAudio.add(match.getSound());
