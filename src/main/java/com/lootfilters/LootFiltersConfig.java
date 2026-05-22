@@ -340,6 +340,14 @@ public interface LootFiltersConfig extends Config {
     default LootbeamHeight lootbeamHeight() {
         return LootbeamHeight.NORMAL;
     }
+    @ConfigItem(
+        keyName = "customSystemNotification",
+        name = "Customized system notifications",
+        description = "Customize system notifications sent.",
+        section = displayOverrides,
+        position = 201
+    )
+    default Notification customSystemNotification() { return Notification.OFF; }
 
     @ConfigSection(
             name = "Global filters",
@@ -422,29 +430,21 @@ public interface LootFiltersConfig extends Config {
             position = 4
     )
     default boolean highlightNotify() { return false; }
-    @ConfigItem(
-        keyName = "customSystemNotification",
-        name = "Customized system notifications",
-        description = "Customize system notifications sent.",
-        section = itemLists,
-        position = 5
-    )
-    default Notification customSystemNotification() { return Notification.OFF; }
-    @ConfigItem(position = 6, section = itemLists,
+    @ConfigItem(position = 5, section = itemLists,
             keyName = "hdBackgroundColor", name = "Background", description = "")
     @Alpha default Color higlightBackgroundColor() { return null; }
-    @ConfigItem(position = 7, section = itemLists,
+    @ConfigItem(position = 6, section = itemLists,
             keyName = "hdBorderColor", name = "Border", description = "")
     @Alpha default Color highlightBorderColor() { return Color.decode("#aa00ff"); }
-    @ConfigItem(position = 8, section = itemLists,
+    @ConfigItem(position = 7, section = itemLists,
             keyName = "hdLootbeamColor", name = "Lootbeam", description = "")
     @Alpha default Color highlightLootbeamColor() { return null; }
-    @ConfigItem(position = 9, section = itemLists,
+    @ConfigItem(position = 8, section = itemLists,
             keyName = "hdMenuTextColor", name = "Menu text", description = "")
     @Alpha default Color highlightMenuTextColor() { return null; }
-    @ConfigItem(position = 10, section = itemLists, keyName = "hdMenuSort", name = "Menu sort priority", description = "")
+    @ConfigItem(position = 9, section = itemLists, keyName = "hdMenuSort", name = "Menu sort priority", description = "")
     default int highlightMenuSort() { return 0; }
-    @ConfigItem(position = 11, section = itemLists,
+    @ConfigItem(position = 10, section = itemLists,
             keyName = "hdSound", name = "Sound", description = "Can be one of two types of values:<br><br>A number: play a game sound effect by ID<br>A string: play a custom audio file from .runelite/loot-filters/sounds, not all sound formats are supported")
     default String highlightSound() { return ""; }
 
