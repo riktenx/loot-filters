@@ -1,7 +1,5 @@
 package com.lootfilters;
 
-import lombok.val;
-
 public class FilterNotFoundException extends RuntimeException {
     final String filterName;
 
