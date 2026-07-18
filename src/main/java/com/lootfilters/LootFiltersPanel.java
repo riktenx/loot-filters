@@ -45,44 +45,44 @@ public class LootFiltersPanel extends PluginPanel {
     private static final String NONE_DESCRIPTION = "Select a filter to show its description.";
     private static final String BLANK_DESCRIPTION = "<no description provided>";
 
-	private static final Executor importExecutor = Executors.newSingleThreadExecutor();
-
     private final LootFiltersPlugin plugin;
-	private final LootFilterManager lootFilterManager;
+    private final LootFilterManager lootFilterManager;
 
     private JPanel root;
-	private JComboBox<String> filterSelect;
-	private JTextArea filterName;
+    private JComboBox<String> filterSelect;
+    private JTextArea filterName;
     private JTextArea filterDescription;
-	private JTextArea filterError;
+    private JTextArea filterError;
 
-	@Inject
+    @Inject
     public LootFiltersPanel(LootFiltersPlugin plugin, LootFilterManager lootFilterManager) {
         this.plugin = plugin;
-		this.lootFilterManager = lootFilterManager;
+        this.lootFilterManager = lootFilterManager;
 
-		init();
+        init();
     }
 
     public void init() {
-		root = new JPanel();
-		root.setLayout(new BoxLayout(root, BoxLayout.Y_AXIS));
+        root = new JPanel();
+        root.setLayout(new BoxLayout(root, BoxLayout.Y_AXIS));
 
-		filterSelect = new JComboBox<>();
+        filterSelect = new JComboBox<>();
 
-		filterName = new JTextArea();
-		filterName.setEditable(false);
-		filterName.setFont(FontManager.getRunescapeBoldFont());
+        filterName = new JTextArea();
+        filterName.setEditable(false);
+        filterName.setFont(FontManager.getRunescapeBoldFont());
 
-		filterDescription = new JTextArea();
-		filterDescription.setEditable(false);
-		filterDescription.setLineWrap(true);
+        filterDescription = new JTextArea();
+        filterDescription.setEditable(false);
+        filterDescription.setLineWrap(true);
+        filterDescription.setWrapStyleWord(true);
 
-		filterError = new JTextArea();
-		filterError.setEditable(false);
-		filterError.setVisible(false);
-		filterError.setLineWrap(true);
-		filterError.setForeground(Color.RED);
+        filterError = new JTextArea();
+        filterError.setEditable(false);
+        filterError.setVisible(false);
+        filterError.setLineWrap(true);
+        filterError.setWrapStyleWord(true);
+        filterError.setForeground(Color.RED);
 
         var top = new JPanel();
         top.setLayout(new BoxLayout(top, BoxLayout.X_AXIS));
@@ -124,11 +124,11 @@ public class LootFiltersPanel extends PluginPanel {
         root.add(mid);
         root.add(filterSelect);
         root.add(bottom);
-		root.add(Box.createVerticalStrut(10));
-		root.add(filterName);
-		root.add(Box.createVerticalStrut(5));
+        root.add(Box.createVerticalStrut(10));
+        root.add(filterName);
+        root.add(Box.createVerticalStrut(5));
         root.add(filterDescription);
-		root.add(filterError);
+        root.add(filterError);
 
         add(root);
     }
@@ -149,7 +149,7 @@ public class LootFiltersPanel extends PluginPanel {
         try {
             newFilter = LootFilter.fromSourcesWithPreamble(Map.of("clipboard", newSrc));
         } catch (Exception e) {
-			showError("Import failed: " + e.getMessage());
+            showError("Import failed: " + e.getMessage());
             return;
         }
 
@@ -159,22 +159,22 @@ public class LootFiltersPanel extends PluginPanel {
         }
 
         var existing = lootFilterManager.getFilenames();
-		var filename = LootFilterManager.toFilename(newFilter.getName());
-		if (existing.contains(filename)) {
-			if (!confirm("File " + quote(filename) + " already exists. Update it?")) {
-				return;
-			}
+        var filename = LootFilterManager.toFilename(newFilter.getName());
+        if (existing.contains(filename)) {
+            if (!confirm("File " + quote(filename) + " already exists. Update it?")) {
+                return;
+            }
 
-			try {
-				lootFilterManager.updateFilter(filename, newSrc);
-			} catch (Exception e) {
-				showError("Import failed: " + e.getMessage());
-				return;
-			}
+            try {
+                lootFilterManager.updateFilter(filename, newSrc);
+            } catch (Exception e) {
+                showError("Import failed: " + e.getMessage());
+                return;
+            }
 
-			finalizeImport(filename);
-			return;
-		}
+            finalizeImport(filename);
+            return;
+        }
 
         try {
             lootFilterManager.createFilter(newFilter.getName(), newSrc);
@@ -183,18 +183,20 @@ public class LootFiltersPanel extends PluginPanel {
             return;
         }
 
-		finalizeImport(filename);
+        finalizeImport(filename);
     }
 
-	private void finalizeImport(String filename) {
-		plugin.addChatMessage("Import ok.");
-		plugin.setSelectedFilter(filename);
-		onReloadFilters();
-	}
+    private void finalizeImport(String filename) {
+        plugin.addChatMessage("Import ok.");
+        plugin.setSelectedFilter(filename);
+        onReloadFilters();
+    }
 
     private void onFilterSelect(ActionEvent event) {
         var selected = (String) filterSelect.getSelectedItem();
-        plugin.setSelectedFilter(NONE_ITEM.equals(selected) ? null : selected);
+        if (!NONE_ITEM.equals(selected)) {
+            plugin.setSelectedFilter(selected);
+        }
     }
 
     private JButton createIconButton(BufferedImage icon, String tooltip, Runnable onClick) {
@@ -220,7 +222,7 @@ public class LootFiltersPanel extends PluginPanel {
     }
 
     private void onReloadFilters() {
-		lootFilterManager.reload().thenAccept(plugin::onSelectedFilterReloaded);
+        lootFilterManager.reload().thenAccept(plugin::onSelectedFilterReloaded);
     }
 
     private void onBrowseFolder() {
@@ -240,19 +242,17 @@ public class LootFiltersPanel extends PluginPanel {
 
         if (filters.contains(selected)) { // selected filter could be gone
             filterSelect.setSelectedItem(selected);
-        } else {
-            plugin.setSelectedFilter(null);
         }
         filterSelect.addActionListener(this::onFilterSelect);
     }
 
     public void reflowFilterInfo() {
-		filterName.setVisible(true);
-		filterDescription.setVisible(true);
-		filterError.setVisible(false);
+        filterName.setVisible(true);
+        filterDescription.setVisible(true);
+        filterError.setVisible(false);
 
         if (plugin.getSelectedFilter() == null) {
-			filterName.setText("");
+            filterName.setText("");
             filterDescription.setText(NONE_DESCRIPTION);
             return;
         }
@@ -262,19 +262,19 @@ public class LootFiltersPanel extends PluginPanel {
         if (desc == null || desc.isBlank()) {
             desc = BLANK_DESCRIPTION;
         }
-		filterName.setText(filter.getName());
+        filterName.setText(filter.getName());
         filterDescription.setText(desc.replaceAll("<br>", "\n"));
     }
 
-	private static final DateTimeFormatter ERROR_DATE_FMT = DateTimeFormatter
-		.ofPattern("hh:mm:ss")
-		.withZone(ZoneId.systemDefault());
+    private static final DateTimeFormatter ERROR_DATE_FMT = DateTimeFormatter
+            .ofPattern("hh:mm:ss")
+            .withZone(ZoneId.systemDefault());
 
-	public void showError(String text) {
-		filterName.setVisible(false);
-		filterDescription.setVisible(false);
-		filterError.setVisible(true);
+    public void showError(String text) {
+        filterName.setVisible(false);
+        filterDescription.setVisible(false);
+        filterError.setVisible(true);
 
-		filterError.setText("[" + ERROR_DATE_FMT.format(Instant.now()) + "]\n" + text);
-	}
+        filterError.setText("[" + ERROR_DATE_FMT.format(Instant.now()) + "]\n" + text);
+    }
 }
