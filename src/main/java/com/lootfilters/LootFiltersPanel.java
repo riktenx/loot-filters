@@ -194,9 +194,7 @@ public class LootFiltersPanel extends PluginPanel {
 
     private void onFilterSelect(ActionEvent event) {
         var selected = (String) filterSelect.getSelectedItem();
-        if (!NONE_ITEM.equals(selected)) {
-            plugin.setSelectedFilter(selected);
-        }
+	    plugin.setSelectedFilter(NONE_ITEM.equals(selected) ? null : selected);
     }
 
     private JButton createIconButton(BufferedImage icon, String tooltip, Runnable onClick) {
