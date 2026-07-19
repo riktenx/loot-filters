@@ -45,8 +45,6 @@ public class LootFiltersPanel extends PluginPanel {
     private static final String NONE_DESCRIPTION = "Select a filter to show its description.";
     private static final String BLANK_DESCRIPTION = "<no description provided>";
 
-	private static final Executor importExecutor = Executors.newSingleThreadExecutor();
-
     private final LootFiltersPlugin plugin;
 	private final LootFilterManager lootFilterManager;
 
@@ -77,11 +75,13 @@ public class LootFiltersPanel extends PluginPanel {
 		filterDescription = new JTextArea();
 		filterDescription.setEditable(false);
 		filterDescription.setLineWrap(true);
+        filterDescription.setWrapStyleWord(true);
 
 		filterError = new JTextArea();
 		filterError.setEditable(false);
 		filterError.setVisible(false);
 		filterError.setLineWrap(true);
+        filterError.setWrapStyleWord(true);
 		filterError.setForeground(Color.RED);
 
         var top = new JPanel();
@@ -194,7 +194,9 @@ public class LootFiltersPanel extends PluginPanel {
 
     private void onFilterSelect(ActionEvent event) {
         var selected = (String) filterSelect.getSelectedItem();
-        plugin.setSelectedFilter(NONE_ITEM.equals(selected) ? null : selected);
+        if (!NONE_ITEM.equals(selected)) {
+            plugin.setSelectedFilter(selected);
+        }
     }
 
     private JButton createIconButton(BufferedImage icon, String tooltip, Runnable onClick) {
@@ -240,8 +242,6 @@ public class LootFiltersPanel extends PluginPanel {
 
         if (filters.contains(selected)) { // selected filter could be gone
             filterSelect.setSelectedItem(selected);
-        } else {
-            plugin.setSelectedFilter(null);
         }
         filterSelect.addActionListener(this::onFilterSelect);
     }

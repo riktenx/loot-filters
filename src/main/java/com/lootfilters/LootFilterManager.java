@@ -1,15 +1,11 @@
 package com.lootfilters;
 
-import com.lootfilters.lang.CompileException;
-import java.io.FileNotFoundException;
 import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.Getter;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
@@ -73,7 +69,7 @@ public class LootFilterManager {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				return doLoadFilter();
-			} catch (Exception e) {
+			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
 		});
@@ -90,6 +86,9 @@ public class LootFilterManager {
 		}
 
 		var file = new File(LootFiltersPlugin.FILTER_DIRECTORY, selected);
+		if (!file.exists()) {
+			throw new FilterNotFoundException(selected);
+		}
 		var src = Files.readString(file.toPath());
 		var filter = LootFilter.fromSource(file.getName(), src);
 

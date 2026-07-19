@@ -43,10 +43,10 @@ import javax.inject.Inject;
 import javax.swing.SwingUtilities;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -178,6 +178,14 @@ public class LootFiltersPlugin extends Plugin {
 		}).exceptionally(e -> {
 			log.error("init filter manager", e);
 			pluginPanel.reflowFilterSelect(filterManager.getFilenames(), getSelectedFilter());
+
+            if (e instanceof CompletionException && e.getCause() instanceof FilterNotFoundException) {
+                pluginPanel.showError(
+                        String.format("The currently configured filter '%s' was not found on this computer.\n\n" +
+                                "RuneLite likely synced this setting from another computer, but the filter files are too large to be synced.\n\n" +
+                                "Download the filter on this computer to use it.", ((FilterNotFoundException) e.getCause()).filterName
+                        ));
+            }
 			return null;
 		});
 	}
