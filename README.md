@@ -23,6 +23,7 @@ Loot filters allow you to do things like the following:
   * value
   * quantity
   * tradeable
+  * geTradeable
   * stackable
   * noted
   * "ownership" value
@@ -32,4 +33,3 @@ Loot filters allow you to do things like the following:
 * sort menu entries for ground items
 
 The above teaser image provides an example of what is possible with this plugin.
-

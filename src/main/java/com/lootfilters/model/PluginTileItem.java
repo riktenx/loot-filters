@@ -21,6 +21,7 @@ public class PluginTileItem {
     @Getter private final boolean isStackable;
     @Getter private final boolean isNoted;
     @Getter private final boolean isTradeable;
+    @Getter private final boolean isGeTradeable;
     @Getter private final Tile tile;
     @Getter private final int worldView;
 
@@ -41,6 +42,7 @@ public class PluginTileItem {
         this.isStackable = composition.isStackable();
         this.isNoted = composition.getNote() != -1;
         this.isTradeable = composition.isTradeable() || (linkedNoteComposition.getId() != -1 && linkedNoteComposition.isTradeable());
+        this.isGeTradeable = composition.isGeTradeable() || (linkedNoteComposition.getId() != -1 && linkedNoteComposition.isGeTradeable());
         this.tile = tile;
         this.worldView = tile.getItemLayer().getWorldView().getId();
     }

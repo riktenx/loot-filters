@@ -12,6 +12,7 @@ import com.lootfilters.model.Comparator;
 import com.lootfilters.ast.leaf.ConstCondition;
 import com.lootfilters.model.FontType;
 import com.lootfilters.ast.leaf.ItemIdCondition;
+import com.lootfilters.ast.leaf.ItemGeTradeableCondition;
 import com.lootfilters.ast.leaf.ItemNameCondition;
 import com.lootfilters.ast.leaf.ItemNotedCondition;
 import com.lootfilters.ast.leaf.ItemOwnershipCondition;
@@ -251,6 +252,8 @@ public class Parser {
                 return parseItemValueRule(ValueType.HA);
             case "tradeable":
                 return parseItemTradeableRule();
+            case "geTradeable":
+                return parseItemGeTradeableRule();
             case "stackable":
                 return parseItemStackableRule();
             case "noted":
@@ -305,6 +308,11 @@ public class Parser {
     private ItemTradeableCondition parseItemTradeableRule() {
         var op = tokens.take();
         return new ItemTradeableCondition((op.expectBoolean()));
+    }
+
+    private ItemGeTradeableCondition parseItemGeTradeableRule() {
+        var op = tokens.take();
+        return new ItemGeTradeableCondition((op.expectBoolean()));
     }
 
     private ItemStackableCondition parseItemStackableRule() {
