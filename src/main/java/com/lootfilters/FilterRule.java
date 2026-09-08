@@ -22,14 +22,13 @@ import java.util.stream.Collectors;
 @ToString
 public class FilterRule {
     private final Condition cond;
-    private final DisplayConfig display;
+    private final DisplayConfig.Builder display;
     private final boolean isTerminal;
     private final int sourceLine;
 
-    public FilterRule withDisplay(Consumer<DisplayConfig.DisplayConfigBuilder> consumer) {
-        var builder = display.toBuilder();
-        consumer.accept(builder);
-        return new FilterRule(cond, builder.build(), isTerminal, sourceLine);
+    public FilterRule withDisplay(Consumer<DisplayConfig.Builder> consumer) {
+        consumer.accept(display);
+        return new FilterRule(cond, display, isTerminal, sourceLine);
     }
 
     public static FilterRule highlight(LootFiltersConfig config) {
@@ -60,8 +59,7 @@ public class FilterRule {
                 .lootbeamColor(config.highlightLootbeamColor())
                 .menuTextColor(config.highlightMenuTextColor())
                 .menuSort(config.highlightMenuSort())
-                .sound(sound)
-                .build();
+                .sound(sound);
         return new FilterRule(rule, display, true, -3);
     }
 
@@ -73,8 +71,7 @@ public class FilterRule {
                         .collect(Collectors.toList())
         );
         var display = DisplayConfig.builder()
-                .hidden(true)
-                .build();
+                .hidden(true);
         return new FilterRule(rule, display, true, -4);
     }
 }

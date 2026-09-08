@@ -5,7 +5,6 @@ import com.lootfilters.model.BufferedImageProvider;
 import com.lootfilters.model.FontType;
 import com.lootfilters.model.TextAccent;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -17,11 +16,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Getter
-@Builder(toBuilder = true)
 @AllArgsConstructor
 @EqualsAndHashCode
 @ToString
 public class DisplayConfig {
+    public static Builder builder() {
+        return new Builder();
+    }
+
     public static final Color DEFAULT_MENU_TEXT_COLOR = Color.decode("#ff9040");
 
     private final Color textColor;
@@ -30,7 +32,7 @@ public class DisplayConfig {
     private final Boolean hidden;
     private final Boolean showLootbeam;
     private final Boolean showValue;
-    private final Boolean compact;
+    private final Boolean compact; // compact is currently a config-only setting and not supported in rs2f
     private final Boolean showDespawn;
     private final Boolean notify;
     private final TextAccent textAccent;
@@ -48,32 +50,31 @@ public class DisplayConfig {
     private final Integer menuSort;
     private final BufferedImageProvider icon;
 
-    // ideally this would be in EvalDisplayConfig which extends DisplayConfig but that's just more code tbh
     private final List<Integer> evalTrace;
 
-    public DisplayConfig(Color textColor) {
-        this.textColor = textColor;
-        backgroundColor = null;
-        borderColor = null;
-        hidden = false;
-        showLootbeam = false;
-        showValue = false;
-        compact = false; // compact is currently a config-only setting and not supported in rs2f
-        showDespawn = false;
-        notify = false;
-        textAccent = null;
-        textAccentColor = null;
-        lootbeamColor = null;
-        fontType = null;
-        menuTextColor = null;
-        highlightTile = null;
-        tileStrokeColor = null;
-        tileFillColor = null;
-        hideOverlay = null;
-        sound = null;
-        menuSort = null;
-        icon = null;
-        evalTrace = new ArrayList<>();
+    private DisplayConfig(Builder builder, List<Integer> evalTrace) {
+        compact = Box.unwrap(builder.compact);
+        hidden = Box.unwrap(builder.hidden);
+        hideOverlay = Box.unwrap(builder.hideOverlay);
+        highlightTile = Box.unwrap(builder.highlightTile);
+        notify = Box.unwrap(builder.notify);
+        showDespawn = Box.unwrap(builder.showDespawn);
+        showLootbeam = Box.unwrap(builder.showLootbeam);
+        showValue = Box.unwrap(builder.showValue);
+        icon = Box.unwrap(builder.icon);
+        backgroundColor = Box.unwrap(builder.backgroundColor);
+        borderColor = Box.unwrap(builder.borderColor);
+        lootbeamColor = Box.unwrap(builder.lootbeamColor);
+        menuTextColor = Box.unwrap(builder.menuTextColor);
+        textAccentColor = Box.unwrap(builder.textAccentColor);
+        textColor = Box.unwrap(builder.textColor);
+        tileFillColor = Box.unwrap(builder.tileFillColor);
+        tileStrokeColor = Box.unwrap(builder.tileStrokeColor);
+        fontType = Box.unwrap(builder.fontType);
+        menuSort = Box.unwrap(builder.menuSort);
+        sound = Box.unwrap(builder.sound);
+        textAccent = Box.unwrap(builder.textAccent);
+        this.evalTrace = evalTrace;
     }
 
     public SoundProvider getSound() {
@@ -120,41 +121,250 @@ public class DisplayConfig {
         return tileStrokeColor != null ? tileStrokeColor : textColor;
     }
 
-    public boolean isHidden() { return hidden != null && hidden; }
-    public boolean isShowLootbeam() { return !isHidden() && showLootbeam != null && showLootbeam; }
-    public boolean isShowValue() { return showValue != null && showValue; }
-    public boolean isShowDespawn() { return showDespawn != null && showDespawn; }
-    public boolean isNotify() { return !isHidden() && notify != null && notify; }
-    public boolean isHighlightTile() { return !isHidden() && highlightTile != null && highlightTile; }
-    public boolean isHideOverlay() { return isHidden() || (hideOverlay != null && hideOverlay); }
+    public boolean isHidden() {
+        return hidden != null && hidden;
+    }
+
+    public boolean isShowLootbeam() {
+        return !isHidden() && showLootbeam != null && showLootbeam;
+    }
+
+    public boolean isShowValue() {
+        return showValue != null && showValue;
+    }
+
+    public boolean isShowDespawn() {
+        return showDespawn != null && showDespawn;
+    }
+
+    public boolean isNotify() {
+        return !isHidden() && notify != null && notify;
+    }
+
+    public boolean isHighlightTile() {
+        return !isHidden() && highlightTile != null && highlightTile;
+    }
+
+    public boolean isHideOverlay() {
+        return isHidden() || (hideOverlay != null && hideOverlay);
+    }
 
     public boolean isCompact() {
         return compact != null && compact;
     }
 
-    public DisplayConfig merge(DisplayConfig other) {
-        var b = toBuilder();
-        if (other.textColor != null) { b.textColor(other.textColor); }
-        if (other.backgroundColor != null) { b.backgroundColor(other.backgroundColor); }
-        if (other.borderColor != null) { b.borderColor(other.borderColor); }
-        if (other.hidden != null) { b.hidden(other.hidden); }
-        if (other.showLootbeam != null) { b.showLootbeam(other.showLootbeam); }
-        if (other.showValue != null) { b.showValue(other.showValue); }
-        if (other.compact != null) { b.compact(other.compact); }
-        if (other.showDespawn != null) { b.showDespawn(other.showDespawn); }
-        if (other.notify != null) { b.notify(other.notify); }
-        if (other.textAccent != null) { b.textAccent(other.textAccent); }
-        if (other.textAccentColor != null) { b.textAccentColor(other.textAccentColor); }
-        if (other.lootbeamColor != null) { b.lootbeamColor(other.lootbeamColor); }
-        if (other.fontType != null) { b.fontType(other.fontType); }
-        if (other.menuTextColor != null) { b.menuTextColor(other.menuTextColor); }
-        if (other.highlightTile != null) { b.highlightTile(other.highlightTile); }
-        if (other.tileStrokeColor != null) { b.tileStrokeColor(other.tileStrokeColor); }
-        if (other.tileFillColor != null) { b.tileFillColor(other.tileFillColor); }
-        if (other.hideOverlay != null) { b.hideOverlay(other.hideOverlay); }
-        if (other.sound != null) { b.sound(other.sound); }
-        if (other.menuSort != null) { b.menuSort(other.menuSort); }
-        if (other.icon != null) { b.icon(other.icon); }
-        return b.build();
+    public static class Builder {
+        private Box<Boolean> compact;
+        private Box<Boolean> hidden;
+        private Box<Boolean> hideOverlay;
+        private Box<Boolean> highlightTile;
+        private Box<Boolean> notify;
+        private Box<Boolean> showDespawn;
+        private Box<Boolean> showLootbeam;
+        private Box<Boolean> showValue;
+        private Box<BufferedImageProvider> icon;
+        private Box<Color> backgroundColor;
+        private Box<Color> borderColor;
+        private Box<Color> lootbeamColor;
+        private Box<Color> menuTextColor;
+        private Box<Color> textAccentColor;
+        private Box<Color> textColor;
+        private Box<Color> tileFillColor;
+        private Box<Color> tileStrokeColor;
+        private Box<FontType> fontType;
+        private Box<Integer> menuSort;
+        private Box<SoundProvider> sound;
+        private Box<TextAccent> textAccent;
+
+        private Builder() {
+        }
+
+        public Builder compact(Boolean v) {
+            compact = Box.wrap(v);
+            return this;
+        }
+
+        public Builder hidden(Boolean v) {
+            hidden = Box.wrap(v);
+            return this;
+        }
+
+        public Builder hideOverlay(Boolean v) {
+            hideOverlay = Box.wrap(v);
+            return this;
+        }
+
+        public Builder highlightTile(Boolean v) {
+            highlightTile = Box.wrap(v);
+            return this;
+        }
+
+        public Builder notify(Boolean v) {
+            notify = Box.wrap(v);
+            return this;
+        }
+
+        public Builder showDespawn(Boolean v) {
+            showDespawn = Box.wrap(v);
+            return this;
+        }
+
+        public Builder showLootbeam(Boolean v) {
+            showLootbeam = Box.wrap(v);
+            return this;
+        }
+
+        public Builder showValue(Boolean v) {
+            showValue = Box.wrap(v);
+            return this;
+        }
+
+        public Builder icon(BufferedImageProvider v) {
+            icon = Box.wrap(v);
+            return this;
+        }
+
+        public Builder backgroundColor(Color v) {
+            backgroundColor = Box.wrap(v);
+            return this;
+        }
+
+        public Builder borderColor(Color v) {
+            borderColor = Box.wrap(v);
+            return this;
+        }
+
+        public Builder lootbeamColor(Color v) {
+            lootbeamColor = Box.wrap(v);
+            return this;
+        }
+
+        public Builder menuTextColor(Color v) {
+            menuTextColor = Box.wrap(v);
+            return this;
+        }
+
+        public Builder textAccentColor(Color v) {
+            textAccentColor = Box.wrap(v);
+            return this;
+        }
+
+        public Builder textColor(Color v) {
+            textColor = Box.wrap(v);
+            return this;
+        }
+
+        public Builder tileFillColor(Color v) {
+            tileFillColor = Box.wrap(v);
+            return this;
+        }
+
+        public Builder tileStrokeColor(Color v) {
+            tileStrokeColor = Box.wrap(v);
+            return this;
+        }
+
+        public Builder fontType(FontType v) {
+            fontType = Box.wrap(v);
+            return this;
+        }
+
+        public Builder menuSort(Integer v) {
+            menuSort = Box.wrap(v);
+            return this;
+        }
+
+        public Builder sound(SoundProvider v) {
+            sound = Box.wrap(v);
+            return this;
+        }
+
+        public Builder textAccent(TextAccent v) {
+            textAccent = Box.wrap(v);
+            return this;
+        }
+
+        public void apply(Builder other) {
+            if (other.compact != null) {
+                compact = other.compact;
+            }
+            if (other.hidden != null) {
+                hidden = other.hidden;
+            }
+            if (other.hideOverlay != null) {
+                hideOverlay = other.hideOverlay;
+            }
+            if (other.highlightTile != null) {
+                highlightTile = other.highlightTile;
+            }
+            if (other.notify != null) {
+                notify = other.notify;
+            }
+            if (other.showDespawn != null) {
+                showDespawn = other.showDespawn;
+            }
+            if (other.showLootbeam != null) {
+                showLootbeam = other.showLootbeam;
+            }
+            if (other.showValue != null) {
+                showValue = other.showValue;
+            }
+            if (other.icon != null) {
+                icon = other.icon;
+            }
+            if (other.backgroundColor != null) {
+                backgroundColor = other.backgroundColor;
+            }
+            if (other.borderColor != null) {
+                borderColor = other.borderColor;
+            }
+            if (other.lootbeamColor != null) {
+                lootbeamColor = other.lootbeamColor;
+            }
+            if (other.menuTextColor != null) {
+                menuTextColor = other.menuTextColor;
+            }
+            if (other.textAccentColor != null) {
+                textAccentColor = other.textAccentColor;
+            }
+            if (other.textColor != null) {
+                textColor = other.textColor;
+            }
+            if (other.tileFillColor != null) {
+                tileFillColor = other.tileFillColor;
+            }
+            if (other.tileStrokeColor != null) {
+                tileStrokeColor = other.tileStrokeColor;
+            }
+            if (other.fontType != null) {
+                fontType = other.fontType;
+            }
+            if (other.menuSort != null) {
+                menuSort = other.menuSort;
+            }
+            if (other.sound != null) {
+                sound = other.sound;
+            }
+            if (other.textAccent != null) {
+                textAccent = other.textAccent;
+            }
+        }
+
+        public DisplayConfig build(List<Integer> evalTrace) {
+            return new DisplayConfig(this, evalTrace);
+        }
+    }
+
+    @AllArgsConstructor
+    private static class Box<T> {
+        public static <V> Box<V> wrap(V v) {
+            return new Box<>(v);
+        }
+
+        public static <V> V unwrap(Box<V> b) {
+            return b != null ? b.value : null;
+        }
+
+        private final T value;
     }
 }
