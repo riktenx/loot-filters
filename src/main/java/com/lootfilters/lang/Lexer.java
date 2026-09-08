@@ -26,12 +26,16 @@ public class Lexer {
         put("if", Token.Type.IF);
         put("&&", Token.Type.OP_AND);
         put("||", Token.Type.OP_OR);
+        put(">>", Token.Type.OP_RSHIFT);
+        put("<<", Token.Type.OP_LSHIFT);
         put(">=", Token.Type.OP_GTEQ);
         put("<=", Token.Type.OP_LTEQ);
         put("==", Token.Type.OP_EQ);
         put("!", Token.Type.OP_NOT);
         put(">", Token.Type.OP_GT);
         put("<", Token.Type.OP_LT);
+        put("&", Token.Type.OP_BITAND);
+        put("|", Token.Type.OP_BITOR);
         put(";", Token.Type.STMT_END);
         put(":", Token.Type.COLON);
         put("=", Token.Type.ASSIGN);
