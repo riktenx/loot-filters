@@ -1,6 +1,8 @@
 package com.lootfilters;
 
 import com.lootfilters.lang.CompileException;
+
+import java.awt.datatransfer.StringSelection;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -98,7 +100,7 @@ public class LootFiltersPanel extends PluginPanel {
                 "Reload filters from disk.",
                 this::onReloadFilters);
         var browseFolder = createIconButton(Icons.FOLDER,
-                "View the plugin directory, where filters, sound files, and icon files should be placed, in the system file browser.",
+                "View the plugin directory path, where filters, sound files, and icon files should be placed.",
                 this::onBrowseFolder);
 
         var openFiltersite = new JLabel("<html><u>filterscape.xyz</u></html>");
@@ -224,7 +226,13 @@ public class LootFiltersPanel extends PluginPanel {
     }
 
     private void onBrowseFolder() {
-        LinkBrowser.open(LootFiltersPlugin.PLUGIN_DIRECTORY.getAbsolutePath());
+        var path = LootFiltersPlugin.PLUGIN_DIRECTORY.getAbsolutePath();
+        var selection = new StringSelection(path);
+        Toolkit.getDefaultToolkit().getSystemClipboard().setContents(selection, selection);
+        JOptionPane.showMessageDialog(this, "<html><strong>Hub plugins are no longer allowed to directly open the system file browser.</strong><br><br>" +
+                "The plugin folder is located at:<br><br>"+
+                path + "<br><br>" +
+                "<strong>The path has been copied to your clipboard</strong>, you can paste it into a file browser to navigate there.</html>");
     }
 
     public void reflowFilterSelect(List<String> filters, String selected) {
