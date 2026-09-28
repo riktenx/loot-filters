@@ -34,5 +34,5 @@ public abstract class ComparatorCondition extends LeafCondition {
         return false;
     }
 
-    public abstract int getLhs(LootFiltersPlugin plugin, PluginTileItem item);
+    public abstract long getLhs(LootFiltersPlugin plugin, PluginTileItem item);
 }

@@ -390,7 +390,7 @@ public class LootFiltersOverlay extends Overlay {
         }
     }
 
-    private String formatDualValueText(DualValueDisplayType displayType, int geValue, int haValue, boolean showBoth) {
+    private String formatDualValueText(DualValueDisplayType displayType, long geValue, long haValue, boolean showBoth) {
         var geFmt = abbreviateValue(geValue);
         var haFmt = abbreviateValue(haValue);
         var geFmtStr = displayType == DualValueDisplayType.COMPACT ? "%s" : "(GE: %s)";

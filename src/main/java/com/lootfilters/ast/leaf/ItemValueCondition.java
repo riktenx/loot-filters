@@ -18,11 +18,11 @@ public class ItemValueCondition extends ComparatorCondition {
     }
 
     @Override
-    public int getLhs(LootFiltersPlugin plugin, PluginTileItem item) {
+    public long getLhs(LootFiltersPlugin plugin, PluginTileItem item) {
         return getValue(item) * item.getQuantity();
     }
 
-    private int getValue(PluginTileItem item) {
+    private long getValue(PluginTileItem item) {
         switch (valueType) {
             case HIGHEST: return Math.max(item.getGePrice(), item.getHaPrice());
             case GE: return item.getGePrice();

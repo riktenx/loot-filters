@@ -14,7 +14,7 @@ public class ItemQuantityCondition extends ComparatorCondition {
     }
 
     @Override
-    public int getLhs(LootFiltersPlugin plugin, PluginTileItem item) {
+    public long getLhs(LootFiltersPlugin plugin, PluginTileItem item) {
         return item.getQuantity();
     }
 }
