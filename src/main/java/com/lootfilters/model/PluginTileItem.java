@@ -13,7 +13,7 @@ import java.time.Instant;
 public class PluginTileItem {
     private final TileItem item;
     @Getter private final String name;
-    private final int gePrice;
+    private final long gePrice;
     @Getter private final int haPrice;
     @Getter private final WorldPoint worldPoint;
     @Getter private final int spawnTime;
@@ -47,7 +47,7 @@ public class PluginTileItem {
         this.worldView = tile.getItemLayer().getWorldView().getId();
     }
 
-    public int getGePrice() {
+    public long getGePrice() {
         switch (getId()) {
             case ItemID.COINS:
                 return 1;

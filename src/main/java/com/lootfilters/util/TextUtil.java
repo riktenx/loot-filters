@@ -24,7 +24,7 @@ public class TextUtil {
         return c == '_' || isAlpha(c) || isNumeric(c);
     }
 
-    public static String abbreviate(int value) {
+    public static String abbreviate(long value) {
         if (value >= 1e9) { // > 1b
             return String.format("%.2fB", (float)value / 1e9);
         } else if (value >= 1e8) { // > 100m
@@ -40,10 +40,10 @@ public class TextUtil {
         } else if (value >= 1e3) { // > 1k
             return String.format("%.2fK", (float)value / 1e3);
         }
-        return Integer.toString(value);
+        return Long.toString(value);
     }
 
-    public static String abbreviateValue(int value) {
+    public static String abbreviateValue(long value) {
         return value < 1000 ? value + "gp" : abbreviate(value);
     }
 
