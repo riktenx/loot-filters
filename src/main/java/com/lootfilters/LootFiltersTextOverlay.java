@@ -27,7 +27,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.awt.AlphaComposite;
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
@@ -43,10 +42,9 @@ import java.util.function.Consumer;
 import static com.lootfilters.util.TextUtil.abbreviate;
 import static com.lootfilters.util.TextUtil.abbreviateValue;
 import static com.lootfilters.util.TextUtil.withParentheses;
-import static net.runelite.api.Perspective.getCanvasTilePoly;
 import static net.runelite.client.ui.FontManager.getRunescapeSmallFont;
 
-public class LootFiltersOverlay extends Overlay {
+public class LootFiltersTextOverlay extends Overlay {
     private static final int BOX_PAD = 2;
     private static final int CLICKBOX_SIZE = 8;
     private static final int TIMER_RADIUS = 5;
@@ -59,7 +57,7 @@ public class LootFiltersOverlay extends Overlay {
     private final LootFiltersConfig config;
 
     @Inject
-    public LootFiltersOverlay(Client client, LootFiltersPlugin plugin, LootFiltersConfig config) {
+    public LootFiltersTextOverlay(Client client, LootFiltersPlugin plugin, LootFiltersConfig config) {
         setPosition(OverlayPosition.DYNAMIC);
         setLayer(OverlayLayer.ABOVE_SCENE);
         // we want to explicitly draw above overlays of plugins on the ABOVE_SCENE layer that do the "clipping" logic
@@ -84,23 +82,12 @@ public class LootFiltersOverlay extends Overlay {
 
         var player = client.getLocalPlayer();
 
-        for (var entry : plugin.getTileItemIndex().entrySet()) { // all tile draws have to go first so text is on top
-            var tile = entry.getKey();
-            if (tile.getItemLayer() == null) {
-                continue;
-            }
-            if (!inRenderRange(player, tile)) {
-                continue;
-            }
-
-            highlightTiles(g, tile, entry.getValue());
-        }
         for (var entry : plugin.getTileItemIndex().entrySet()) {
             var tile = entry.getKey();
             if (tile.getItemLayer() == null) {
                 continue;
             }
-            if (!inRenderRange(player, tile)) {
+            if (!inRenderRange(client, player, tile)) {
                 continue;
             }
 
@@ -481,36 +468,6 @@ public class LootFiltersOverlay extends Overlay {
         g.drawLine(show.x + show.width / 2, show.y + 2, show.x + show.width / 2, show.y + show.height - 2);
     }
 
-    private void highlightTiles(Graphics2D g, Tile tile, List<PluginTileItem> items) {
-        if (tile.getLocalLocation() == null || tile.getPlane() != client.getTopLevelWorldView().getPlane()) {
-            return;
-        }
-
-        for (var item : items) {
-            var match = plugin.getDisplayIndex().get(item);
-            if (match.isHighlightTile()) {
-                highlightTile(g, tile, match);
-            }
-        }
-    }
-
-    private void highlightTile(Graphics2D g, Tile tile, DisplayConfig display) {
-        var poly = getCanvasTilePoly(client, tile.getLocalLocation(), tile.getItemLayer().getHeight());
-        if (poly == null) {
-            return;
-        }
-
-        var origStroke = g.getStroke();
-        g.setColor(display.getTileStrokeColor());
-        g.setStroke(new BasicStroke(2));
-        g.draw(poly);
-        if (display.getTileFillColor() != null) {
-            g.setColor(display.getTileFillColor());
-            g.fill(poly);
-        }
-        g.setStroke(origStroke);
-    }
-
     private Dimension renderIcon(Graphics2D g, BufferedImageProvider.CacheKey cacheKey, Point textPoint, int yOffset) {
         var image = plugin.getIconIndex().get(cacheKey);
         if (image == null) {
@@ -576,7 +533,7 @@ public class LootFiltersOverlay extends Overlay {
         }
     }
 
-    private boolean inRenderRange(Player player, Tile tile) {
+    static boolean inRenderRange(Client client, Player player, Tile tile) {
         var pLoc = player.getLocalLocation();
         var tLoc = tile.getLocalLocation();
         if (pLoc.getWorldView() == tLoc.getWorldView()) { // avoid transforming unless we absolutely must
