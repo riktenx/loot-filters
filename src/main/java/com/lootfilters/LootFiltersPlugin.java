@@ -75,7 +75,8 @@ public class LootFiltersPlugin extends Plugin {
 	@Inject private ClientToolbar clientToolbar;
 
 	@Inject private LootFiltersConfig config;
-	@Inject private LootFiltersOverlay overlay;
+	@Inject private LootFiltersTextOverlay textOverlay;
+	@Inject private LootFiltersTileOverlay tileOverlay;
 	@Inject private LootFiltersMouseAdapter mouseAdapter;
 	@Inject private LootFiltersHotkeyListener hotkeyListener;
 	@Inject private OverlayStateIndicator overlayStateIndicator;
@@ -147,7 +148,8 @@ public class LootFiltersPlugin extends Plugin {
 		// panel needs to come into being on EDT once LAF is setup
 		pluginPanel = injector.getInstance(LootFiltersPanel.class);
 
-		overlayManager.add(overlay);
+		overlayManager.add(tileOverlay);
+		overlayManager.add(textOverlay);
 		infoBoxManager.addInfoBox(overlayStateIndicator);
 		keyManager.registerKeyListener(hotkeyListener);
 		mouseManager.registerMouseListener(mouseAdapter);
@@ -192,7 +194,8 @@ public class LootFiltersPlugin extends Plugin {
 
 	@Override
 	protected void shutDown() {
-		overlayManager.remove(overlay);
+		overlayManager.remove(textOverlay);
+		overlayManager.remove(tileOverlay);
 		infoBoxManager.removeInfoBox(overlayStateIndicator);
 		keyManager.unregisterKeyListener(hotkeyListener);
 		mouseManager.unregisterMouseListener(mouseAdapter);
