@@ -19,6 +19,7 @@ public class Token {
         LITERAL_INT, LITERAL_STRING,
         ASSIGN,
         OP_EQ, OP_GT, OP_LT, OP_GTEQ, OP_LTEQ, OP_AND, OP_OR, OP_NOT,
+        OP_RSHIFT, OP_LSHIFT, OP_BITAND, OP_BITOR,
         EXPR_START, EXPR_END,
         BLOCK_START, BLOCK_END,
         LIST_START, LIST_END,
