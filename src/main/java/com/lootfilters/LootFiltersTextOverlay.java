@@ -75,12 +75,15 @@ public class LootFiltersTextOverlay extends Overlay {
             return null;
         }
 
+        var player = client.getLocalPlayer();
+        if (player == null) {
+            return null;
+        }
+
         var mouse = client.getMouseCanvasPosition();
         var hoveredItem = new AtomicInteger(-1);
         var hoveredHide = new AtomicInteger(-1);
         var hoveredHighlight = new AtomicInteger(-1);
-
-        var player = client.getLocalPlayer();
 
         for (var entry : plugin.getTileItemIndex().entrySet()) {
             var tile = entry.getKey();
