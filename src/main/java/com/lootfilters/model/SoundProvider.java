@@ -5,6 +5,7 @@ import com.lootfilters.lang.ParseException;
 import com.lootfilters.lang.Token;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -25,6 +26,7 @@ public abstract class SoundProvider {
     @AllArgsConstructor
     @EqualsAndHashCode(callSuper = false)
     public static final class SoundEffect extends SoundProvider {
+        @Getter
         private final int id;
 
         @Override
@@ -44,6 +46,7 @@ public abstract class SoundProvider {
     @AllArgsConstructor
     @EqualsAndHashCode(callSuper = false)
     public static final class File extends SoundProvider {
+        @Getter
         private final String filename;
 
         @Override

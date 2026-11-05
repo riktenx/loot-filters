@@ -33,3 +33,7 @@ Loot filters allow you to do things like the following:
 * sort menu entries for ground items
 
 The above teaser image provides an example of what is possible with this plugin.
+
+## For Developers
+
+See [Plugin Messages](plugin-messages.md) for the integration API.
