@@ -26,10 +26,10 @@ import net.runelite.client.Notifier;
 import net.runelite.client.audio.AudioPlayer;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
-import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.eventbus.EventBus;
-import net.runelite.client.events.PluginMessage;
+import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ConfigChanged;
+import net.runelite.client.events.PluginMessage;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.game.SpriteManager;
 import net.runelite.client.input.KeyManager;
@@ -47,6 +47,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutorService;
@@ -108,7 +109,7 @@ public class LootFiltersPlugin extends Plugin {
 	@Inject private EventBus eventBus;
 
 	@Subscribe
-	public void onPluginMessage(net.runelite.client.events.PluginMessage message) {
+	public void onPluginMessage(PluginMessage message) {
 		resolvedDisplayService.onPluginMessage(message);
 	}
 
@@ -205,7 +206,6 @@ public class LootFiltersPlugin extends Plugin {
 
 	@Override
 	protected void shutDown() {
-		resolvedDisplayService.invalidate();
 		overlayManager.remove(textOverlay);
 		overlayManager.remove(tileOverlay);
 		infoBoxManager.removeInfoBox(overlayStateIndicator);
@@ -413,11 +413,10 @@ public class LootFiltersPlugin extends Plugin {
 
 	private void resetDisplay() {
 		clientThread.invoke(() -> {
-			resolvedDisplayService.invalidate();
 			displayIndex.reset(this);
 			lootbeamIndex.reset(this);
 			iconIndex.reset(this);
-			eventBus.post(new PluginMessage("loot-filters", "filter-reloaded", java.util.Map.of()));
+			eventBus.post(new PluginMessage("loot-filters", "filter-reloaded", Map.of()));
 		});
 	}
 }
